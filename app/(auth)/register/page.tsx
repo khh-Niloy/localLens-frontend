@@ -1,19 +1,22 @@
-import { GalleryVerticalEnd } from "lucide-react"
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-import { SignupForm } from "@/components/signup-form"
+export default function RegisterPage() {
+  const router = useRouter();
 
-export default function SignupPage() {
+  useEffect(() => {
+    // Redirect to tourist registration by default
+    router.replace("/register/tourist");
+  }, [router]);
+
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <a href="#" className="flex items-center gap-2 self-center font-medium">
-          <div className="bg-[#1FB67A] text-white flex size-6 items-center justify-center rounded-md">
-            <GalleryVerticalEnd className="size-4" />
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <div className="text-center">
+          <p>Redirecting to registration...</p>
           </div>
-          <span className="text-[#1FB67A]">Course Master</span>
-        </a>
-        <SignupForm />
       </div>
     </div>
-  )
+  );
 }

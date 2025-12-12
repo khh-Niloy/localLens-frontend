@@ -16,16 +16,51 @@ import { authApi, useGetMeQuery, useLogoutMutation } from "@/redux/features/auth
 import { useAppDispatch } from "@/redux/hooks";
 
 export function NavbarDemo() {
-  const navItems = [
-    {
-      name: "Home",
-      link: "/",
-    },
-    {
-      name: "All Courses",
-      link: "/all-courses",
-    },
+  const { data: meData } = useGetMeQuery(undefined);
+  const me = meData as any;
+  
+  // Role-based navigation items
+  const getNavItems = () => {
+    if (!me) {
+      // Logged out navigation
+      return [
+        { name: "Home", link: "/" },
+        { name: "Explore Tours", link: "/explore" },
+        { name: "Become a Guide", link: "/register/guide" },
+      ];
+    }
+
+    // Base items for all logged-in users
+    const baseItems = [
+      { name: "Home", link: "/" },
+        { name: "Explore Tours", link: "/explore" },
+    ];
+
+    // Role-specific items
+    switch (me.role?.toLowerCase()) {
+      case 'tourist':
+        return [
+          ...baseItems,
+          { name: "My Bookings", link: "/my-bookings" },
+        ];
+      case 'guide':
+        return [
+          ...baseItems,
+          { name: "Dashboard", link: "/dashboard" },
+        ];
+      case 'admin':
+        return [
+          { name: "Home", link: "/" },
+          { name: "Admin Dashboard", link: "/dashboard" },
+          { name: "Manage Users", link: "/admin/users" },
+          { name: "Manage Listings", link: "/admin/listings" },
   ];
+      default:
+        return baseItems;
+    }
+  };
+
+  const navItems = getNavItems();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -53,17 +88,15 @@ export function NavbarDemo() {
     setIsMobileMenuOpen(false);
   };
 
-  const {data: meData} = useGetMeQuery(undefined)
-  const me = meData as any;
-  const [logout] = useLogoutMutation()
-  const dispatch = useAppDispatch()
-
+  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const handleLogout = async()=>{
-    await logout(undefined)
-    dispatch(authApi.util.resetApiState())
-  }
+  const handleLogout = async () => {
+    await logout(undefined);
+    dispatch(authApi.util.resetApiState());
+    router.push('/');
+  };
 
   return (
     <div className="relative w-full">
@@ -75,8 +108,8 @@ export function NavbarDemo() {
           <div className="flex items-center gap-4">
             {me ? (
               <>
-                <NavbarButton href="/dashboard" variant="secondary">
-                  {me.role === "STUDENT" ? "Student Dashboard" : me.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}
+                <NavbarButton href="/profile" variant="secondary">
+                  Profile
                 </NavbarButton>
                 <NavbarButton
                   onClick={() => handleLogout()}
@@ -86,11 +119,15 @@ export function NavbarDemo() {
                 </NavbarButton>
               </>
             ) : (
+              <>
               <NavbarButton href="/login" variant="secondary">
                 Login
               </NavbarButton>
+                <NavbarButton href="/register/tourist" variant="primary">
+                  Register
+                </NavbarButton>
+              </>
             )}
-
           </div>
         </NavBody>
 
@@ -121,8 +158,8 @@ export function NavbarDemo() {
             <div className="flex w-full flex-col gap-4">
               {me ? (
                 <>
-                  <NavbarButton href="/dashboard" variant="secondary">
-                    {me.role === "STUDENT" ? "Student Dashboard" : me.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}
+                  <NavbarButton href="/profile" variant="secondary">
+                    Profile
                   </NavbarButton>
                   <NavbarButton
                     onClick={() => handleLogout()}
@@ -132,9 +169,14 @@ export function NavbarDemo() {
                   </NavbarButton>
                 </>
               ) : (
+                <>
                 <NavbarButton href="/login" variant="secondary">
                   Login
                 </NavbarButton>
+                  <NavbarButton href="/register/tourist" variant="primary">
+                    Register
+                  </NavbarButton>
+                </>
               )}
             </div>
           </MobileNavMenu>

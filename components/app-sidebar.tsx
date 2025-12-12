@@ -2,16 +2,17 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
+  Users,
+  MapPin,
+  Calendar,
   BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
+  BarChart3,
+  Plus,
+  List,
+  Clock,
+  CheckCircle,
+  User,
+  Home,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -25,149 +26,79 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { useGetMeQuery } from "@/redux/features/auth/auth.api"
+import { roleBasedRoutes } from "@/utils/roleBasedRoutes"
 
-// This is sample data.
-const data = {
+// Icon mapping for role-based routes
+const iconMap: Record<string, any> = {
+  "Home": Home,
+  "User Management": Users,
+  "Listing Management": MapPin,
+  "Booking Management": Calendar,
+  "Tour Management": BookOpen,
+  "My Trips": MapPin,
+  "All Users": Users,
+  "All Listings": List,
+  "All Bookings": Calendar,
+  "Create Tour": Plus,
+  "My Tours": List,
+  "Upcoming Bookings": Clock,
+  "Pending Bookings": CheckCircle,
+  "Upcoming Trips": Clock,
+  "Past Trips": BarChart3,
+  "Wishlist Trips": BookOpen,
+};
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: meData } = useGetMeQuery(undefined);
+  const me = meData as any;
+
+  // Get role-based routes and transform them for sidebar
+  const roleRoutes = me ? roleBasedRoutes({ role: me.role?.toLowerCase() || 'tourist' }) : [];
+  
+  const sidebarData = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+      name: me?.name || "User",
+      email: me?.email || "user@example.com",
+      avatar: "/avatars/user.jpg",
   },
   teams: [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
+        name: "Local Lens",
+        logo: MapPin,
+        plan: me?.role || "Tourist",
     },
   ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
+    navMain: roleRoutes.map(route => ({
+      title: route.title,
+      url: route.url === "#" ? "#" : route.url,
+      icon: iconMap[route.title] || BookOpen,
+      isActive: false,
+      items: route.items?.map(item => ({
+        title: item.title,
+        url: item.url,
+      })) || [],
+    })),
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+        name: "Profile",
+        url: "/profile",
+        icon: User,
     },
   ],
-}
+  };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={sidebarData.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={sidebarData.navMain} />
+        <NavProjects projects={sidebarData.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={sidebarData.user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
