@@ -75,7 +75,6 @@ app/
 │   ├── tours/[id]/         # Detailed tour pages with booking
 │   ├── profile/            # User profile management
 │   │   └── [id]/           # Dynamic profile pages (role-based)
-│   ├── my-bookings/        # Tourist: Booking management
 │   └── admin/              # Admin-specific public pages
 │       ├── users/          # User management interface
 │       └── listings/       # Listing management interface
@@ -165,7 +164,7 @@ const getNavItems = () => {
   
   // Role-specific navigation items
   switch (me.role?.toLowerCase()) {
-    case 'tourist': return [...baseItems, { name: "My Bookings", link: "/my-bookings" }];
+    case 'tourist': return [...baseItems, { name: "Dashboard", link: "/dashboard" }, { name: "Wishlist", link: "/dashboard/wishlist" }];
     case 'guide': return [...baseItems, { name: "Dashboard", link: "/dashboard" }];
     case 'admin': return [adminSpecificItems];
   }
@@ -245,9 +244,8 @@ const roleRoutes = roleBasedRoutes({ role: me.role?.toLowerCase() });
 
 // Tourist Role Features:
 - Tour Discovery (/explore-tours)
-- Booking Management (/my-bookings)
-- Trip Planning (/dashboard/upcoming-trips, /dashboard/past-trips)
-- Wishlist Management (/dashboard/wishlist-trips)
+- Trip Planning (/dashboard/upcoming-bookings, /dashboard/past-bookings)
+- Wishlist Management (/dashboard/wishlist)
 
 // Dynamic Navigation System:
 - Role-based navbar with contextual menu items
@@ -343,7 +341,7 @@ const roleRoutes = roleBasedRoutes({ role: me.role?.toLowerCase() });
 - **Authentication**: `/auth/login`, `/auth/register`, `/auth/logout`, `/auth/me`
 - **User Management**: `/user/profile`, `/user/profile/[id]`, `/user/admin/all`
 - **Tour Management**: `/tour`, `/tour/search`, `/tour/[slug]`, `/tour/guide/my-tours`
-- **Booking System**: `/booking`, `/booking/my-bookings`, `/booking/guide/upcoming`
+- **Booking System**: `/booking`, `/booking/guide/upcoming`
 - **Review System**: `/review`, `/review/tour/[id]`, `/review/guide/[id]`
 - **Admin Operations**: Complete admin endpoints for users, tours, bookings, and reviews
 - **Real-time Features**: Live booking updates and notifications
@@ -523,8 +521,7 @@ This **Local Lens Tourism Platform** represents a **complete, production-ready, 
 - **Tourist Experience**: 
   - Advanced tour discovery with filters (`/explore`, `/explore-tours`)
   - Detailed tour pages with booking widgets (`/tours/[id]`)
-  - Personal booking management (`/my-bookings`) 
-  - Trip planning and wishlist (`/dashboard/upcoming-trips`, `/dashboard/wishlist-trips`)
+  - Trip planning and wishlist (`/dashboard/upcoming-bookings`, `/dashboard/past-bookings`, `/dashboard/wishlist`)
   - Profile management and review system (`/profile`, `/profile/[id]`)
 
 - **Guide Experience**:

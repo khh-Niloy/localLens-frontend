@@ -75,22 +75,30 @@ const routes = {
       url: "/",
     },
     {
+      title: "Browse Tours",
+      url: "/tours",
+    },
+    {
       title: "My Trips",
       url: "#",
       items: [
         {
-          title: "Upcoming Trips",
-          url: "/dashboard/upcoming-trips",
+          title: "Upcoming Bookings",
+          url: "/dashboard/upcoming-bookings",
         },
         {
-          title: "Past Trips",
-          url: "/dashboard/past-trips",
-        },
-        {
-          title: "Wishlist Trips",
-          url: "/dashboard/wishlist-trips",
+          title: "Past Bookings",
+          url: "/dashboard/past-bookings",
         },
       ],
+    },
+    {
+      title: "Wishlist",
+      url: "/dashboard/wishlist",
+    },
+    {
+      title: "Profile",
+      url: "/dashboard/profile",
     },
   ],
 };

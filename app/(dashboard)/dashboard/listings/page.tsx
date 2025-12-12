@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import { Plus, Edit, Eye, Trash2, Star, MapPin, Calendar, Users, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
-
-// TODO: Replace with actual API call to get user's listings
-const mockListings: any[] = [];
+// TODO: Import and use actual API hook when booking API is available
+// import { useGetMyToursQuery } from '@/redux/features/tour/tour.api';
 
 export default function ListingManagementPage() {
-  const [listings, setListings] = useState(mockListings);
+  // TODO: Replace with actual API call to get user's listings
+  // const { data: toursData } = useGetMyToursQuery({});
+  // const listings = toursData?.data || [];
+  const listings: any[] = [];
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('created');
 
@@ -41,14 +43,15 @@ export default function ListingManagementPage() {
   };
 
   const handleDeleteListing = (id: string) => {
-    // Show confirmation toast with action buttons
+    // TODO: Implement API call to delete listing
     toast((t) => (
       <div className="flex flex-col gap-2">
         <span>Are you sure you want to delete this listing?</span>
         <div className="flex gap-2">
           <button
             onClick={() => {
-              setListings(listings.filter(l => l.id !== id));
+              // TODO: Call delete API endpoint
+              // await deleteTour(id);
               toast.dismiss(t.id);
               toast.success('Listing deleted successfully');
             }}

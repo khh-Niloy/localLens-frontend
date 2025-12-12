@@ -36,7 +36,10 @@ const iconMap: Record<string, any> = {
   "Listing Management": MapPin,
   "Booking Management": Calendar,
   "Tour Management": BookOpen,
-  "My Trips": MapPin,
+  "My Trips": Calendar,
+  "Browse Tours": MapPin,
+  "Wishlist": BookOpen,
+  "Profile": User,
   "All Users": Users,
   "All Listings": List,
   "All Bookings": Calendar,
@@ -44,9 +47,7 @@ const iconMap: Record<string, any> = {
   "My Tours": List,
   "Upcoming Bookings": Clock,
   "Pending Bookings": CheckCircle,
-  "Upcoming Trips": Clock,
-  "Past Trips": BarChart3,
-  "Wishlist Trips": BookOpen,
+  "Past Bookings": BarChart3,
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

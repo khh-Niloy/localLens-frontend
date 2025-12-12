@@ -182,12 +182,12 @@ export default function MyToursPage() {
                             <button className="text-red-600 hover:text-red-800 text-sm">Delete</button>
                           </>
                         )}
-                        <Link 
-                          href={`/dashboard/tour-details/${tour._id}`}
-                          className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium"
-                        >
-                          View Details
-                        </Link>
+                                  <Link
+                                    href={`/tours/${tour.slug || tour._id}`}
+                                    className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium"
+                                  >
+                                    View Details
+                                  </Link>
                       </div>
                     </div>
                   </div>

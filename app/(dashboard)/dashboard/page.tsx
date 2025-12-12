@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
+import { useGetWishlistQuery } from '@/redux/features/wishlist/wishlist.api';
 import { Calendar, Users, MapPin, TrendingUp, Clock, CheckCircle, Star, DollarSign } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -81,7 +82,11 @@ export default function DashboardPage() {
     </div>
   );
 
-  const renderTouristDashboard = () => (
+  const renderTouristDashboard = () => {
+    const { data: wishlistData } = useGetWishlistQuery({}, { skip: !me || me.role !== 'TOURIST' });
+    const wishlistCount = wishlistData?.data?.length || 0;
+
+    return (
     <div className="space-y-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">My Trips</h1>
@@ -114,7 +119,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Wishlist</p>
-              <p className="text-2xl font-bold text-yellow-600">0</p>
+              <p className="text-2xl font-bold text-yellow-600">{wishlistCount}</p>
             </div>
             <Star className="w-8 h-8 text-yellow-600" />
           </div>
@@ -124,26 +129,98 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upcoming Trips */}
         <div className="bg-white rounded-lg shadow border">
-          <div className="p-6 border-b">
+          <div className="p-6 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold">Upcoming Trips</h2>
+            <a 
+              href="/dashboard/upcoming-bookings"
+              className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium"
+            >
+              View All
+            </a>
           </div>
           <div className="p-6">
             <p className="text-gray-500 text-center py-8">No upcoming trips found.</p>
+            <div className="text-center">
+              <a 
+                href="/explore-tours"
+                className="inline-block bg-[#1FB67A] text-white px-4 py-2 rounded-md hover:bg-[#1dd489] transition-colors text-sm"
+              >
+                Browse Tours
+              </a>
+            </div>
           </div>
         </div>
 
         {/* Wishlist */}
         <div className="bg-white rounded-lg shadow border">
-          <div className="p-6 border-b">
+          <div className="p-6 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold">Wishlist</h2>
+            <a 
+              href="/dashboard/wishlist"
+              className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium"
+            >
+              View All
+            </a>
           </div>
           <div className="p-6">
             <p className="text-gray-500 text-center py-8">No items in wishlist.</p>
+            <div className="text-center">
+              <a 
+                href="/dashboard/wishlist"
+                className="inline-block border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm"
+              >
+                Explore Wishlist
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions for Tourists */}
+      <div className="bg-white rounded-lg shadow border">
+        <div className="p-6 border-b">
+          <h2 className="text-lg font-semibold">Quick Actions</h2>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a 
+              href="/dashboard/upcoming-bookings"
+              className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-[#1FB67A]" />
+                <span>View Upcoming Trips</span>
+              </div>
+              <span className="text-gray-400">→</span>
+            </a>
+            
+            <a 
+              href="/dashboard/past-bookings"
+              className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-blue-600" />
+                <span>View Past Trips</span>
+              </div>
+              <span className="text-gray-400">→</span>
+            </a>
+            
+            <a 
+              href="/dashboard/wishlist"
+              className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Star className="w-5 h-5 text-yellow-600" />
+                <span>Manage Wishlist</span>
+              </div>
+              <span className="text-gray-400">→</span>
+            </a>
           </div>
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   const renderAdminDashboard = () => (
     <div className="space-y-6">
