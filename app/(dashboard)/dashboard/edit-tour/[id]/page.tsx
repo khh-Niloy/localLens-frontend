@@ -596,9 +596,7 @@ export default function EditTourPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="DRAFT">Draft</SelectItem>
-                        <SelectItem value="PAUSED">Paused</SelectItem>
-                        <SelectItem value="SUSPENDED">Suspended</SelectItem>
+                        <SelectItem value="DEACTIVATE">Deactivate</SelectItem>
                       </SelectContent>
                     </Select>
                   )}

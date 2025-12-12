@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { useGetAllToursQuery } from '@/redux/features/tour/tour.api';
+import { useCreateBookingMutation } from '@/redux/features/booking/booking.api';
 import WishlistButton from '@/components/ui/WishlistButton';
 import {
   Dialog,
@@ -12,13 +13,18 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 import { MapPin, Users, Star, ArrowRight, Clock, BookOpen } from 'lucide-react';
+import { Hero7 } from '@/components/hero7';
 
 export default function HomePage() {
   const { data: userData, isLoading: userLoading } = useGetMeQuery({});
   const { data: toursData, isLoading: toursLoading } = useGetAllToursQuery({});
+  const [createBooking, { isLoading: isCreatingBooking }] = useCreateBookingMutation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedTour, setSelectedTour] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [guestCount, setGuestCount] = useState(1);
 
   const tours = toursData?.data || [];
 
@@ -30,7 +36,13 @@ export default function HomePage() {
     }
     
     if (userData.role !== 'TOURIST') {
-      alert('Only tourists can book tours. Please register as a tourist to book experiences.');
+      toast.error('Only tourists can book tours. Please register as a tourist to book experiences.');
+      return;
+    }
+
+    // Check if user has address and phone number
+    if (!userData.address || !userData.phone) {
+      toast.error('Please update your profile with address and phone number before booking a tour. Go to Profile settings to update.');
       return;
     }
 
@@ -51,55 +63,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#1FB67A] to-[#1dd489] text-white py-20">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-5xl font-bold mb-6">
-            Discover Local Experiences with
-            <span className="block text-6xl mt-2">LocalLens</span>
-          </h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Connect with local guides and discover authentic experiences in your destination. 
-            Book unique tours, cultural experiences, and hidden gems.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {userData ? (
-              // Show dashboard button for authenticated users
-              <>
-                <Link 
-                  href="/dashboard"
-                  className="bg-white text-[#1FB67A] px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center"
-                >
-                  Go to Dashboard
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <Link 
-                  href="/explore-tours"
-                  className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-[#1FB67A] transition-colors"
-                >
-                  Explore Tours
-                </Link>
-              </>
-            ) : (
-              // Show registration buttons for non-authenticated users
-              <>
-                <Link 
-                  href="/explore-tours"
-                  className="bg-white text-[#1FB67A] px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center"
-                >
-                  Explore Tours
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <Link 
-                  href="/register/guide"
-                  className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-[#1FB67A] transition-colors"
-                >
-                  Become a Guide
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
+      <Hero7 userData={userData} />
 
       {/* Features Section */}
       <section className="py-16 bg-gray-50">
@@ -321,20 +285,27 @@ export default function HomePage() {
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Select Date
+                  Select Date *
                 </label>
                 <input 
                   type="date" 
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A] focus:border-transparent"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1FB67A] focus:border-transparent"
                   min={new Date().toISOString().split('T')[0]}
+                  required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Number of Guests
+                  Number of Guests *
                 </label>
-                <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A] focus:border-transparent">
+                <select 
+                  value={guestCount}
+                  onChange={(e) => setGuestCount(parseInt(e.target.value))}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1FB67A] focus:border-transparent"
+                >
                   {Array.from({ length: selectedTour.maxGroupSize }, (_, i) => i + 1).map(num => (
                     <option key={num} value={num}>{num} guest{num > 1 ? 's' : ''}</option>
                   ))}
@@ -348,26 +319,62 @@ export default function HomePage() {
                 </div>
                 <div className="flex justify-between items-center mb-3">
                   <span className="font-medium">Total:</span>
-                  <span className="text-lg font-bold text-[#1FB67A]">${selectedTour.tourFee}</span>
+                  <span className="text-lg font-bold text-[#1FB67A]">${(selectedTour.tourFee * guestCount).toFixed(2)}</span>
                 </div>
               </div>
 
               <div className="flex space-x-3 pt-2">
                 <button
-                  onClick={() => setShowBookingModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                  onClick={() => {
+                    setShowBookingModal(false);
+                    setSelectedDate('');
+                    setGuestCount(1);
+                  }}
+                  disabled={isCreatingBooking}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    // Here you would handle the actual booking
-                    alert('Booking functionality will be implemented with payment integration!');
-                    setShowBookingModal(false);
+                  onClick={async () => {
+                    if (!selectedDate) {
+                      toast.error('Please select a date');
+                      return;
+                    }
+
+                    try {
+                      const bookingDate = selectedDate;
+                      const bookingTime = new Date(selectedDate).toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: true 
+                      });
+                      
+                      const totalAmount = (selectedTour.tourFee || 0) * guestCount;
+
+                      const bookingData = {
+                        tourId: selectedTour._id,
+                        guideId: selectedTour.guideId?._id || selectedTour.guideId,
+                        bookingDate,
+                        bookingTime,
+                        numberOfGuests: guestCount,
+                        totalAmount,
+                      };
+
+                      await createBooking(bookingData).unwrap();
+                      
+                      toast.success('Booking request sent! The guide will review and confirm your booking.');
+                      setShowBookingModal(false);
+                      setSelectedDate('');
+                      setGuestCount(1);
+                    } catch (error: any) {
+                      toast.error(error?.data?.message || 'Failed to create booking. Please try again.');
+                    }
                   }}
-                  className="flex-1 px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489]"
+                  disabled={isCreatingBooking || !selectedDate}
+                  className="flex-1 px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Confirm Booking
+                  {isCreatingBooking ? 'Processing...' : 'Confirm Booking'}
                 </button>
               </div>
             </div>

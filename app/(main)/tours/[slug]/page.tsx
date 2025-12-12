@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useGetTourBySlugQuery, useGetTourByIdQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
+import { useCreateBookingMutation } from '@/redux/features/booking/booking.api';
+import { useGetTourReviewsQuery } from '@/redux/features/review/review.api';
 import WishlistButton from '@/components/ui/WishlistButton';
 import {
   Dialog,
@@ -52,11 +54,17 @@ export default function TourDetailsPage() {
   const error = isObjectId ? errorById : errorBySlug;
   
   const { data: userData } = useGetMeQuery({});
+  const [createBooking, { isLoading: isCreatingBooking }] = useCreateBookingMutation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [guestCount, setGuestCount] = useState(1);
 
   const tour = tourData?.data;
+  const { data: reviewsData, isLoading: isLoadingReviews } = useGetTourReviewsQuery(
+    { tourId: tour?._id || '', page: 1, limit: 10 },
+    { skip: !tour?._id }
+  );
+  const reviews = reviewsData?.data?.reviews || [];
 
   const handleBookTour = () => {
     if (!userData) {
@@ -70,22 +78,60 @@ export default function TourDetailsPage() {
       return;
     }
 
+    // Check if user has address and phone number
+    if (!userData.address || !userData.phone) {
+      toast.error('Please update your profile with address and phone number before booking a tour. Go to Profile settings to update.');
+      return;
+    }
+
     setShowBookingModal(true);
   };
 
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
     if (!selectedDate) {
       toast.error('Please select a date');
       return;
     }
 
-    // Here you would integrate with your booking API
-    toast.success('Booking request sent! You will receive confirmation shortly.');
-    setShowBookingModal(false);
-    
-    // Reset form
-    setSelectedDate('');
-    setGuestCount(1);
+    if (!tour || !userData) {
+      toast.error('Missing tour or user information');
+      return;
+    }
+
+    try {
+      // Parse date and time
+      const bookingDate = selectedDate;
+      const bookingTime = new Date(selectedDate).toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      });
+      
+      const totalAmount = (tour.tourFee || 0) * guestCount;
+
+      const bookingData = {
+        tourId: tour._id,
+        guideId: tour.guideId?._id || tour.guideId,
+        bookingDate,
+        bookingTime,
+        numberOfGuests: guestCount,
+        totalAmount,
+      };
+
+      await createBooking(bookingData).unwrap();
+      
+      toast.success('Booking request sent! The guide will review and confirm your booking.');
+      setShowBookingModal(false);
+      setSelectedDate('');
+      setGuestCount(1);
+      
+      // Redirect to bookings page after a short delay
+      setTimeout(() => {
+        router.push('/dashboard/upcoming-bookings');
+      }, 1500);
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to create booking. Please try again.');
+    }
   };
 
   if (isLoading) {
@@ -299,6 +345,61 @@ export default function TourDetailsPage() {
                 </div>
               </div>
             )}
+
+            {/* Reviews Section */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Reviews & Ratings</h2>
+              
+              {isLoadingReviews ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1FB67A]"></div>
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="text-center py-8">
+                  <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-600">No reviews yet. Be the first to review this tour!</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {reviews.map((review: any) => (
+                    <div key={review._id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center">
+                          <img 
+                            src={review.userId?.image || 'https://via.placeholder.com/40x40'} 
+                            alt={review.userId?.name || 'User'}
+                            className="w-10 h-10 rounded-full object-cover mr-3"
+                          />
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{review.userId?.name || 'Anonymous'}</h4>
+                            <div className="flex items-center mt-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-4 h-4 ${
+                                    star <= review.rating
+                                      ? 'text-yellow-400 fill-current'
+                                      : 'text-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-sm text-gray-500">
+                          {new Date(review.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -482,9 +583,10 @@ export default function TourDetailsPage() {
               </button>
               <button
                 onClick={handleConfirmBooking}
-                className="flex-1 px-4 py-3 bg-[#1FB67A] text-white rounded-lg hover:bg-[#1dd489] transition-colors font-medium"
+                disabled={isCreatingBooking || !selectedDate}
+                className="flex-1 px-4 py-3 bg-[#1FB67A] text-white rounded-lg hover:bg-[#1dd489] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Confirm Booking
+                {isCreatingBooking ? 'Processing...' : 'Confirm Booking'}
               </button>
             </div>
           </div>

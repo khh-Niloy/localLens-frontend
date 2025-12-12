@@ -59,12 +59,12 @@ const routes = {
       url: "#",
       items: [
         {
-          title: "Upcoming Bookings",
-          url: "/dashboard/upcoming-bookings",
-        },
-        {
           title: "Pending Bookings",
           url: "/dashboard/pending-bookings",
+        },
+        {
+          title: "Upcoming Bookings",
+          url: "/dashboard/guide-upcoming-bookings",
         },
       ],
     },
@@ -73,10 +73,6 @@ const routes = {
     {
       title: "Home",
       url: "/",
-    },
-    {
-      title: "Browse Tours",
-      url: "/tours",
     },
     {
       title: "My Trips",

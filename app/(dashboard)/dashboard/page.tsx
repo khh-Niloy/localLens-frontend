@@ -1,12 +1,21 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { useGetWishlistQuery } from '@/redux/features/wishlist/wishlist.api';
 import { Calendar, Users, MapPin, TrendingUp, Clock, CheckCircle, Star, DollarSign } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { data: meData } = useGetMeQuery(undefined);
+  const router = useRouter();
+  const { data: meData, isLoading } = useGetMeQuery(undefined);
   const me = meData as any;
+
+  // Redirect guides to My Tours page
+  useEffect(() => {
+    if (!isLoading && me?.role?.toLowerCase() === 'guide') {
+      router.replace('/dashboard/my-tours');
+    }
+  }, [me, isLoading, router]);
 
   const renderGuideDashboard = () => (
     <div className="space-y-6">
@@ -290,37 +299,38 @@ export default function DashboardPage() {
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 gap-4">
-              <button className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+              <a 
+                href="/admin/users"
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <Users className="w-5 h-5 text-[#1FB67A]" />
                   <span>Manage Users</span>
                 </div>
                 <span className="text-gray-400">→</span>
-              </button>
+              </a>
               
-              <button className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+              <a 
+                href="/admin/listings"
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <MapPin className="w-5 h-5 text-blue-600" />
                   <span>Review Listings</span>
                 </div>
                 <span className="text-gray-400">→</span>
-              </button>
+              </a>
               
-              <button className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+              <a 
+                href="/admin/bookings"
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <Calendar className="w-5 h-5 text-green-600" />
-                  <span>Booking Reports</span>
+                  <span>Booking Management</span>
                 </div>
                 <span className="text-gray-400">→</span>
-              </button>
-              
-              <button className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-purple-600" />
-                  <span>Analytics</span>
-                </div>
-                <span className="text-gray-400">→</span>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -328,7 +338,8 @@ export default function DashboardPage() {
     </div>
   );
 
-  if (!me) {
+  // Show loading while checking user role or redirecting
+  if (isLoading || !me) {
     return (
       <div className="p-6">
         <div className="text-center">
@@ -338,9 +349,19 @@ export default function DashboardPage() {
     );
   }
 
+  // If guide, show loading while redirecting (should redirect immediately)
+  if (me.role?.toLowerCase() === 'guide') {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <p>Redirecting to My Tours...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
-      {me.role?.toLowerCase() === 'guide' && renderGuideDashboard()}
       {me.role?.toLowerCase() === 'tourist' && renderTouristDashboard()}
       {me.role?.toLowerCase() === 'admin' && renderAdminDashboard()}
     </div>

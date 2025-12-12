@@ -17,13 +17,9 @@ import {
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { useGetMeQuery } from "@/redux/features/auth/auth.api"
@@ -58,18 +54,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const roleRoutes = me ? roleBasedRoutes({ role: me.role?.toLowerCase() || 'tourist' }) : [];
   
   const sidebarData = {
-  user: {
-      name: me?.name || "User",
-      email: me?.email || "user@example.com",
-      avatar: "/avatars/user.jpg",
-  },
-  teams: [
-    {
-        name: "Local Lens",
-        logo: MapPin,
-        plan: me?.role || "Tourist",
-    },
-  ],
     navMain: roleRoutes.map(route => ({
       title: route.title,
       url: route.url === "#" ? "#" : route.url,
@@ -80,7 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: item.url,
       })) || [],
     })),
-  projects: [
+  projects: me?.role?.toLowerCase() === 'tourist' ? [] : [
     {
         name: "Profile",
         url: "/profile",
@@ -91,16 +75,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={sidebarData.teams} />
-      </SidebarHeader>
       <SidebarContent>
         <NavMain items={sidebarData.navMain} />
         <NavProjects projects={sidebarData.projects} />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={sidebarData.user} />
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

@@ -28,18 +28,31 @@ export const userApi = baseApi.injectEndpoints({
     }),
     
     updateProfile: builder.mutation({
-      query: (data) => ({
-        url: "/user/profile",
-        method: "PATCH",
-        data: data,
-      }),
-      invalidatesTags: ["user"],
+      query: (data) => {
+        // If data is FormData, don't set Content-Type header (let browser set it with boundary)
+        const isFormData = data instanceof FormData;
+        return {
+          url: "/user/profile",
+          method: "PATCH",
+          data: data,
+          headers: isFormData ? {} : { 'Content-Type': 'application/json' },
+        };
+      },
+      invalidatesTags: ["user"], // This will invalidate both user and auth queries
     }),
     
     // Admin routes
     getAllUsers: builder.query({
       query: () => ({
         url: "/user/admin/all",
+        method: "GET",
+      }),
+      providesTags: ["user"],
+    }),
+    
+    getUsersByRole: builder.query({
+      query: (role) => ({
+        url: `/user/admin/role/${role}`,
         method: "GET",
       }),
       providesTags: ["user"],
@@ -70,6 +83,7 @@ export const {
   useGetProfileQuery,
   useUpdateProfileMutation,
   useGetAllUsersQuery,
+  useGetUsersByRoleQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
 } = userApi;

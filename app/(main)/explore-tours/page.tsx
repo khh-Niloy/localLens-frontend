@@ -28,11 +28,24 @@ export default function ExploreToursPage() {
   const { data: userData } = useGetMeQuery({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedDestination, setSelectedDestination] = useState('');
+  const [selectedLanguage, setSelectedLanguage] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedTour, setSelectedTour] = useState<any>(null);
 
   const tours = toursData?.data || [];
+
+  // Extract unique destinations and languages from tours
+  const uniqueDestinations = Array.from(new Set(tours.map((tour: any) => tour.location).filter(Boolean))).sort();
+  const uniqueLanguages = Array.from(
+    new Set(
+      tours
+        .map((tour: any) => tour.guideId?.language || [])
+        .flat()
+        .filter(Boolean)
+    )
+  ).sort();
 
   // Filter tours based on search and filters
   const filteredTours = tours.filter((tour: any) => {
@@ -42,10 +55,16 @@ export default function ExploreToursPage() {
     
     const matchesCategory = !selectedCategory || tour.category === selectedCategory;
     
+    const matchesDestination = !selectedDestination || tour.location === selectedDestination;
+    
+    const matchesLanguage = !selectedLanguage || 
+                           (tour.guideId?.language && Array.isArray(tour.guideId.language) && 
+                            tour.guideId.language.includes(selectedLanguage));
+    
     const matchesPrice = (!priceRange.min || tour.tourFee >= parseFloat(priceRange.min)) &&
                         (!priceRange.max || tour.tourFee <= parseFloat(priceRange.max));
     
-    return matchesSearch && matchesCategory && matchesPrice;
+    return matchesSearch && matchesCategory && matchesDestination && matchesLanguage && matchesPrice;
   });
 
   const categories = ['CULTURAL', 'FOOD', 'HISTORICAL', 'ADVENTURE', 'NATURE', 'ART'];
@@ -59,6 +78,12 @@ export default function ExploreToursPage() {
     
     if (userData.role !== 'TOURIST') {
       toast.error('Only tourists can book tours');
+      return;
+    }
+
+    // Check if user has address and phone number
+    if (!userData.address || !userData.phone) {
+      toast.error('Please update your profile with address and phone number before booking a tour. Go to Profile settings to update.');
       return;
     }
 
@@ -110,7 +135,41 @@ export default function ExploreToursPage() {
             <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Destination/City Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Destination / City</label>
+              <select
+                value={selectedDestination}
+                onChange={(e) => setSelectedDestination(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
+              >
+                <option value="">All Destinations</option>
+                {uniqueDestinations.map((destination) => (
+                  <option key={destination} value={destination}>
+                    {destination}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Language Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
+              >
+                <option value="">All Languages</option>
+                {uniqueLanguages.map((language) => (
+                  <option key={language} value={language}>
+                    {language}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Category Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
@@ -150,20 +209,22 @@ export default function ExploreToursPage() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
               />
             </div>
+          </div>
 
-            {/* Clear Filters */}
-            <div className="flex items-end">
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('');
-                  setPriceRange({ min: '', max: '' });
-                }}
-                className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Clear Filters
-              </button>
-            </div>
+          {/* Clear Filters Button */}
+          <div className="mt-4">
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('');
+                setSelectedDestination('');
+                setSelectedLanguage('');
+                setPriceRange({ min: '', max: '' });
+              }}
+              className="bg-gray-100 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+            >
+              Clear All Filters
+            </button>
           </div>
         </div>
 
@@ -189,6 +250,8 @@ export default function ExploreToursPage() {
               onClick={() => {
                 setSearchTerm('');
                 setSelectedCategory('');
+                setSelectedDestination('');
+                setSelectedLanguage('');
                 setPriceRange({ min: '', max: '' });
               }}
               className="bg-[#1FB67A] text-white px-6 py-3 rounded-lg hover:bg-[#1dd489] transition-colors"

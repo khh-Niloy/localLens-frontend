@@ -32,11 +32,8 @@ export default function WishlistPage() {
       case 'active':
         return <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Available</span>;
       case 'limited':
-      case 'paused':
         return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Limited</span>;
       case 'unavailable':
-      case 'suspended':
-      case 'draft':
         return <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Unavailable</span>;
       default:
         return <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">{availability}</span>;

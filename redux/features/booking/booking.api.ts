@@ -20,6 +20,14 @@ export const bookingApi = baseApi.injectEndpoints({
       providesTags: ["booking"],
     }),
     
+    initiatePayment: builder.mutation({
+      query: (bookingId) => ({
+        url: `/booking/${bookingId}/payment`,
+        method: "POST",
+      }),
+      invalidatesTags: ["booking"],
+    }),
+    
     // Guide routes
     getUpcomingBookings: builder.query({
       query: () => ({
@@ -69,6 +77,7 @@ export const bookingApi = baseApi.injectEndpoints({
 export const {
   useCreateBookingMutation,
   useGetMyBookingsQuery,
+  useInitiatePaymentMutation,
   useGetUpcomingBookingsQuery,
   useGetPendingBookingsQuery,
   useUpdateBookingStatusMutation,

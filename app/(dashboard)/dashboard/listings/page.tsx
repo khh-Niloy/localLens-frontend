@@ -75,9 +75,7 @@ export default function ListingManagementPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
-      case 'draft': return 'bg-yellow-100 text-yellow-800';
-      case 'paused': return 'bg-gray-100 text-gray-800';
-      case 'suspended': return 'bg-red-100 text-red-800';
+      case 'deactivate': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -165,9 +163,7 @@ export default function ListingManagementPage() {
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
-                <option value="draft">Draft</option>
-                <option value="paused">Paused</option>
-                <option value="suspended">Suspended</option>
+                <option value="deactivate">Deactivate</option>
               </select>
             </div>
             

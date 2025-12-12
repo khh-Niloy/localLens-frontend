@@ -27,7 +27,7 @@ const tourFormSchema = z.object({
   category: z.enum(["FOOD", "HISTORICAL", "ART", "NATURE", "ADVENTURE", "CULTURAL"]),
   location: z.string().min(1, "Location is required"),
   cancellationPolicy: z.string().optional().or(z.literal("")),
-  status: z.enum(["ACTIVE", "DRAFT", "PAUSED", "SUSPENDED"]).optional(),
+  status: z.enum(["ACTIVE", "DEACTIVATE"]).optional(),
   // Arrays - simplified (backend handles parsing)
   highlights: z.array(z.string()).optional(),
   included: z.array(z.string()).optional(),
@@ -517,9 +517,7 @@ export default function CreateTourPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="DRAFT">Draft</SelectItem>
-                        <SelectItem value="PAUSED">Paused</SelectItem>
-                        <SelectItem value="SUSPENDED">Suspended</SelectItem>
+                        <SelectItem value="DEACTIVATE">Deactivate</SelectItem>
                       </SelectContent>
                     </Select>
                   )}

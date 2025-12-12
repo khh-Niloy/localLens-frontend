@@ -1,60 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Calendar, MapPin, Clock, Users, Star, Phone, Mail, Filter, X } from 'lucide-react';
-import Link from 'next/link';
-import { useGetMyBookingsQuery } from '@/redux/features/booking/booking.api';
+import React from 'react';
+import { Calendar, MapPin, Clock, Users, Star, Phone, Mail, CheckCircle, XCircle } from 'lucide-react';
+import { useGetPendingBookingsQuery, useUpdateBookingStatusMutation } from '@/redux/features/booking/booking.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
+import { toast } from 'react-hot-toast';
+import Link from 'next/link';
 
-export default function UpcomingBookingsPage() {
+export default function PendingBookingsPage() {
   const { data: userData } = useGetMeQuery({});
-  const { data: bookingsData, isLoading, error } = useGetMyBookingsQuery({}, { 
-    skip: !userData || userData.role !== 'TOURIST' 
+  const { data: bookingsData, isLoading, error } = useGetPendingBookingsQuery({}, { 
+    skip: !userData || userData.role !== 'GUIDE' 
   });
+  const [updateBookingStatus, { isLoading: isUpdating }] = useUpdateBookingStatusMutation();
 
-  const [selectedDestination, setSelectedDestination] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const pendingBookings = bookingsData?.data || [];
 
-  // Filter for upcoming bookings (PENDING, CONFIRMED status and future dates)
-  const today = new Date().toISOString().split('T')[0];
-  const allBookings = bookingsData?.data || [];
-  const baseUpcomingBookings = allBookings.filter((booking: any) => {
-    const bookingDate = booking.bookingDate || booking.createdAt;
-    const isFuture = bookingDate >= today;
-    const isUpcoming = booking.status === 'PENDING' || booking.status === 'CONFIRMED';
-    return isFuture && isUpcoming;
-  });
+  const handleAcceptBooking = async (bookingId: string) => {
+    try {
+      await updateBookingStatus({ id: bookingId, status: 'CONFIRMED' }).unwrap();
+      toast.success('Booking confirmed successfully!');
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to confirm booking');
+    }
+  };
 
-  // Extract unique values for filters
-  const uniqueDestinations = Array.from(
-    new Set(baseUpcomingBookings.map((b: any) => b.tourId?.location).filter(Boolean))
-  ).sort();
-  const uniqueLanguages = Array.from(
-    new Set(
-      baseUpcomingBookings
-        .map((b: any) => b.guideId?.language || [])
-        .flat()
-        .filter(Boolean)
-    )
-  ).sort();
-  const categories = ['CULTURAL', 'FOOD', 'HISTORICAL', 'ADVENTURE', 'NATURE', 'ART'];
+  const handleDeclineBooking = async (bookingId: string) => {
+    if (!confirm('Are you sure you want to decline this booking?')) {
+      return;
+    }
 
-  // Apply additional filters
-  const upcomingBookings = baseUpcomingBookings.filter((booking: any) => {
-    const tour = booking.tourId || {};
-    const guide = booking.guideId || {};
-
-    const matchesDestination = !selectedDestination || tour.location === selectedDestination;
-    const matchesLanguage = !selectedLanguage || 
-                           (guide.language && Array.isArray(guide.language) && guide.language.includes(selectedLanguage));
-    const matchesCategory = !selectedCategory || tour.category === selectedCategory;
-    const matchesPrice = (!priceRange.min || (tour.tourFee || 0) >= parseFloat(priceRange.min)) &&
-                        (!priceRange.max || (tour.tourFee || 0) <= parseFloat(priceRange.max));
-
-    return matchesDestination && matchesLanguage && matchesCategory && matchesPrice;
-  });
+    try {
+      await updateBookingStatus({ id: bookingId, status: 'CANCELLED' }).unwrap();
+      toast.success('Booking declined');
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to decline booking');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -70,7 +52,7 @@ export default function UpcomingBookingsPage() {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <p className="text-red-800">Failed to load bookings. Please try again.</p>
+          <p className="text-red-800">Failed to load pending bookings. Please try again.</p>
         </div>
       </div>
     );
@@ -79,49 +61,21 @@ export default function UpcomingBookingsPage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Upcoming Bookings</h1>
-        <p className="text-gray-600">Your confirmed tours and experiences</p>
+        <h1 className="text-2xl font-bold text-gray-900">Pending Bookings</h1>
+        <p className="text-gray-600">Review and manage booking requests from tourists</p>
       </div>
 
-      {upcomingBookings.length === 0 ? (
+      {pendingBookings.length === 0 ? (
         <div className="text-center py-12">
           <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {baseUpcomingBookings.length === 0 
-              ? 'No upcoming bookings' 
-              : 'No trips match your filters'}
-          </h3>
-          <p className="text-gray-500 mb-6">
-            {baseUpcomingBookings.length === 0
-              ? "You don't have any tours booked yet."
-              : "Try adjusting your filters to see more results."}
-          </p>
-          {baseUpcomingBookings.length === 0 ? (
-            <Link 
-              href="/explore-tours"
-              className="inline-block bg-[#1FB67A] text-white px-6 py-2 rounded-md hover:bg-[#1dd489] transition-colors"
-            >
-              Browse Tours
-            </Link>
-          ) : (
-            <button
-              onClick={() => {
-                setSelectedDestination('');
-                setSelectedLanguage('');
-                setSelectedCategory('');
-                setPriceRange({ min: '', max: '' });
-              }}
-              className="inline-block bg-[#1FB67A] text-white px-6 py-2 rounded-md hover:bg-[#1dd489] transition-colors"
-            >
-              Clear Filters
-            </button>
-          )}
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No pending bookings</h3>
+          <p className="text-gray-500 mb-6">You don't have any pending booking requests at the moment.</p>
         </div>
       ) : (
         <div className="space-y-6">
-          {upcomingBookings.map((booking: any) => {
+          {pendingBookings.map((booking: any) => {
             const tour = booking.tourId || {};
-            const guide = booking.guideId || {};
+            const tourist = booking.userId || {};
             const payment = booking.payment || {};
             
             return (
@@ -162,35 +116,29 @@ export default function UpcomingBookingsPage() {
                       <div className="text-right">
                         <div className="text-2xl font-bold text-[#1FB67A]">${booking.totalAmount || 0}</div>
                         <div className="text-sm text-gray-500">Booking #{booking._id.slice(-6)}</div>
-                        <span className={`inline-block mt-2 px-3 py-1 text-xs rounded-full ${
-                          booking.status === 'CONFIRMED' 
-                            ? 'bg-green-100 text-green-800'
-                            : booking.status === 'PENDING'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {booking.status}
+                        <span className="inline-block mt-2 px-3 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                          PENDING
                         </span>
                       </div>
                     </div>
 
-                    {/* Guide Information */}
-                    {guide && (
-                      <div className="border-t pt-4">
-                        <h4 className="font-medium text-gray-900 mb-3">Your Guide</h4>
+                    {/* Tourist Information */}
+                    {tourist && (
+                      <div className="border-t pt-4 mb-4">
+                        <h4 className="font-medium text-gray-900 mb-3">Tourist Information</h4>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <img 
-                              src={guide.image || 'https://via.placeholder.com/48x48'} 
-                              alt={guide.name}
+                              src={tourist.image || 'https://via.placeholder.com/48x48'} 
+                              alt={tourist.name}
                               className="w-12 h-12 rounded-full object-cover mr-3"
                             />
                             <div>
-                              <p className="font-medium text-gray-900">{guide.name}</p>
-                              {guide.email && (
+                              <p className="font-medium text-gray-900">{tourist.name}</p>
+                              {tourist.email && (
                                 <div className="flex items-center">
                                   <Mail className="w-3 h-3 text-gray-400 mr-1" />
-                                  <span className="text-xs text-gray-600">{guide.email}</span>
+                                  <span className="text-xs text-gray-600">{tourist.email}</span>
                                 </div>
                               )}
                             </div>
@@ -201,19 +149,19 @@ export default function UpcomingBookingsPage() {
                               <Users className="w-4 h-4 text-gray-400 mr-1" />
                               <span className="text-sm text-gray-600">{booking.numberOfGuests} guest{booking.numberOfGuests > 1 ? 's' : ''}</span>
                             </div>
-                            {guide.phone && (
+                            {tourist.phone && (
                               <div className="flex space-x-2">
                                 <a 
-                                  href={`tel:${guide.phone}`}
+                                  href={`tel:${tourist.phone}`}
                                   className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                  title="Call guide"
+                                  title="Call tourist"
                                 >
                                   <Phone className="w-4 h-4" />
                                 </a>
                                 <a 
-                                  href={`mailto:${guide.email}`}
+                                  href={`mailto:${tourist.email}`}
                                   className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                  title="Email guide"
+                                  title="Email tourist"
                                 >
                                   <Mail className="w-4 h-4" />
                                 </a>
@@ -226,7 +174,7 @@ export default function UpcomingBookingsPage() {
 
                     {/* Payment Status */}
                     {payment && (
-                      <div className="border-t pt-4 mt-4">
+                      <div className="border-t pt-4 mb-4">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Payment Status:</span>
                           <span className={`font-medium ${
@@ -250,15 +198,23 @@ export default function UpcomingBookingsPage() {
                       >
                         View Tour Details
                       </Link>
-                      <div className="space-x-3">
-                        {guide.phone && (
-                          <a 
-                            href={`tel:${guide.phone}`}
-                            className="px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] text-sm"
-                          >
-                            Contact Guide
-                          </a>
-                        )}
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={() => handleDeclineBooking(booking._id)}
+                          disabled={isUpdating}
+                          className="flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-sm disabled:opacity-50"
+                        >
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Decline
+                        </button>
+                        <button
+                          onClick={() => handleAcceptBooking(booking._id)}
+                          disabled={isUpdating}
+                          className="flex items-center px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] transition-colors text-sm disabled:opacity-50"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          {isUpdating ? 'Processing...' : 'Accept Booking'}
+                        </button>
                       </div>
                     </div>
                   </div>

@@ -57,15 +57,6 @@ export const reviewApi = baseApi.injectEndpoints({
       providesTags: ["review"],
     }),
     
-    // Mark review as helpful
-    markHelpful: builder.mutation({
-      query: (id) => ({
-        url: `/review/${id}/helpful`,
-        method: "PATCH",
-      }),
-      invalidatesTags: ["review"],
-    }),
-    
     // Admin routes
     getAllReviews: builder.query({
       query: ({ page = 1, limit = 20 }) => ({
@@ -93,7 +84,6 @@ export const {
   useGetTourReviewsQuery,
   useGetGuideReviewsQuery,
   useGetUserReviewsQuery,
-  useMarkHelpfulMutation,
   useGetAllReviewsQuery,
   useAdminDeleteReviewMutation,
 } = reviewApi;
