@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Calendar, MapPin, Clock, Users, Phone, Mail, DollarSign, CheckCircle } from 'lucide-react';
-import { useGetAllGuideBookingsQuery, useGetMyBookingsQuery, useUpdateBookingStatusMutation, useInitiatePaymentMutation } from '@/redux/features/booking/booking.api';
+import { useGetAllGuideBookingsQuery, useGetMyBookingsQuery, useGetAllBookingsQuery, useUpdateBookingStatusMutation, useInitiatePaymentMutation } from '@/redux/features/booking/booking.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
@@ -48,25 +48,31 @@ export default function AllBookingsPage() {
   const { data: userData } = useGetMeQuery({});
   const isGuide = userData?.role === 'GUIDE';
   const isTourist = userData?.role === 'TOURIST';
+  const isAdmin = userData?.role === 'ADMIN';
 
   // Fetch bookings based on role
   const { data: guideBookingsData, isLoading: isLoadingGuide } = useGetAllGuideBookingsQuery({}, { 
-    skip: !isGuide 
+    skip: !isGuide || isAdmin
   });
   const { data: touristBookingsData, isLoading: isLoadingTourist } = useGetMyBookingsQuery({}, { 
-    skip: !isTourist 
+    skip: !isTourist || isAdmin
+  });
+  const { data: adminBookingsData, isLoading: isLoadingAdmin } = useGetAllBookingsQuery({}, {
+    skip: !isAdmin
   });
 
   const [updateBookingStatus, { isLoading: isUpdating }] = useUpdateBookingStatusMutation();
   const [initiatePayment, { isLoading: isInitiatingPayment }] = useInitiatePaymentMutation();
 
-  const isLoading = isGuide ? isLoadingGuide : isLoadingTourist;
-  const allBookingsRaw = isGuide 
-    ? (guideBookingsData?.data || [])
-    : (touristBookingsData?.data || []);
+  const isLoading = isAdmin ? isLoadingAdmin : (isGuide ? isLoadingGuide : isLoadingTourist);
+  const allBookingsRaw = isAdmin
+    ? (adminBookingsData?.data || [])
+    : (isGuide 
+      ? (guideBookingsData?.data || [])
+      : (touristBookingsData?.data || []));
   
   // For tourists: Filter to show only accepted bookings (CONFIRMED, COMPLETED)
-  // For guides: Show all bookings
+  // For guides and admin: Show all bookings
   const allBookings = isTourist
     ? allBookingsRaw.filter((booking: any) => 
         booking.status === 'CONFIRMED' || booking.status === 'COMPLETED'
@@ -108,7 +114,9 @@ export default function AllBookingsPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">All Bookings</h1>
         <p className="text-gray-600">
-          {isGuide 
+          {isAdmin
+            ? 'All bookings in the system'
+            : isGuide 
             ? 'All your tour bookings with complete information' 
             : 'All tours that have been accepted by guides'}
         </p>
@@ -119,7 +127,9 @@ export default function AllBookingsPage() {
           <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings found</h3>
           <p className="text-gray-500">
-            {isGuide 
+            {isAdmin
+              ? "No bookings found in the system."
+              : isGuide 
               ? "You don't have any bookings yet."
               : "You haven't made any bookings yet."}
           </p>
@@ -128,7 +138,9 @@ export default function AllBookingsPage() {
         <div className="space-y-6">
           {allBookings.map((booking: any) => {
             const tour = booking.tourId || {};
-            const user = isGuide ? (booking.userId || {}) : (booking.guideId || {});
+            const tourist = booking.userId || {};
+            const guide = booking.guideId || {};
+            const user = isAdmin ? null : (isGuide ? tourist : guide);
             const payment = booking.payment || {};
             const paymentStatus = payment.status || 'UNPAID';
             
@@ -204,63 +216,128 @@ export default function AllBookingsPage() {
                       </div>
                     </div>
 
-                    {/* User Information (Guide sees Tourist, Tourist sees Guide) */}
-                    {user && (
-                      <div className="border-t pt-4 mb-4">
-                        <h4 className="font-medium text-gray-900 mb-3">
-                          {isGuide ? 'Tourist Information' : 'Guide Information'}
-                        </h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <img 
-                              src={user.image || 'https://via.placeholder.com/48x48'} 
-                              alt={user.name}
-                              className="w-12 h-12 rounded-full object-cover mr-3"
-                            />
+                    {/* User Information */}
+                    {(user || isAdmin) && (
+                      <div className="border-t pt-4 mb-4 space-y-4">
+                        {isAdmin ? (
+                          <>
                             <div>
-                              <p className="font-medium text-gray-900">{user.name}</p>
-                              {user.email && (
-                                <div className="flex items-center text-xs text-gray-600">
-                                  <Mail className="w-3 h-3 mr-1" />
-                                  <span>{user.email}</span>
+                              <h4 className="font-medium text-gray-900 mb-3">Tourist Information</h4>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <img 
+                                    src={tourist.image || 'https://via.placeholder.com/48x48'} 
+                                    alt={tourist.name}
+                                    className="w-12 h-12 rounded-full object-cover mr-3"
+                                  />
+                                  <div>
+                                    <p className="font-medium text-gray-900">{tourist.name || 'N/A'}</p>
+                                    {tourist.email && (
+                                      <div className="flex items-center text-xs text-gray-600">
+                                        <Mail className="w-3 h-3 mr-1" />
+                                        <span>{tourist.email}</span>
+                                      </div>
+                                    )}
+                                    {tourist.phone && (
+                                      <div className="flex items-center text-xs text-gray-600">
+                                        <Phone className="w-3 h-3 mr-1" />
+                                        <span>{tourist.phone}</span>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              )}
-                              {user.phone && (
-                                <div className="flex items-center text-xs text-gray-600">
-                                  <Phone className="w-3 h-3 mr-1" />
-                                  <span>{user.phone}</span>
-                                </div>
-                              )}
+                              </div>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center">
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-3">Guide Information</h4>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <img 
+                                    src={guide.image || 'https://via.placeholder.com/48x48'} 
+                                    alt={guide.name}
+                                    className="w-12 h-12 rounded-full object-cover mr-3"
+                                  />
+                                  <div>
+                                    <p className="font-medium text-gray-900">{guide.name || 'N/A'}</p>
+                                    {guide.email && (
+                                      <div className="flex items-center text-xs text-gray-600">
+                                        <Mail className="w-3 h-3 mr-1" />
+                                        <span>{guide.email}</span>
+                                      </div>
+                                    )}
+                                    {guide.phone && (
+                                      <div className="flex items-center text-xs text-gray-600">
+                                        <Phone className="w-3 h-3 mr-1" />
+                                        <span>{guide.phone}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <h4 className="font-medium text-gray-900 mb-3">
+                              {isGuide ? 'Tourist Information' : 'Guide Information'}
+                            </h4>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <img 
+                                  src={user.image || 'https://via.placeholder.com/48x48'} 
+                                  alt={user.name}
+                                  className="w-12 h-12 rounded-full object-cover mr-3"
+                                />
+                                <div>
+                                  <p className="font-medium text-gray-900">{user.name}</p>
+                                  {user.email && (
+                                    <div className="flex items-center text-xs text-gray-600">
+                                      <Mail className="w-3 h-3 mr-1" />
+                                      <span>{user.email}</span>
+                                    </div>
+                                  )}
+                                  {user.phone && (
+                                    <div className="flex items-center text-xs text-gray-600">
+                                      <Phone className="w-3 h-3 mr-1" />
+                                      <span>{user.phone}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center space-x-4">
+                                <div className="flex items-center">
+                                  <Users className="w-4 h-4 text-gray-400 mr-1" />
+                                  <span className="text-sm text-gray-600">{booking.numberOfGuests} guest{booking.numberOfGuests > 1 ? 's' : ''}</span>
+                                </div>
+                                <div className="flex space-x-2">
+                                  {user.phone && (
+                                    <a 
+                                      href={`tel:${user.phone}`}
+                                      className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
+                                      title={isGuide ? "Call tourist" : "Call guide"}
+                                    >
+                                      <Phone className="w-4 h-4" />
+                                    </a>
+                                  )}
+                                  {user.email && (
+                                    <a 
+                                      href={`mailto:${user.email}`}
+                                      className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
+                                      title={isGuide ? "Email tourist" : "Email guide"}
+                                    >
+                                      <Mail className="w-4 h-4" />
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center pt-2">
                               <Users className="w-4 h-4 text-gray-400 mr-1" />
                               <span className="text-sm text-gray-600">{booking.numberOfGuests} guest{booking.numberOfGuests > 1 ? 's' : ''}</span>
                             </div>
-                            <div className="flex space-x-2">
-                              {user.phone && (
-                                <a 
-                                  href={`tel:${user.phone}`}
-                                  className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                  title={isGuide ? "Call tourist" : "Call guide"}
-                                >
-                                  <Phone className="w-4 h-4" />
-                                </a>
-                              )}
-                              {user.email && (
-                                <a 
-                                  href={`mailto:${user.email}`}
-                                  className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                  title={isGuide ? "Email tourist" : "Email guide"}
-                                >
-                                  <Mail className="w-4 h-4" />
-                                </a>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                          </>
+                        )}
                       </div>
                     )}
 
@@ -304,7 +381,7 @@ export default function AllBookingsPage() {
                       >
                         View Tour Details
                       </Link>
-                      {isGuide && (
+                      {!isAdmin && isGuide && (
                         <div className="flex space-x-3">
                           {booking.status === 'CONFIRMED' && (
                             <button

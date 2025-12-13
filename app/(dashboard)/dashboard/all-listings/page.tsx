@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useGetAllToursForAdminQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 
-export default function ListingManagementPage() {
+export default function AllListingsPage() {
   const { data: userData } = useGetMeQuery({});
   const { data: toursData, isLoading, error } = useGetAllToursForAdminQuery({}, {
     skip: !userData || userData.role !== 'ADMIN'
@@ -177,3 +177,4 @@ export default function ListingManagementPage() {
     </div>
   );
 }
+
