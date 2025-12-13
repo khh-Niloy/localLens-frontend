@@ -1,49 +1,106 @@
-# Local Lens - Full-Stack Tourism Platform 🌍
+# LocalLens Frontend
 
-A modern, scalable full-stack application for local tourism and travel experiences, built with enterprise-grade architecture and best practices.
+A modern, full-featured tourism platform frontend built with Next.js, React, TypeScript, and Redux Toolkit. LocalLens provides an intuitive interface for tourists to discover and book tours, guides to manage their listings, and administrators to oversee the platform.
 
-## 🏗️ **Full-Stack Architecture Overview**
+## 📋 Short Description
 
-This project consists of two main components:
-- **Frontend**: `/Documents/workspace/level-2/local-lens-frontend` (This repository)
-- **Backend**: `/Documents/workspace/level-2/localLens-backend` (API Server)
+LocalLens Frontend is a Next.js application that provides a comprehensive user interface for a tourism platform. It enables tourists to explore and book tours, guides to create and manage tour listings, and administrators to manage the entire system. The application features role-based navigation, dynamic dashboards, and seamless integration with the LocalLens backend API.
 
-### **System Architecture**
-```
-┌─────────────────────┐    HTTP/HTTPS     ┌─────────────────────┐
-│                     │ ◄──────────────► │                     │
-│   Frontend (React)  │                  │   Backend (API)     │
-│   - Next.js 16      │                  │   - Node.js/Express │
-│   - TypeScript      │                  │   - MongoDB/SQL     │
-│   - Redux Toolkit   │                  │   - JWT Auth        │
-│   - Tailwind CSS    │                  │   - RESTful APIs    │
-│                     │                  │                     │
-└─────────────────────┘                  └─────────────────────┘
-```
+## 🚀 Key Features
 
-## 🎯 **Frontend Application Overview**
+- **Role-Based User Interface**: Dynamic navigation and dashboards for Tourists, Guides, and Admins
+- **Tour Discovery**: Advanced search and filtering with multiple categories and price ranges
+- **Booking Management**: Complete booking workflow with date/time selection and payment integration
+- **Tour Management**: Create, edit, and manage tour listings with image uploads
+- **Wishlist System**: Save and manage favorite tours
+- **Review & Rating**: Post-tour reviews and ratings with moderation
+- **Profile Management**: Comprehensive profile pages with role-specific features
+- **Payment Integration**: SSL Commerz payment gateway integration
+- **Responsive Design**: Mobile-first approach with collapsible sidebar
+- **Real-time Updates**: Live booking status updates and notifications
 
-A sophisticated React/Next.js application serving as the user interface for the Local Lens tourism platform.
+## 🛠️ Technology Stack
 
-## 🏗️ Project Architecture Overview
+### **Frontend Framework**
+- **Next.js 16.0.8** - React framework with App Router
+- **React 19.2.1** - UI library
+- **TypeScript 5.x** - Type safety
 
-### **Technology Stack**
-- **Framework**: Next.js 16.0.8 (App Router)
-- **Language**: TypeScript 5.x
-- **Styling**: Tailwind CSS 4.x with custom design system
-- **State Management**: Redux Toolkit with RTK Query
-- **Form Handling**: React Hook Form with Zod validation
-- **UI Components**: Radix UI primitives with custom components
-- **Icons**: Lucide React & Tabler Icons
-- **Animations**: Framer Motion
-- **HTTP Client**: Axios with interceptors
-- **Notifications**: React Hot Toast
+### **State Management**
+- **Redux Toolkit** - State management
+- **RTK Query** - Server state management with caching
+- **React Redux** - React bindings for Redux
 
-## 📁 Project Structure Analysis
+### **UI & Styling**
+- **Tailwind CSS 4.x** - Utility-first CSS framework
+- **Radix UI** - Accessible component primitives
+- **Framer Motion** - Animation library
+- **Lucide React** - Icon library
+- **Tabler Icons** - Additional icon set
 
-### **Architectural Patterns**
+### **Form Handling**
+- **React Hook Form** - Form state management
+- **Zod** - Schema validation
+- **@hookform/resolvers** - Form validation integration
 
-#### **1. Route-Based Architecture (App Router)**
+### **HTTP Client**
+- **Axios** - HTTP client with interceptors
+
+### **Notifications**
+- **React Hot Toast** - Toast notification system
+
+### **Development Tools**
+- **ESLint** - Code linting
+- **TypeScript** - Type checking
+- **PostCSS** - CSS processing
+
+## 📄 Frontend Pages
+
+### **Authentication Pages** (`/app/(auth)/`)
+- `/login` - User login page
+- `/register` - Registration redirect page
+- `/register/tourist` - Tourist registration page
+- `/register/guide` - Guide registration page
+
+### **Public Pages** (`/app/(main)/`)
+- `/` - Landing/home page
+- `/explore` - Advanced tour discovery with filters
+- `/explore-tours` - Basic tour browsing page
+- `/tours/[slug]` - Tour details page with booking widget
+- `/profile` - Own profile page
+- `/profile/[id]` - Public profile page (role-based)
+- `/my-bookings` - User bookings page
+- `/payment/success` - Payment success page
+- `/payment/fail` - Payment failure page
+- `/payment/cancel` - Payment cancellation page
+
+### **Admin Pages** (`/app/(main)/admin/`)
+- `/admin/users` - User management interface
+- `/admin/listings` - Listing management interface
+- `/admin/bookings` - Booking oversight page
+
+### **Dashboard Pages** (`/app/(dashboard)/dashboard/`)
+- `/dashboard` - Main dashboard (role-based)
+- `/dashboard/profile` - Profile management page
+- `/dashboard/create-tour` - Tour creation page (Guide)
+- `/dashboard/edit-tour/[id]` - Tour editing page (Guide)
+- `/dashboard/my-tours` - My tours listing (Guide)
+- `/dashboard/my-all-tours` - All tours overview (Guide)
+- `/dashboard/listings` - Comprehensive listing management (Guide)
+- `/dashboard/upcoming-bookings` - Upcoming bookings (Tourist/Guide)
+- `/dashboard/pending-bookings` - Pending booking requests (Guide)
+- `/dashboard/guide-upcoming-bookings` - Guide's upcoming bookings
+- `/dashboard/past-bookings` - Past bookings history (Tourist)
+- `/dashboard/my-trips` - Trip management (Tourist)
+- `/dashboard/wishlist` - Wishlist management (Tourist)
+- `/dashboard/tour-details/[id]` - Tour details in dashboard context
+- `/dashboard/all-users` - User management (Admin)
+- `/dashboard/all-listings` - All listings management (Admin)
+- `/dashboard/all-bookings` - All bookings oversight (Admin)
+
+## 🏗️ Project Architecture
+
+### **Route-Based Architecture (App Router)**
 ```
 app/
 ├── (auth)/                    # Authentication group routes
@@ -62,9 +119,9 @@ app/
 │   │   ├── my-tours/        # Guide: Tour management
 │   │   ├── upcoming-bookings/ # Guide: Booking management
 │   │   ├── pending-bookings/  # Guide: Pending requests
-│   │   ├── upcoming-trips/    # Tourist: Trip planning
-│   │   ├── past-trips/        # Tourist: Trip history
-│   │   ├── wishlist-trips/    # Tourist: Saved tours
+│   │   ├── my-trips/          # Tourist: Trip planning
+│   │   ├── past-bookings/     # Tourist: Trip history
+│   │   ├── wishlist/          # Tourist: Saved tours
 │   │   └── listings/          # Guide: Comprehensive listing management
 │   └── layout.tsx           # Dashboard layout with sidebar
 ├── (main)/                  # Public routes with navbar
@@ -72,7 +129,7 @@ app/
 │   ├── page.tsx            # Landing page
 │   ├── explore/            # Advanced tour discovery with filters
 │   ├── explore-tours/      # Basic tour browsing
-│   ├── tours/[id]/         # Detailed tour pages with booking
+│   ├── tours/[slug]/       # Detailed tour pages with booking
 │   ├── profile/            # User profile management
 │   │   └── [id]/           # Dynamic profile pages (role-based)
 │   └── admin/              # Admin-specific public pages
@@ -82,16 +139,7 @@ app/
 └── globals.css             # Global styles and design system
 ```
 
-**Key Design Decisions:**
-- **Route Groups**: Uses parentheses `()` for logical grouping without affecting URL structure
-- **Nested Layouts**: Implements layout composition with different navigation for public vs dashboard
-- **Role-Based Organization**: Pages organized by user role and access level
-- **Co-located Components**: Pages and layouts are organized by feature/section
-- **Dual Registration Flows**: Separate registration paths for different user types
-- **Context-Aware Routing**: Routes adapt based on user authentication and role
-
-#### **2. Component Architecture**
-
+### **Component Architecture**
 ```
 components/
 ├── ui/              # Reusable UI primitives
@@ -104,13 +152,7 @@ components/
 └── [feature-components] # Business logic components
 ```
 
-**Component Design Patterns:**
-- **Compound Components**: Complex UI elements like Navbar with sub-components
-- **Polymorphic Components**: Flexible components that can render as different elements
-- **Composition over Inheritance**: Highly composable UI building blocks
-
-#### **3. State Management Architecture**
-
+### **State Management Architecture**
 ```
 redux/
 ├── store.ts         # Store configuration
@@ -122,285 +164,27 @@ redux/
         └── auth.api.ts # Feature-specific API slice
 ```
 
-**State Management Strategy:**
-- **RTK Query**: Server state management with caching
-- **Feature-based Slices**: Organized by business domain
-- **Type Safety**: Full TypeScript integration
-- **Optimistic Updates**: Built-in cache invalidation
-
-## 🎨 Design System & UI Architecture
-
-### **Custom Design System**
-- **Brand Colors**: Primary green (`#1FB67A`) with hover states
-- **Typography**: Geist font family (Sans & Mono variants)
-- **Component Variants**: Systematic approach to component variations
-- **Responsive Design**: Mobile-first approach with breakpoint management
-
-### **Advanced UI Components**
-
-#### **Resizable Navbar Component**
-```typescript
-// Sophisticated navbar with scroll-based animations
-- Backdrop blur effects on scroll
-- Dynamic width and positioning
-- Mobile-responsive with collapsible menu
-- Framer Motion animations
-```
-
-#### **Role-Based Navigation System**
-```typescript
-// Comprehensive navigation system with multiple touchpoints
-
-// 1. Dynamic Navbar (components/NavFooter/Navbar.tsx)
-const getNavItems = () => {
-  if (!me) {
-    // Logged out: Home, Explore Tours, Become a Guide, Login, Register
-    return [
-      { name: "Home", link: "/" },
-      { name: "Explore Tours", link: "/explore-tours" },
-      { name: "Become a Guide", link: "/register/guide" },
-    ];
-  }
-  
-  // Role-specific navigation items
-  switch (me.role?.toLowerCase()) {
-    case 'tourist': return [...baseItems, { name: "Dashboard", link: "/dashboard" }, { name: "Wishlist", link: "/dashboard/wishlist" }];
-    case 'guide': return [...baseItems, { name: "Dashboard", link: "/dashboard" }];
-    case 'admin': return [adminSpecificItems];
-  }
-};
-
-// 2. Dynamic Sidebar (components/app-sidebar.tsx)
-const roleRoutes = roleBasedRoutes({ role: me.role?.toLowerCase() });
-// Transforms utils/roleBasedRoutes.ts data into sidebar navigation
-
-// 3. Separate Registration Flows
-- /register/tourist - Tourist-specific registration
-- /register/guide - Guide-specific registration with additional fields
-```
-
-## 🔧 Development Practices & Code Quality
-
-### **Type Safety & Validation**
-- **Zod Schemas**: Runtime type validation for forms
-- **TypeScript**: Strict type checking throughout
-- **Form Validation**: React Hook Form + Zod integration
-- **API Types**: Inferred types from RTK Query
-
-### **Code Organization Principles**
-
-#### **1. Separation of Concerns**
-- **Business Logic**: Isolated in custom hooks and services
-- **UI Logic**: Separated from business logic
-- **API Layer**: Centralized in Redux slices
-- **Utilities**: Shared functions in dedicated modules
-
-#### **2. Reusability & Modularity**
-- **Component Composition**: Highly reusable UI components
-- **Custom Hooks**: Shared logic extraction
-- **Utility Functions**: Common operations centralized
-- **Configuration**: Environment-based settings
-
-#### **3. Performance Optimizations**
-- **Code Splitting**: Route-based and component-based
-- **Image Optimization**: Next.js Image component
-- **Bundle Analysis**: Optimized imports and dependencies
-- **Caching Strategy**: RTK Query automatic caching
-
-## 🔐 Authentication & Security
-
-### **Authentication Flow**
-```typescript
-// JWT-based authentication with secure storage
-- Login/Register forms with validation
-- Automatic token management
-- Protected route handling
-- Role-based access control (RBAC)
-```
-
-### **Security Measures**
-- **Input Validation**: Zod schemas for all forms
-- **XSS Protection**: Sanitized inputs and outputs
-- **CSRF Protection**: Axios credentials configuration
-- **Environment Variables**: Secure API endpoint management
-
-## 🚀 Advanced Features & Integrations
-
-### **Role-Based Access Control (RBAC)**
-```typescript
-// Sophisticated role management system with complete UI integration
-
-// Admin Role Features:
-- User Management Dashboard (/dashboard/all-users)
-- Listing Management (/admin/listings) 
-- Booking Oversight (/dashboard/all-bookings)
-- System Analytics and Reports
-
-// Guide Role Features:
-- Tour Creation & Management (/dashboard/create-tour, /dashboard/my-tours)
-- Booking Management (/dashboard/upcoming-bookings, /dashboard/pending-bookings)
-- Revenue Analytics and Performance Metrics
-- Customer Communication Tools
-
-// Tourist Role Features:
-- Tour Discovery (/explore-tours)
-- Trip Planning (/dashboard/upcoming-bookings, /dashboard/past-bookings)
-- Wishlist Management (/dashboard/wishlist)
-
-// Dynamic Navigation System:
-- Role-based navbar with contextual menu items
-- Dynamic sidebar with role-specific dashboard sections
-- Separate registration flows for different user types
-```
-
-### **Modern UI/UX Features**
-- **Role-Based Dashboard**: Dynamic sidebar with contextual navigation
-- **Responsive Design**: Mobile-first approach with collapsible sidebar
-- **Advanced Animations**: Framer Motion integration with scroll-based effects
-- **Toast Notifications**: Real-time user feedback system
-- **Loading States**: Comprehensive loading management across all interactions
-- **Error Handling**: Graceful error boundaries with user-friendly messages
-- **Multi-Step Registration**: Separate flows for different user types
-- **Contextual Navigation**: Navigation adapts based on authentication state and user role
-
-### **Developer Experience (DX)**
-- **Hot Reload**: Next.js fast refresh
-- **TypeScript**: Full type safety
-- **ESLint**: Code quality enforcement
-- **Path Aliases**: Clean import statements (`@/`)
-- **Component Library**: Shadcn/ui integration
-
-## 📦 Dependency Management
-
-### **Production Dependencies**
-```json
-{
-  "core": ["next", "react", "typescript"],
-  "state": ["@reduxjs/toolkit", "react-redux"],
-  "ui": ["@radix-ui/*", "tailwindcss", "framer-motion"],
-  "forms": ["react-hook-form", "@hookform/resolvers", "zod"],
-  "http": ["axios"],
-  "notifications": ["react-hot-toast"]
-}
-```
-
-### **Development Workflow**
-- **Package Manager**: npm with lock file
-- **Build System**: Next.js built-in optimization
-- **Styling**: PostCSS with Tailwind CSS
-- **Type Checking**: TypeScript compiler
-
-## 🏛️ Architectural Decisions & Rationale
-
-### **Why Next.js App Router?**
-- **File-based Routing**: Intuitive route organization
-- **Server Components**: Performance optimization
-- **Nested Layouts**: Flexible layout composition
-- **Built-in Optimizations**: Image, font, and bundle optimization
-
-### **Why Redux Toolkit Query?**
-- **Server State**: Automatic caching and synchronization
-- **Type Safety**: Full TypeScript integration
-- **Developer Tools**: Excellent debugging experience
-- **Optimistic Updates**: Better user experience
-
-### **Why Tailwind CSS?**
-- **Utility-First**: Rapid development
-- **Design System**: Consistent styling approach
-- **Performance**: Purged CSS in production
-- **Responsive**: Mobile-first design principles
-
-## 🔄 Full-Stack Data Flow Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              FRONTEND (This Repository)                          │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│ User Interaction → React Component → RTK Query → Axios → HTTP Request           │
-│                       ↓                                      ↓                  │
-│ User Interface ← Redux Store ← Response Processing ← HTTP Response               │
-└─────────────────────────────────────────────────────────────────────────────────┘
-                                        ↕ HTTP/HTTPS
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                        BACKEND (/Documents/workspace/level-2/localLens-backend) │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│ Route Handler → Controller → Service Layer → Database (MongoDB/SQL)             │
-│                    ↓              ↓              ↓                              │
-│ JSON Response ← Middleware ← Business Logic ← Data Processing                    │
-└─────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### **Cross-Application Communication**
-1. **Frontend → Backend**: RTK Query sends HTTP requests via Axios
-2. **Authentication**: JWT tokens managed across both applications
-3. **Data Synchronization**: Real-time updates through API polling/WebSockets
-4. **Error Handling**: Consistent error responses from backend to frontend
-5. **Type Safety**: Shared TypeScript interfaces between frontend and backend
-
-### **Complete API Integration Points**
-- **Authentication**: `/auth/login`, `/auth/register`, `/auth/logout`, `/auth/me`
-- **User Management**: `/user/profile`, `/user/profile/[id]`, `/user/admin/all`
-- **Tour Management**: `/tour`, `/tour/search`, `/tour/[slug]`, `/tour/guide/my-tours`
-- **Booking System**: `/booking`, `/booking/guide/upcoming`
-- **Review System**: `/review`, `/review/tour/[id]`, `/review/guide/[id]`
-- **Admin Operations**: Complete admin endpoints for users, tours, bookings, and reviews
-- **Real-time Features**: Live booking updates and notifications
-
-## 🎯 Project Management & Organization
-
-### **Feature-Driven Development**
-- **Modular Architecture**: Features organized by business domain
-- **Component Reusability**: Shared UI components across features
-- **API Organization**: Feature-specific API slices
-- **Route Organization**: Logical grouping of related pages
-
-### **Code Quality Standards**
-- **Consistent Naming**: Clear, descriptive naming conventions
-- **Component Structure**: Standardized component patterns
-- **Error Handling**: Comprehensive error management
-- **Documentation**: Self-documenting code with TypeScript
-
-## 🚀 Getting Started - Full-Stack Setup
+## 🚀 Getting Started
 
 ### **Prerequisites**
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
-- Git
-- MongoDB (for backend)
-- Backend API server running
+- Backend API server running (see backend README)
 
-### **Complete Setup Instructions**
-
-#### **1. Backend Setup First**
-```bash
-# Navigate to backend directory
-cd /Documents/workspace/level-2/localLens-backend
-
-# Install backend dependencies
-npm install
-
-# Set up backend environment variables
-cp .env.example .env
-# Configure database connection, JWT secrets, etc.
-
-# Start backend server (typically on port 5000)
-npm run dev
-```
-
-#### **2. Frontend Setup (This Repository)**
+### **Installation**
 ```bash
 # Navigate to frontend directory
 cd /Documents/workspace/level-2/local-lens-frontend
 
-# Install frontend dependencies
+# Install dependencies
 npm install
 
-# Set up frontend environment variables
+# Set up environment variables
 cp .env.example .env.local
 # Configure API endpoints to point to your backend
 # Example: NEXT_PUBLIC_BASE_URL=http://localhost:5000/api
 
-# Start frontend development server
+# Start development server
 npm run dev
 ```
 
@@ -409,84 +193,27 @@ npm run dev
 # Frontend (.env.local)
 NEXT_PUBLIC_BASE_URL=http://localhost:5000/api
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Backend (.env) - in localLens-backend
-DATABASE_URL=mongodb://localhost:27017/locallens
-JWT_SECRET=your-jwt-secret
-PORT=5000
 ```
 
 ### **Available Scripts**
 ```bash
-# Frontend Scripts
 npm run dev      # Start development server (port 3000)
 npm run build    # Build for production
 npm run start    # Start production server
 npm run lint     # Run ESLint
-
-# Backend Scripts (in localLens-backend)
-npm run dev      # Start backend development server
-npm run build    # Build backend for production
-npm run start    # Start production backend server
 ```
 
-### **Development Workflow**
-1. **Start Backend**: Ensure backend server is running first
-2. **Start Frontend**: Launch frontend development server
-3. **API Testing**: Use tools like Postman to test backend endpoints
-4. **Full-Stack Testing**: Test complete user flows from frontend to backend
+## 🔗 Related Repositories
 
-## 🔮 Future Enhancements & Scalability
+**Backend API**: [`~/Documents/workspace/level-2/localLens-backend`](~/Documents/workspace/level-2/localLens-backend)
+- Node.js/Express backend API
+- Provides RESTful endpoints for this frontend
+- Handles authentication, business logic, and database operations
 
-### **Planned Features**
-- **Real-time Updates**: WebSocket integration
-- **Offline Support**: PWA capabilities
-- **Advanced Search**: Elasticsearch integration
-- **Payment Integration**: Stripe/PayPal integration
-- **Multi-language**: i18n support
+## 📝 Summary
 
-### **Scalability Considerations**
-- **Micro-frontends**: Module federation for large teams
-- **CDN Integration**: Static asset optimization
-- **Database Optimization**: Query optimization and caching
-- **Monitoring**: Error tracking and performance monitoring
+LocalLens Frontend demonstrates a **modern, production-ready React application** with:
 
-## 📊 Performance Metrics
-
-### **Bundle Analysis**
-- **Core Bundle**: Optimized for fast initial load
-- **Code Splitting**: Route and component-based splitting
-- **Tree Shaking**: Unused code elimination
-- **Image Optimization**: Next.js automatic optimization
-
-### **Development Metrics**
-- **Type Coverage**: 100% TypeScript coverage
-- **Component Reusability**: High component reuse ratio
-- **API Efficiency**: Optimized query patterns
-- **Build Time**: Fast development builds
-
-## 🤝 Contributing Guidelines
-
-### **Code Standards**
-- Follow TypeScript best practices
-- Use consistent component patterns
-- Implement proper error handling
-- Write self-documenting code
-- Follow the established folder structure
-
-### **Git Workflow**
-- Feature branch development
-- Descriptive commit messages
-- Pull request reviews
-- Continuous integration
-
----
-
-## 📝 Full-Stack Project Summary
-
-This **Local Lens Tourism Platform** represents a **complete, production-ready, enterprise-grade full-stack application** that demonstrates:
-
-### **Frontend Excellence** (This Repository)
 - **Modern Architecture**: Leveraging Next.js 16 App Router with advanced patterns
 - **Type Safety**: Comprehensive TypeScript implementation throughout
 - **Scalable Design**: Modular, maintainable component architecture
@@ -494,68 +221,7 @@ This **Local Lens Tourism Platform** represents a **complete, production-ready, 
 - **Developer Experience**: Excellent tooling and development workflow
 - **Security**: Robust authentication and input validation
 - **Accessibility**: Radix UI components with built-in accessibility
+- **Role-Based UI**: Dynamic interfaces that adapt to user roles
+- **Full-Stack Integration**: Seamless communication with backend API
 
-### **Full-Stack Integration**
-- **Seamless Communication**: Frontend and backend work in perfect harmony
-- **Consistent Architecture**: Both applications follow similar patterns and conventions
-- **Type Safety Across Stack**: Shared TypeScript interfaces and validation
-- **Authentication Flow**: JWT-based auth system spanning both applications
-- **Real-time Features**: Live updates and notifications across the platform
-- **Role-Based Access**: Sophisticated permission system (Admin, Guide, Tourist)
-
-### **Project Repositories**
-- **Frontend**: `/Documents/workspace/level-2/local-lens-frontend` (This repository)
-- **Backend**: `/Documents/workspace/level-2/localLens-backend` (API server)
-
-### **Technical Achievements**
-- **Advanced React Patterns**: Compound components, polymorphic patterns, custom hooks
-- **Modern State Management**: RTK Query with optimistic updates and caching
-- **Sophisticated UI Components**: Custom design system with Framer Motion animations
-- **Enterprise Architecture**: Scalable, maintainable, and well-documented codebase
-- **Full-Stack Type Safety**: End-to-end TypeScript implementation
-- **Professional Development Practices**: Clean code, proper separation of concerns
-
-### **Complete Business Logic Implementation**
-
-#### **Multi-Role System Architecture**
-- **Tourist Experience**: 
-  - Advanced tour discovery with filters (`/explore`, `/explore-tours`)
-  - Detailed tour pages with booking widgets (`/tours/[id]`)
-  - Trip planning and wishlist (`/dashboard/upcoming-bookings`, `/dashboard/past-bookings`, `/dashboard/wishlist`)
-  - Profile management and review system (`/profile`, `/profile/[id]`)
-
-- **Guide Experience**:
-  - Comprehensive tour creation and management (`/dashboard/create-tour`, `/dashboard/my-tours`, `/dashboard/listings`)
-  - Advanced booking oversight (`/dashboard/upcoming-bookings`, `/dashboard/pending-bookings`)
-  - Revenue tracking and performance analytics
-  - Customer communication and review management
-  - Professional profile showcase (`/profile/[id]`)
-
-- **Admin Experience**:
-  - System-wide user management (`/dashboard/all-users`, `/admin/users`)
-  - Listing oversight and moderation (`/admin/listings`, `/dashboard/all-listings`)
-  - Booking management and dispute resolution (`/dashboard/all-bookings`)
-  - Platform analytics and comprehensive reporting
-  - Content moderation and review management
-
-#### **Advanced Features**
-- **Dynamic Registration**: Separate registration flows with role-specific onboarding (`/register/tourist`, `/register/guide`)
-- **Contextual Navigation**: UI adapts completely based on user role and authentication state
-- **Comprehensive Dashboard**: Role-specific dashboard with relevant tools and analytics
-- **Permission-Based Routing**: Automatic redirection and access control based on user permissions
-- **Advanced Search & Discovery**: Multi-filter search with map view, categories, and price ranges
-- **Professional Booking System**: Complete booking flow with date/time selection and guest management
-- **Review & Rating System**: Comprehensive review system with helpful voting and moderation
-- **Dynamic Profile Pages**: Role-based profile views with statistics, reviews, and tour listings
-
-This project showcases **professional full-stack development skills**, demonstrating the ability to build complex, scalable applications with modern technologies and best practices.
-
-**Built with ❤️ by a developer who understands both frontend excellence and full-stack architecture.**
-
----
-
-## 🔗 **Related Repositories**
-- **Backend API**: `/Documents/workspace/level-2/localLens-backend`
-- **Frontend Application**: `/Documents/workspace/level-2/local-lens-frontend` (You are here)
-
-*For complete project setup and development, both repositories are required.*
+The project showcases professional frontend development practices suitable for production environments, with comprehensive feature coverage for a tourism platform.
