@@ -6,6 +6,11 @@ A modern, full-featured tourism platform frontend built with Next.js, React, Typ
 
 LocalLens Frontend is a Next.js application that provides a comprehensive user interface for a tourism platform. It enables tourists to explore and book tours, guides to create and manage tour listings, and administrators to manage the entire system. The application features role-based navigation, dynamic dashboards, and seamless integration with the LocalLens backend API.
 
+## 🌐 Live URLs
+
+- **Frontend Application**: [https://local-lens-frontend.vercel.app/](https://local-lens-frontend.vercel.app/)
+- **Backend API**: [https://local-lens-backend.vercel.app/](https://local-lens-backend.vercel.app/)
+
 ## 🚀 Key Features
 
 - **Role-Based User Interface**: Dynamic navigation and dashboards for Tourists, Guides, and Admins

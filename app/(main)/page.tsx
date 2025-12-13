@@ -18,8 +18,8 @@ import { MapPin, Users, Star, ArrowRight, Clock, BookOpen } from 'lucide-react';
 import { Hero7 } from '@/components/hero7';
 
 export default function HomePage() {
-  const { data: userData, isLoading: userLoading } = useGetMeQuery({});
-  const { data: toursData, isLoading: toursLoading } = useGetAllToursQuery({});
+  const { data: userData, isLoading: userLoading, error: userError } = useGetMeQuery({});
+  const { data: toursData, isLoading: toursLoading, error: toursError } = useGetAllToursQuery({});
   const [createBooking, { isLoading: isCreatingBooking }] = useCreateBookingMutation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedTour, setSelectedTour] = useState<any>(null);
@@ -57,6 +57,23 @@ export default function HomePage() {
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#1FB67A]"></div>
       </div>
     );
+  }
+
+  // Handle errors gracefully
+  if (userError) {
+    console.error('Error loading user data:', userError);
+    // Don't block the page, just show a toast
+    if (typeof window !== 'undefined') {
+      toast.error('Unable to load user information. Some features may be limited.');
+    }
+  }
+
+  if (toursError) {
+    console.error('Error loading tours:', toursError);
+    // Don't block the page, just show a toast
+    if (typeof window !== 'undefined') {
+      toast.error('Unable to load tours. Please refresh the page or try again later.');
+    }
   }
 
   // Show landing page for non-authenticated users
@@ -122,6 +139,20 @@ export default function HomePage() {
           {toursLoading ? (
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+            </div>
+          ) : toursError ? (
+            <div className="text-center py-12">
+              <BookOpen className="w-16 h-16 text-red-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Unable to load tours</h3>
+              <p className="text-gray-500 mb-4">
+                {(toursError as any)?.data?.message || 'Please refresh the page or try again later.'}
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-[#1FB67A] text-white px-6 py-2 rounded-lg hover:bg-[#1dd489] transition-colors"
+              >
+                Refresh Page
+              </button>
             </div>
           ) : tours.length === 0 ? (
             <div className="text-center py-12">
@@ -247,6 +278,164 @@ export default function HomePage() {
               </Link>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Booking a local experience is simple and straightforward. Follow these easy steps to get started.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                1
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Browse Tours</h3>
+              <p className="text-gray-600">
+                Explore our curated collection of authentic local experiences and find the perfect tour for you.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                2
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Book Your Experience</h3>
+              <p className="text-gray-600">
+                Select your preferred date, number of guests, and submit your booking request.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                3
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Get Confirmed</h3>
+              <p className="text-gray-600">
+                Your guide will review and confirm your booking. You'll receive all the details you need.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                4
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Enjoy & Pay</h3>
+              <p className="text-gray-600">
+                Experience your tour, then complete payment after the experience. Simple and secure.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tour Categories Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore by Category</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Discover tours tailored to your interests. From food adventures to cultural experiences, find the perfect tour for you.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <Link 
+              href="/explore-tours?category=FOOD"
+              className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
+            >
+              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🍜</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Food</h3>
+              <p className="text-sm text-gray-600">Culinary Tours</p>
+            </Link>
+            
+            <Link 
+              href="/explore-tours?category=HISTORICAL"
+              className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
+            >
+              <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🏛️</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Historical</h3>
+              <p className="text-sm text-gray-600">Heritage Sites</p>
+            </Link>
+            
+            <Link 
+              href="/explore-tours?category=ART"
+              className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
+            >
+              <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🎨</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Art</h3>
+              <p className="text-sm text-gray-600">Art & Culture</p>
+            </Link>
+            
+            <Link 
+              href="/explore-tours?category=NATURE"
+              className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
+            >
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🌲</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Nature</h3>
+              <p className="text-sm text-gray-600">Outdoor Adventures</p>
+            </Link>
+            
+            <Link 
+              href="/explore-tours?category=ADVENTURE"
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
+            >
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">⛰️</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Adventure</h3>
+              <p className="text-sm text-gray-600">Thrilling Tours</p>
+            </Link>
+            
+            <Link 
+              href="/explore-tours?category=CULTURAL"
+              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
+            >
+              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🎭</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Cultural</h3>
+              <p className="text-sm text-gray-600">Local Traditions</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="py-16 bg-[#1FB67A]">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Adventure?</h2>
+          <p className="text-white/90 max-w-2xl mx-auto mb-8">
+            Join thousands of travelers discovering authentic local experiences. Browse our tours or become a guide and share your city with the world.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              href="/explore-tours"
+              className="bg-white text-[#1FB67A] px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+            >
+              Explore Tours
+            </Link>
+            <Link 
+              href="/register/guide"
+              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white/10 transition-colors font-medium"
+            >
+              Become a Guide
+            </Link>
+          </div>
         </div>
       </section>
 
