@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ManageListings() {
-  const { data, isLoading } = useGetAllToursForAdminQuery();
+  const { data, isLoading } = useGetAllToursForAdminQuery({});
   const tours = data?.data || [];
 
   const formatDate = (dateString: string) => {

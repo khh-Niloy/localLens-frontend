@@ -37,15 +37,15 @@ export default function ExploreToursPage() {
   const tours = toursData?.data || [];
 
   // Extract unique destinations and languages from tours
-  const uniqueDestinations = Array.from(new Set(tours.map((tour: any) => tour.location).filter(Boolean))).sort();
-  const uniqueLanguages = Array.from(
+  const uniqueDestinations: string[] = Array.from(new Set(tours.map((tour: any) => tour.location).filter(Boolean))).sort() as string[];
+  const uniqueLanguages: string[] = Array.from(
     new Set(
       tours
         .map((tour: any) => tour.guideId?.language || [])
         .flat()
         .filter(Boolean)
     )
-  ).sort();
+  ).sort() as string[];
 
   // Filter tours based on search and filters
   const filteredTours = tours.filter((tour: any) => {
@@ -102,25 +102,25 @@ export default function ExploreToursPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#1FB67A] to-[#1dd489] text-white py-16">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+      <div className="bg-white py-8 sm:py-12 md:py-16 lg:py-20 border-b border-gray-200">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 text-gray-900">
             Explore Amazing Tours
           </h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-2xl mx-auto px-4 text-gray-600">
             Discover unique experiences curated by passionate local guides around the world
           </p>
           
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto px-4">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
               <input
                 type="text"
                 placeholder="Search tours, locations, or experiences..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-lg text-gray-900 text-lg focus:outline-none focus:ring-2 focus:ring-white"
+                className="w-full pl-12 pr-4 py-4 rounded-lg bg-gray-50 text-gray-900 text-lg shadow-md border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#1FB67A] focus:border-[#1FB67A] placeholder:text-gray-400 transition-all"
               />
             </div>
           </div>
@@ -129,9 +129,9 @@ export default function ExploreToursPage() {
 
       <div className="container mx-auto px-6 py-8">
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-8">
           <div className="flex items-center mb-4">
-            <SlidersHorizontal className="w-5 h-5 mr-2 text-gray-600" />
+            <SlidersHorizontal className="w-5 h-5 mr-2 text-[#1FB67A]" />
             <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
           </div>
           
@@ -145,7 +145,7 @@ export default function ExploreToursPage() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
               >
                 <option value="">All Destinations</option>
-                {uniqueDestinations.map((destination) => (
+                {uniqueDestinations.map((destination: string) => (
                   <option key={destination} value={destination}>
                     {destination}
                   </option>
@@ -162,7 +162,7 @@ export default function ExploreToursPage() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
               >
                 <option value="">All Languages</option>
-                {uniqueLanguages.map((language) => (
+                {uniqueLanguages.map((language: string) => (
                   <option key={language} value={language}>
                     {language}
                   </option>
@@ -279,12 +279,6 @@ export default function ExploreToursPage() {
                   <div className="absolute top-3 right-3">
                     <WishlistButton tourId={tour._id} />
                   </div>
-                  
-                  {tour.originalPrice && tour.originalPrice > tour.tourFee && (
-                    <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
-                      Save ${tour.originalPrice - tour.tourFee}
-                    </div>
-                  )}
                 </div>
                 
                 <div className="p-6">
@@ -316,9 +310,6 @@ export default function ExploreToursPage() {
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <span className="text-2xl font-bold text-[#1FB67A]">${tour.tourFee}</span>
-                      {tour.originalPrice && tour.originalPrice > tour.tourFee && (
-                        <span className="text-sm text-gray-500 line-through ml-2">${tour.originalPrice}</span>
-                      )}
                       <div className="text-xs text-gray-600">per person</div>
                     </div>
                     <div className="text-xs text-gray-500">

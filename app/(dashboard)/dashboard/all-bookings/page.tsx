@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Calendar, MapPin, Clock, Users, Phone, Mail, CheckCircle, XCircle, DollarSign } from 'lucide-react';
-import { useGetPendingBookingsQuery, useGetMyBookingsQuery, useUpdateBookingStatusMutation } from '@/redux/features/booking/booking.api';
+import { Calendar, MapPin, Clock, Users, Phone, Mail, DollarSign, CheckCircle } from 'lucide-react';
+import { useGetAllGuideBookingsQuery, useGetMyBookingsQuery, useUpdateBookingStatusMutation, useInitiatePaymentMutation } from '@/redux/features/booking/booking.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
@@ -44,59 +44,52 @@ const getPaymentStatusColor = (status: PaymentStatus | string) => {
   }
 };
 
-export default function PendingBookingsPage() {
+export default function AllBookingsPage() {
   const { data: userData } = useGetMeQuery({});
   const isGuide = userData?.role === 'GUIDE';
   const isTourist = userData?.role === 'TOURIST';
-  
-  // For guides: Get pending bookings from guide endpoint
-  const { data: guideBookingsData, isLoading: isLoadingGuide, error: errorGuide } = useGetPendingBookingsQuery({}, { 
+
+  // Fetch bookings based on role
+  const { data: guideBookingsData, isLoading: isLoadingGuide } = useGetAllGuideBookingsQuery({}, { 
     skip: !isGuide 
   });
-  
-  // For tourists: Get all bookings and filter for PENDING status
-  const { data: touristBookingsData, isLoading: isLoadingTourist, error: errorTourist } = useGetMyBookingsQuery({}, { 
+  const { data: touristBookingsData, isLoading: isLoadingTourist } = useGetMyBookingsQuery({}, { 
     skip: !isTourist 
   });
-  
+
   const [updateBookingStatus, { isLoading: isUpdating }] = useUpdateBookingStatusMutation();
+  const [initiatePayment, { isLoading: isInitiatingPayment }] = useInitiatePaymentMutation();
 
   const isLoading = isGuide ? isLoadingGuide : isLoadingTourist;
-  const error = isGuide ? errorGuide : errorTourist;
-  
-  // Get pending bookings based on role
-  const pendingBookings = isGuide
+  const allBookingsRaw = isGuide 
     ? (guideBookingsData?.data || [])
-    : (touristBookingsData?.data || []).filter((booking: any) => booking.status === 'PENDING');
-
-  const handleAcceptBooking = async (bookingId: string) => {
-    try {
-      await updateBookingStatus({ id: bookingId, status: 'CONFIRMED' }).unwrap();
-      toast.success('Booking confirmed successfully!');
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to confirm booking');
-    }
-  };
-
-  const handleDeclineBooking = async (bookingId: string) => {
-    if (!confirm('Are you sure you want to decline this booking?')) {
-      return;
-    }
-
-    try {
-      await updateBookingStatus({ id: bookingId, status: 'CANCELLED' }).unwrap();
-      toast.success('Booking declined');
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to decline booking');
-    }
-  };
+    : (touristBookingsData?.data || []);
+  
+  // For tourists: Filter to show only accepted bookings (CONFIRMED, COMPLETED)
+  // For guides: Show all bookings
+  const allBookings = isTourist
+    ? allBookingsRaw.filter((booking: any) => 
+        booking.status === 'CONFIRMED' || booking.status === 'COMPLETED'
+      )
+    : allBookingsRaw;
 
   const handleCompleteBooking = async (bookingId: string) => {
     try {
       await updateBookingStatus({ id: bookingId, status: 'COMPLETED' }).unwrap();
-      toast.success('Booking marked as completed!');
+      toast.success('Booking marked as completed! Tourist can now make payment.');
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to complete booking');
+    }
+  };
+
+  const handlePayNow = async (bookingId: string) => {
+    try {
+      const result = await initiatePayment(bookingId).unwrap();
+      if (result?.data?.paymentUrl) {
+        window.location.href = result.data.paymentUrl;
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to initiate payment. Please try again.');
     }
   };
 
@@ -110,40 +103,30 @@ export default function PendingBookingsPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <p className="text-red-800">Failed to load bookings. Please try again.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Pending Bookings</h1>
+        <h1 className="text-2xl font-bold text-gray-900">All Bookings</h1>
         <p className="text-gray-600">
           {isGuide 
-            ? 'Review and manage pending booking requests' 
-            : 'Your pending booking requests waiting for guide approval'}
+            ? 'All your tour bookings with complete information' 
+            : 'All tours that have been accepted by guides'}
         </p>
       </div>
 
-      {pendingBookings.length === 0 ? (
+      {allBookings.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow border">
           <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings found</h3>
           <p className="text-gray-500">
             {isGuide 
-              ? "You don't have any pending booking requests at the moment."
-              : "You don't have any pending booking requests waiting for approval."}
+              ? "You don't have any bookings yet."
+              : "You haven't made any bookings yet."}
           </p>
         </div>
       ) : (
         <div className="space-y-6">
-          {pendingBookings.map((booking: any) => {
+          {allBookings.map((booking: any) => {
             const tour = booking.tourId || {};
             const user = isGuide ? (booking.userId || {}) : (booking.guideId || {});
             const payment = booking.payment || {};
@@ -213,6 +196,11 @@ export default function PendingBookingsPage() {
                             Txn: {payment.transactionId}
                           </div>
                         )}
+                        {payment.amount && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            Amount: ${payment.amount}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -251,50 +239,26 @@ export default function PendingBookingsPage() {
                               <Users className="w-4 h-4 text-gray-400 mr-1" />
                               <span className="text-sm text-gray-600">{booking.numberOfGuests} guest{booking.numberOfGuests > 1 ? 's' : ''}</span>
                             </div>
-                            {isGuide && (
-                              <div className="flex space-x-2">
-                                {user.phone && (
-                                  <a 
-                                    href={`tel:${user.phone}`}
-                                    className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                    title="Call tourist"
-                                  >
-                                    <Phone className="w-4 h-4" />
-                                  </a>
-                                )}
-                                {user.email && (
-                                  <a 
-                                    href={`mailto:${user.email}`}
-                                    className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                    title="Email tourist"
-                                  >
-                                    <Mail className="w-4 h-4" />
-                                  </a>
-                                )}
-                              </div>
-                            )}
-                            {isTourist && (
-                              <div className="flex space-x-2">
-                                {user.phone && (
-                                  <a 
-                                    href={`tel:${user.phone}`}
-                                    className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                    title="Call guide"
-                                  >
-                                    <Phone className="w-4 h-4" />
-                                  </a>
-                                )}
-                                {user.email && (
-                                  <a 
-                                    href={`mailto:${user.email}`}
-                                    className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                    title="Email guide"
-                                  >
-                                    <Mail className="w-4 h-4" />
-                                  </a>
-                                )}
-                              </div>
-                            )}
+                            <div className="flex space-x-2">
+                              {user.phone && (
+                                <a 
+                                  href={`tel:${user.phone}`}
+                                  className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
+                                  title={isGuide ? "Call tourist" : "Call guide"}
+                                >
+                                  <Phone className="w-4 h-4" />
+                                </a>
+                              )}
+                              {user.email && (
+                                <a 
+                                  href={`mailto:${user.email}`}
+                                  className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
+                                  title={isGuide ? "Email tourist" : "Email guide"}
+                                >
+                                  <Mail className="w-4 h-4" />
+                                </a>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -342,26 +306,6 @@ export default function PendingBookingsPage() {
                       </Link>
                       {isGuide && (
                         <div className="flex space-x-3">
-                          {booking.status === 'PENDING' && (
-                            <>
-                              <button
-                                onClick={() => handleDeclineBooking(booking._id)}
-                                disabled={isUpdating}
-                                className="flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-sm disabled:opacity-50"
-                              >
-                                <XCircle className="w-4 h-4 mr-2" />
-                                Decline
-                              </button>
-                              <button
-                                onClick={() => handleAcceptBooking(booking._id)}
-                                disabled={isUpdating}
-                                className="flex items-center px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] transition-colors text-sm disabled:opacity-50"
-                              >
-                                <CheckCircle className="w-4 h-4 mr-2" />
-                                {isUpdating ? 'Processing...' : 'Accept Booking'}
-                              </button>
-                            </>
-                          )}
                           {booking.status === 'CONFIRMED' && (
                             <button
                               onClick={() => handleCompleteBooking(booking._id)}
@@ -387,9 +331,24 @@ export default function PendingBookingsPage() {
                         </div>
                       )}
                       {isTourist && (
-                        <div className="text-sm text-gray-600">
-                          Waiting for guide approval
-                        </div>
+                        <>
+                          {booking.status === 'COMPLETED' && paymentStatus === 'UNPAID' && (
+                            <button
+                              onClick={() => handlePayNow(booking._id)}
+                              disabled={isInitiatingPayment}
+                              className="flex items-center px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] transition-colors text-sm disabled:opacity-50"
+                            >
+                              <DollarSign className="w-4 h-4 mr-2" />
+                              {isInitiatingPayment ? 'Processing...' : 'Pay Now'}
+                            </button>
+                          )}
+                          {booking.status === 'COMPLETED' && paymentStatus === 'PAID' && (
+                            <div className="flex items-center text-green-600 text-sm">
+                              <DollarSign className="w-4 h-4 mr-1" />
+                              <span>Payment Confirmed</span>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -402,3 +361,4 @@ export default function PendingBookingsPage() {
     </div>
   );
 }
+

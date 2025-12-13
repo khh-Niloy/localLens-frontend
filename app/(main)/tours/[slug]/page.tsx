@@ -127,7 +127,7 @@ export default function TourDetailsPage() {
       
       // Redirect to bookings page after a short delay
       setTimeout(() => {
-        router.push('/dashboard/upcoming-bookings');
+        router.push('/dashboard/all-bookings');
       }, 1500);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to create booking. Please try again.');
@@ -198,11 +198,6 @@ export default function TourDetailsPage() {
                 <div className="absolute top-4 right-4">
                   <WishlistButton tourId={tour._id} size="lg" />
                 </div>
-                {tour.originalPrice && tour.originalPrice > tour.tourFee && (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-lg font-medium">
-                    Save ${tour.originalPrice - tour.tourFee}
-                  </div>
-                )}
               </div>
 
               {/* Tour Header */}
@@ -231,9 +226,6 @@ export default function TourDetailsPage() {
                   </div>
                   <div className="text-right">
                     <div className="text-3xl font-bold text-[#1FB67A]">${tour.tourFee}</div>
-                    {tour.originalPrice && tour.originalPrice > tour.tourFee && (
-                      <div className="text-lg text-gray-500 line-through">${tour.originalPrice}</div>
-                    )}
                     <div className="text-sm text-gray-600">per person</div>
                   </div>
                 </div>
@@ -408,9 +400,6 @@ export default function TourDetailsPage() {
             <div className="bg-white rounded-lg shadow-lg p-6">
               <div className="text-center mb-6">
                 <div className="text-3xl font-bold text-[#1FB67A] mb-1">${tour.tourFee}</div>
-                {tour.originalPrice && tour.originalPrice > tour.tourFee && (
-                  <div className="text-lg text-gray-500 line-through">${tour.originalPrice}</div>
-                )}
                 <div className="text-sm text-gray-600">per person</div>
               </div>
 

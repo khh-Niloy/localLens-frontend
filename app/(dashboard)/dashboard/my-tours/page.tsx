@@ -15,6 +15,7 @@ interface Tour {
   createdAt: string;
   maxGroupSize: number;
   location: string;
+  slug?: string;
 }
 
 export default function MyToursPage() {

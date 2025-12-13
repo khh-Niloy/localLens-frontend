@@ -5,7 +5,7 @@ import { useGetAllBookingsQuery } from '@/redux/features/booking/booking.api';
 import Image from 'next/image';
 
 export default function ManageBookings() {
-  const { data, isLoading } = useGetAllBookingsQuery();
+  const { data, isLoading } = useGetAllBookingsQuery({});
   const bookings = data?.data || [];
   const [selectedTour, setSelectedTour] = useState<string | null>(null);
 

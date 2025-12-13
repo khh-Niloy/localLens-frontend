@@ -299,7 +299,7 @@ export default function ExplorePage() {
                     <option value="all">Any Duration</option>
                     <option value="short">Short (≤ 2 hours)</option>
                     <option value="medium">Medium (2-4 hours)</option>
-                    <option value="long">Long (> 4 hours)</option>
+                    <option value="long">Long (&gt; 4 hours)</option>
                   </select>
                 </div>
 
@@ -329,7 +329,7 @@ export default function ExplorePage() {
                     <option value="all">Any Size</option>
                     <option value="small">Small (≤ 6 people)</option>
                     <option value="medium">Medium (6-12 people)</option>
-                    <option value="large">Large (> 12 people)</option>
+                    <option value="large">Large (&gt; 12 people)</option>
                   </select>
                 </div>
 

@@ -21,7 +21,6 @@ const tourFormSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   longDescription: z.string().optional().or(z.literal("")),
   tourFee: z.number().min(0.01, "Price must be greater than 0"),
-  originalPrice: z.number().min(0).optional(),
   maxDuration: z.number().min(0.1, "Duration must be greater than 0"),
   meetingPoint: z.string().min(1, "Meeting point is required"),
   maxGroupSize: z.number().min(1, "Group size must be at least 1").max(50, "Group size too large"),
@@ -49,7 +48,6 @@ interface Tour {
   description: string;
   longDescription?: string;
   tourFee: number;
-  originalPrice?: number;
   maxDuration: number;
   meetingPoint: string;
   maxGroupSize: number;
@@ -108,7 +106,6 @@ export default function EditTourPage() {
       description: '',
       longDescription: '',
       tourFee: 0,
-      originalPrice: 0,
       maxDuration: 0,
       meetingPoint: '',
       maxGroupSize: 0,
@@ -141,14 +138,13 @@ export default function EditTourPage() {
     if (tour && categories.length > 0 && !isFormInitialized) {
       // Ensure the category from DB exists in available categories (case-insensitive check)
       const normalizedCategory = tour.category?.toUpperCase();
-      const validCategory = categories.find(cat => cat.toUpperCase() === normalizedCategory) || 'CULTURAL';
+      const validCategory = categories.find((cat: string) => cat.toUpperCase() === normalizedCategory) || 'CULTURAL';
       
       const formValues = {
         title: tour.title || '',
         description: tour.description || '',
         longDescription: tour.longDescription || '',
         tourFee: tour.tourFee || 0,
-        originalPrice: tour.originalPrice || 0,
         maxDuration: tour.maxDuration || 0,
         meetingPoint: tour.meetingPoint || '',
         maxGroupSize: tour.maxGroupSize || 0,
@@ -496,19 +492,6 @@ export default function EditTourPage() {
                 {errors.maxGroupSize && (
                   <p className="text-red-500 text-sm mt-1">{errors.maxGroupSize.message}</p>
                 )}
-              </div>
-
-              <div>
-                <Label htmlFor="originalPrice" className="text-sm font-medium text-gray-700">
-                  Original Price (optional)
-                </Label>
-                <Input
-                  id="originalPrice"
-                  {...register("originalPrice", { valueAsNumber: true })}
-                  type="number"
-                  step="0.01"
-                  placeholder="120"
-                />
               </div>
             </div>
             

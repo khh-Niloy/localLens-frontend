@@ -5,6 +5,7 @@ import { Upload, X, Plus, Minus } from 'lucide-react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useRouter } from 'next/navigation';
 import { useCreateTourMutation } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { toast } from 'react-hot-toast';
@@ -20,7 +21,6 @@ const tourFormSchema = z.object({
   description: z.string().min(1, "Description is required"),
   longDescription: z.string().optional(),
   tourFee: z.number().min(0.01, "Price must be greater than 0"),
-  originalPrice: z.number().optional(),
   maxDuration: z.number().min(0.1, "Duration must be greater than 0"),
   meetingPoint: z.string().min(1, "Meeting point is required"),
   maxGroupSize: z.number().min(1, "Group size must be at least 1"),
@@ -39,6 +39,7 @@ const tourFormSchema = z.object({
 type TourFormData = z.infer<typeof tourFormSchema>;
 
 export default function CreateTourPage() {
+  const router = useRouter();
   const { data: me } = useGetMeQuery(undefined) as { data: any };
   const [createTour, { isLoading }] = useCreateTourMutation();
   
@@ -165,7 +166,6 @@ export default function CreateTourPage() {
       
       // Optional fields
       if (data.longDescription) formData.append('longDescription', data.longDescription);
-      if (data.originalPrice) formData.append('originalPrice', data.originalPrice.toString());
       if (data.cancellationPolicy) formData.append('cancellationPolicy', data.cancellationPolicy);
       if (data.status) formData.append('status', data.status);
       
@@ -200,6 +200,8 @@ export default function CreateTourPage() {
       setIncluded(['']);
       setNotIncluded(['']);
       setImportantInfo(['']);
+      
+      router.push('/dashboard/my-tours');
       
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to create tour. Please try again.");
@@ -313,19 +315,6 @@ export default function CreateTourPage() {
                 {errors.maxGroupSize && (
                   <p className="text-red-500 text-sm mt-1">{errors.maxGroupSize.message}</p>
                 )}
-              </div>
-
-              <div>
-                <Label htmlFor="originalPrice" className="text-sm font-medium text-gray-700">
-                  Original Price (optional)
-                </Label>
-                <Input
-                  id="originalPrice"
-                  {...register("originalPrice", { valueAsNumber: true })}
-                  type="number"
-                  step="0.01"
-                  placeholder="120"
-                />
               </div>
             </div>
             

@@ -56,7 +56,7 @@ export function NavMain({
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={item.isActive}
+              defaultOpen={true}
               className="group/collapsible"
             >
               <SidebarMenuItem>

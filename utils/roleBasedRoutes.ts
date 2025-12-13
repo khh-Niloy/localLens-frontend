@@ -63,8 +63,8 @@ const routes = {
           url: "/dashboard/pending-bookings",
         },
         {
-          title: "Upcoming Bookings",
-          url: "/dashboard/guide-upcoming-bookings",
+          title: "All Bookings",
+          url: "/dashboard/all-bookings",
         },
       ],
     },
@@ -75,18 +75,22 @@ const routes = {
       url: "/",
     },
     {
-      title: "My Trips",
+      title: "Booking Management",
       url: "#",
       items: [
         {
-          title: "Upcoming Bookings",
-          url: "/dashboard/upcoming-bookings",
+          title: "All Bookings",
+          url: "/dashboard/all-bookings",
         },
         {
-          title: "Past Bookings",
-          url: "/dashboard/past-bookings",
+          title: "Pending Bookings",
+          url: "/dashboard/pending-bookings",
         },
       ],
+    },
+    {
+      title: "My Trips",
+      url: "/dashboard/my-trips",
     },
     {
       title: "Wishlist",

@@ -141,7 +141,7 @@ export default function DashboardPage() {
           <div className="p-6 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold">Upcoming Trips</h2>
             <a 
-              href="/dashboard/upcoming-bookings"
+              href="/dashboard/all-bookings"
               className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium"
             >
               View All
@@ -193,7 +193,7 @@ export default function DashboardPage() {
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a 
-              href="/dashboard/upcoming-bookings"
+              href="/dashboard/all-bookings"
               className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center gap-3">

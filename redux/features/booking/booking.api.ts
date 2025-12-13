@@ -45,6 +45,14 @@ export const bookingApi = baseApi.injectEndpoints({
       providesTags: ["booking"],
     }),
     
+    getAllGuideBookings: builder.query({
+      query: () => ({
+        url: "/booking/guide/all",
+        method: "GET",
+      }),
+      providesTags: ["booking"],
+    }),
+    
     updateBookingStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/booking/${id}/status`,
@@ -80,6 +88,7 @@ export const {
   useInitiatePaymentMutation,
   useGetUpcomingBookingsQuery,
   useGetPendingBookingsQuery,
+  useGetAllGuideBookingsQuery,
   useUpdateBookingStatusMutation,
   useGetAllBookingsQuery,
   useGetBookingByIdQuery,

@@ -13,7 +13,6 @@ interface Tour {
   description: string;
   longDescription?: string;
   tourFee: number;
-  originalPrice?: number;
   status: string;
   images: string[];
   createdAt: string;
@@ -123,9 +122,6 @@ export default function TourDetailsPage() {
           </div>
           <div className="text-right">
             <div className="text-2xl font-bold text-[#1FB67A]">${tour.tourFee}</div>
-            {tour.originalPrice && tour.originalPrice > tour.tourFee && (
-              <div className="text-sm text-gray-500 line-through">${tour.originalPrice}</div>
-            )}
           </div>
         </div>
       </div>

@@ -149,11 +149,6 @@ export default function HomePage() {
                     <div className="absolute top-3 right-3">
                       <WishlistButton tourId={tour._id} />
                     </div>
-                    {tour.originalPrice && tour.originalPrice > tour.tourFee && (
-                      <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
-                        Save ${tour.originalPrice - tour.tourFee}
-                      </div>
-                    )}
                   </div>
 
                   {/* Tour Details */}
@@ -198,9 +193,6 @@ export default function HomePage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <span className="text-2xl font-bold text-gray-900">${tour.tourFee}</span>
-                        {tour.originalPrice && tour.originalPrice > tour.tourFee && (
-                          <span className="text-sm text-gray-500 line-through ml-2">${tour.originalPrice}</span>
-                        )}
                         <span className="text-sm text-gray-500 ml-1">/ person</span>
                       </div>
                     </div>

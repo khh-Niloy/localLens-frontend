@@ -38,7 +38,7 @@ export function NavbarDemo() {
         return [
           { name: "Home", link: "/" },
           { name: "Explore Tours", link: "/explore-tours" },
-          { name: "My Bookings", link: "/dashboard/upcoming-bookings" },
+          { name: "My Bookings", link: "/dashboard/all-bookings" },
           { name: "Profile", link: "/dashboard/profile" },
           { name: "Logout", link: "#", isAction: true },
         ];

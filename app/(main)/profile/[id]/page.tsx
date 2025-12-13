@@ -3,8 +3,50 @@ import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Star, MapPin, Calendar, Users, MessageCircle, Award, Globe } from 'lucide-react';
 
+interface Profile {
+  name: string;
+  location: string;
+  joinedDate: string;
+  bio: string;
+  languages?: string[];
+  role: 'guide' | 'tourist';
+  stats: {
+    rating?: number;
+    reviewCount?: number;
+    toursGiven?: number;
+    responseRate?: number;
+    responseTime?: string;
+    tripsCompleted?: number;
+    reviewsWritten?: number;
+    countriesVisited?: number;
+  };
+  activeListings?: Array<{
+    id: string;
+    title: string;
+    rating: number;
+    reviewCount: number;
+    price: number;
+  }>;
+  reviews?: Array<{
+    id: string;
+    author: string;
+    rating: number;
+    comment: string;
+    date: string;
+    tourTitle: string;
+  }>;
+  reviewsWritten?: Array<{
+    id: string;
+    tourTitle: string;
+    guideName: string;
+    rating: number;
+    comment: string;
+    date: string;
+  }>;
+}
+
 // TODO: Replace with actual API call to get user profile
-const getUserProfile = (id: string) => {
+const getUserProfile = (id: string): Profile | null => {
   // This should be replaced with actual API call
   return null;
 };
@@ -81,9 +123,9 @@ export default function ProfilePage() {
             
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                {renderStars(profile.stats.rating)}
-                <span className="font-semibold">{profile.stats.rating}</span>
-                <span className="text-gray-600">({profile.stats.reviewCount} reviews)</span>
+                {renderStars(profile.stats.rating || 0)}
+                <span className="font-semibold">{profile.stats.rating || 0}</span>
+                <span className="text-gray-600">({profile.stats.reviewCount || 0} reviews)</span>
               </div>
               <div className="text-sm text-gray-600">
                 <span className="font-semibold">{profile.stats.toursGiven}</span> tours given

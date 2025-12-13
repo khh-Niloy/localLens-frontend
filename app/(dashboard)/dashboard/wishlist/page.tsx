@@ -53,7 +53,7 @@ export default function WishlistPage() {
         </div>
       )}
 
-      {error && (
+      {!!error && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
           <p className="text-red-800">Failed to load wishlist. Please try again.</p>
         </div>
@@ -81,7 +81,7 @@ export default function WishlistPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {wishlistItems.map((item) => {
+            {wishlistItems.map((item: any) => {
               // Handle both real API data and mock data structure
               const tour = item.tourId || item;
               const itemId = item._id || item.id;
@@ -106,11 +106,6 @@ export default function WishlistPage() {
                   <div className="absolute top-3 left-3">
                     {getAvailabilityBadge(tour.availability || tour.status?.toLowerCase())}
                   </div>
-                  {tour.originalPrice && tour.originalPrice > (tour.tourFee || tour.price) && (
-                    <div className="absolute bottom-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
-                      Save ${tour.originalPrice - (tour.tourFee || tour.price)}
-                    </div>
-                  )}
                 </div>
 
                 {/* Tour Details */}
@@ -158,9 +153,6 @@ export default function WishlistPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <span className="text-lg font-bold text-gray-900">${tour.tourFee || tour.price}</span>
-                      {tour.originalPrice && tour.originalPrice > (tour.tourFee || tour.price) && (
-                        <span className="text-sm text-gray-500 line-through ml-2">${tour.originalPrice}</span>
-                      )}
                     </div>
                   </div>
 

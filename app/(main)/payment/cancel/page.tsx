@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
-export default function PaymentCancelPage() {
+function PaymentCancelContent() {
   const searchParams = useSearchParams();
   const transactionId = searchParams.get('transactionId');
 
@@ -41,5 +41,17 @@ export default function PaymentCancelPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentCancelPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+      </div>
+    }>
+      <PaymentCancelContent />
+    </Suspense>
   );
 }
