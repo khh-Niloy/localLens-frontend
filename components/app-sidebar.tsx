@@ -64,13 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: item.url,
       })) || [],
     })),
-  projects: me?.role?.toLowerCase() === 'tourist' ? [] : [
-    {
-        name: "Profile",
-        url: "/profile",
-        icon: User,
-    },
-  ],
+  projects: [],
   };
 
   return (
