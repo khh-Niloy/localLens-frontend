@@ -28,14 +28,18 @@ import { useRouter } from "next/navigation";
 
 export function SignupForm({
   className,
+  role = "tourist",
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { role?: string }) {
   const router = useRouter();
   const signupSchema = z.object({
-    name: z.string().min(1),
-    email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
+    name: z.string().min(1, "Please enter your full name"),
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters long"),
+    confirmPassword: z.string().min(8, "Please confirm your password"),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
   });
 
   type SignupSchema = z.infer<typeof signupSchema>;
@@ -55,20 +59,14 @@ export function SignupForm({
 
   const onSubmit = async (data: SignupSchema) => {
     const { confirmPassword, ...payload } = data;
-    console.log(payload);
-    if (payload.password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
     try {
-      const res = await userRegister(payload).unwrap();
+      const res = await userRegister({ ...payload, role: role.toUpperCase() }).unwrap();
       if(res.success){
-        toast.success("User registered successfully");
+        toast.success(`${role.charAt(0).toUpperCase() + role.slice(1)} account created successfully`);
         router.push("/");
       }
     } catch (error: any) {
-      console.log(error);
-      toast.error(error.data.message);
+      toast.error(error.data?.message || "Registration failed. Please try again.");
     }
   };
 

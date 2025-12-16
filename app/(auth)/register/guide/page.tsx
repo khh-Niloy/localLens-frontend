@@ -1,0 +1,19 @@
+"use client";
+import { SignupForm } from "@/components/signup-form";
+
+export default function GuideRegisterPage() {
+  return (
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Become a Guide</h1>
+          <p className="text-sm text-gray-600 mt-2">
+            Share your local knowledge and create unforgettable experiences for travelers
+          </p>
+        </div>
+        <SignupForm role="guide" />
+      </div>
+    </div>
+  );
+}
+

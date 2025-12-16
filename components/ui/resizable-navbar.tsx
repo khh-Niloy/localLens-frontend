@@ -240,7 +240,7 @@ export const NavbarLogo = () => {
         <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shadow-lg group-hover:bg-white/20 transition-all group-hover:scale-105 overflow-hidden">
           <Image
             src="/logo-icon.svg"
-            alt="Course Master Logo"
+            alt="Local Lens Logo"
             width={32}
             height={32}
             className="w-full h-full object-contain"
@@ -248,8 +248,8 @@ export const NavbarLogo = () => {
           />
         </div>
         <div className="flex flex-col">
-          <span className="font-bold text-white text-sm leading-tight">Course</span>
-          <span className="text-white/80 text-[10px] leading-tight font-medium">Master</span>
+          <span className="font-bold text-white text-sm leading-tight">Local</span>
+          <span className="text-white/80 text-[10px] leading-tight font-medium">Lens</span>
         </div>
       </div>
     </a>

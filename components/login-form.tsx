@@ -26,8 +26,8 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 type LoginSchema = z.infer<typeof loginSchema>;
@@ -48,7 +48,6 @@ export function LoginForm({
   });
 
   const onSubmit = async (data: LoginSchema) => {
-    console.log(data);
     try {
       const res = await loginUser(data).unwrap();
       if (res.success) {
@@ -56,8 +55,7 @@ export function LoginForm({
         router.push("/");
       }
     } catch (error: any) {
-      console.log(error);
-      toast.error(error.data.message);
+      toast.error(error.data?.message || "Login failed. Please check your credentials.");
     }
   };
 
@@ -90,15 +88,7 @@ export function LoginForm({
                 </FieldDescription>
               )}
               <Field>
-                {/* <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div> */}
+                <FieldLabel htmlFor="password">Password</FieldLabel>
                 <div className="relative">
                   <Input
                     id="password"
@@ -137,7 +127,7 @@ export function LoginForm({
                 </Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account?{" "}
-                  <Link href="/register" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Sign up</Link>
+                  <Link href="/register/tourist" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Sign up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

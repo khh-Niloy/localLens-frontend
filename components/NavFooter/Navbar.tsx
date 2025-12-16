@@ -16,24 +16,84 @@ import { authApi, useGetMeQuery, useLogoutMutation } from "@/redux/features/auth
 import { useAppDispatch } from "@/redux/hooks";
 
 export function NavbarDemo() {
-  const navItems = [
-    {
-      name: "Home",
-      link: "/",
-    },
-    {
-      name: "All Courses",
-      link: "/all-courses",
-    },
-  ];
+  const { data: meData } = useGetMeQuery(undefined);
+  const me = meData as any;
+  
+  // Role-based navigation items
+  const getNavItems = () => {
+    if (!me) {
+      // Logged out navigation
+      return [
+        { name: "Home", link: "/" },
+        { name: "Explore Tours", link: "/explore-tours" },
+        { name: "Become a Guide", link: "/register/guide" },
+        { name: "Login", link: "/login" },
+        { name: "Register", link: "/register/tourist" },
+      ];
+    }
+
+    // Role-specific items
+    switch (me.role?.toLowerCase()) {
+      case 'tourist':
+        return [
+          { name: "Home", link: "/" },
+          { name: "Explore Tours", link: "/explore-tours" },
+          { name: "My Bookings", link: "/dashboard/all-bookings" },
+          { name: "Profile", link: "/dashboard/profile" },
+          { name: "Logout", link: "#", isAction: true },
+        ];
+      case 'guide':
+        return [
+          { name: "Home", link: "/" },
+          { name: "Explore Tours", link: "/explore-tours" },
+          { name: "Dashboard", link: "/dashboard" },
+          { name: "Profile", link: "/dashboard/profile" },
+          { name: "Logout", link: "#", isAction: true },
+        ];
+      case 'admin':
+        return [
+          { name: "Home", link: "/" },
+          { name: "Admin Dashboard", link: "/dashboard" },
+          { name: "Manage Users", link: "/dashboard/all-users" },
+          { name: "Manage Listings", link: "/dashboard/listings" },
+          { name: "Profile", link: "/dashboard/profile" },
+          { name: "Logout", link: "#", isAction: true },
+        ];
+      default:
+        return [
+          { name: "Home", link: "/" },
+          { name: "Explore Tours", link: "/explore-tours" },
+        ];
+    }
+  };
+
+  const navItems = getNavItems();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout(undefined);
+    dispatch(authApi.util.resetApiState());
+    router.push('/');
+  };
+
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    link: string
+    link: string,
+    isAction?: boolean
   ) => {
     e.preventDefault();
+
+    // Handle logout action - check if link is "#" or if isAction flag is set
+    if ((isAction || link === "#") && me) {
+      handleLogout();
+      setIsMobileMenuOpen(false);
+      return;
+    }
 
     if (link.startsWith("/")) {
       router.push(link);
@@ -53,18 +113,6 @@ export function NavbarDemo() {
     setIsMobileMenuOpen(false);
   };
 
-  const {data: meData} = useGetMeQuery(undefined)
-  const me = meData as any;
-  const [logout] = useLogoutMutation()
-  const dispatch = useAppDispatch()
-
-  const router = useRouter();
-
-  const handleLogout = async()=>{
-    await logout(undefined)
-    dispatch(authApi.util.resetApiState())
-  }
-
   return (
     <div className="relative w-full">
       <Navbar>
@@ -72,26 +120,6 @@ export function NavbarDemo() {
         <NavBody>
           <NavbarLogo />
           <NavItems items={navItems} onItemClick={handleNavClick} />
-          <div className="flex items-center gap-4">
-            {me ? (
-              <>
-                <NavbarButton href="/dashboard" variant="secondary">
-                  {me.role === "STUDENT" ? "Student Dashboard" : me.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}
-                </NavbarButton>
-                <NavbarButton
-                  onClick={() => handleLogout()}
-                  variant="secondary"
-                >
-                  Logout
-                </NavbarButton>
-              </>
-            ) : (
-              <NavbarButton href="/login" variant="secondary">
-                Login
-              </NavbarButton>
-            )}
-
-          </div>
         </NavBody>
 
         {/* Mobile Navigation */}
@@ -112,31 +140,12 @@ export function NavbarDemo() {
               <a
                 key={`mobile-link-${idx}`}
                 href={item.link}
-                onClick={(e) => handleNavClick(e, item.link)}
+                onClick={(e) => handleNavClick(e, item.link, (item as any).isAction)}
                 className="relative text-white"
               >
                 <span className="block">{item.name}</span>
               </a>
             ))}
-            <div className="flex w-full flex-col gap-4">
-              {me ? (
-                <>
-                  <NavbarButton href="/dashboard" variant="secondary">
-                    {me.role === "STUDENT" ? "Student Dashboard" : me.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}
-                  </NavbarButton>
-                  <NavbarButton
-                    onClick={() => handleLogout()}
-                    variant="secondary"
-                  >
-                    Logout
-                  </NavbarButton>
-                </>
-              ) : (
-                <NavbarButton href="/login" variant="secondary">
-                  Login
-                </NavbarButton>
-              )}
-            </div>
           </MobileNavMenu>
         </MobileNav>
       </Navbar>
