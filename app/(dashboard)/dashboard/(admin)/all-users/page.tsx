@@ -2,16 +2,19 @@
 
 import React from 'react';
 import { Users, Mail, Phone, Shield, User, MapPin } from 'lucide-react';
-import { useGetAllUsersQuery } from '@/redux/features/user/user.api';
+import { useGetAllUsersQuery, useGetUserEnumsQuery } from '@/redux/features/user/user.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 
 export default function AllUsersPage() {
   const { data: userData } = useGetMeQuery({});
+  const { data: enumsData } = useGetUserEnumsQuery({});
   const { data: usersData, isLoading, error } = useGetAllUsersQuery({}, {
     skip: !userData || userData.role !== 'ADMIN'
   });
 
   const users = usersData?.data || [];
+  const roles = enumsData?.data?.roles || ['TOURIST', 'GUIDE', 'ADMIN'];
+  const statuses = enumsData?.data?.activeStatuses || ['ACTIVE', 'INACTIVE'];
 
   if (isLoading) {
     return (
@@ -34,29 +37,24 @@ export default function AllUsersPage() {
   }
 
   const getRoleIcon = (role: string) => {
-    switch (role?.toUpperCase()) {
-      case 'ADMIN':
-        return <Shield className="w-4 h-4" />;
-      case 'GUIDE':
-        return <MapPin className="w-4 h-4" />;
-      case 'TOURIST':
-        return <User className="w-4 h-4" />;
-      default:
-        return <User className="w-4 h-4" />;
-    }
+    const roleUpper = role?.toUpperCase();
+    if (roleUpper === 'ADMIN') return <Shield className="w-4 h-4" />;
+    if (roleUpper === 'GUIDE') return <MapPin className="w-4 h-4" />;
+    if (roleUpper === 'TOURIST') return <User className="w-4 h-4" />;
+    return <User className="w-4 h-4" />;
   };
 
   const getRoleColor = (role: string) => {
-    switch (role?.toUpperCase()) {
-      case 'ADMIN':
-        return 'bg-purple-100 text-purple-800';
-      case 'GUIDE':
-        return 'bg-blue-100 text-blue-800';
-      case 'TOURIST':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    const roleUpper = role?.toUpperCase();
+    if (roleUpper === 'ADMIN') return 'bg-purple-100 text-purple-800';
+    if (roleUpper === 'GUIDE') return 'bg-blue-100 text-blue-800';
+    if (roleUpper === 'TOURIST') return 'bg-green-100 text-green-800';
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  // Count users by role dynamically
+  const getRoleCount = (role: string) => {
+    return users.filter((u: any) => roles.includes(u.role) && u.role === role).length;
   };
 
   return (
@@ -77,33 +75,28 @@ export default function AllUsersPage() {
             <Users className="w-6 h-6 text-blue-600" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Guides</p>
-              <p className="text-xl font-bold text-[#1FB67A]">{users.filter((u: any) => u.role === 'GUIDE').length}</p>
+        {roles.map((role: string) => {
+          const count = getRoleCount(role);
+          const roleConfig = {
+            'GUIDE': { label: 'Guides', icon: MapPin, color: 'text-[#1FB67A]', bgColor: 'text-[#1FB67A]' },
+            'TOURIST': { label: 'Tourists', icon: User, color: 'text-green-600', bgColor: 'text-green-600' },
+            'ADMIN': { label: 'Admins', icon: Shield, color: 'text-purple-600', bgColor: 'text-purple-600' },
+          }[role] || { label: role, icon: User, color: 'text-gray-600', bgColor: 'text-gray-600' };
+          
+          const IconComponent = roleConfig.icon;
+          
+          return (
+            <div key={role} className="bg-white p-4 rounded-lg shadow border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{roleConfig.label}</p>
+                  <p className={`text-xl font-bold ${roleConfig.bgColor}`}>{count}</p>
+                </div>
+                <IconComponent className={`w-6 h-6 ${roleConfig.color}`} />
+              </div>
             </div>
-            <MapPin className="w-6 h-6 text-[#1FB67A]" />
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Tourists</p>
-              <p className="text-xl font-bold text-green-600">{users.filter((u: any) => u.role === 'TOURIST').length}</p>
-            </div>
-            <User className="w-6 h-6 text-green-600" />
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Admins</p>
-              <p className="text-xl font-bold text-purple-600">{users.filter((u: any) => u.role === 'ADMIN').length}</p>
-            </div>
-            <Shield className="w-6 h-6 text-purple-600" />
-          </div>
-        </div>
+          );
+        })}
       </div>
 
       {/* Users List */}
