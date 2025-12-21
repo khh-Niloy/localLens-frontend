@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetAllToursQuery } from '@/redux/features/tour/tour.api';
+import { useGetAllToursQuery, useGetTourEnumsQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import WishlistButton from '@/components/ui/WishlistButton';
 import {
@@ -25,6 +25,7 @@ import { toast } from 'react-hot-toast';
 
 export default function ExploreToursPage() {
   const { data: toursData, isLoading } = useGetAllToursQuery({});
+  const { data: enumsResponse } = useGetTourEnumsQuery(undefined);
   const { data: userData } = useGetMeQuery({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -67,7 +68,7 @@ export default function ExploreToursPage() {
     return matchesSearch && matchesCategory && matchesDestination && matchesLanguage && matchesPrice;
   });
 
-  const categories = ['CULTURAL', 'FOOD', 'HISTORICAL', 'ADVENTURE', 'NATURE', 'ART'];
+  const categories = enumsResponse?.data?.categories || [];
 
   const handleBookTour = (tour: any) => {
     if (!userData) {
@@ -179,9 +180,9 @@ export default function ExploreToursPage() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
               >
                 <option value="">All Categories</option>
-                {categories.map((category) => (
+                {categories.map((category: string) => (
                   <option key={category} value={category}>
-                    {category.charAt(0) + category.slice(1).toLowerCase()}
+                    {category.charAt(0) + category.slice(1).toLowerCase().replace(/_/g, ' ')}
                   </option>
                 ))}
               </select>

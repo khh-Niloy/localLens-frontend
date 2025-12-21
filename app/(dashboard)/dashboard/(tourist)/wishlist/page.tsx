@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Heart, MapPin, Clock, Users, Star, Calendar, Trash2 } from 'lucide-react';
+import { Heart, MapPin, Clock, Users, Star, Trash2 } from 'lucide-react';
 import { useGetWishlistQuery, useRemoveFromWishlistMutation } from '@/redux/features/wishlist/wishlist.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
-import WishlistButton from '@/components/ui/WishlistButton';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -40,6 +39,26 @@ export default function WishlistPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!!error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+          <p className="text-red-800">{(error as any)?.data?.message || 'Failed to load wishlist. Please try again.'}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -47,20 +66,8 @@ export default function WishlistPage() {
         <p className="text-gray-600">Tours and experiences you want to book</p>
       </div>
 
-      {isLoading && (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
-        </div>
-      )}
-
-      {!!error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-          <p className="text-red-800">Failed to load wishlist. Please try again.</p>
-        </div>
-      )}
-
       {wishlistItems.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12 bg-white rounded-lg shadow border border-dashed border-gray-300">
           <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">Your wishlist is empty</h3>
           <p className="text-gray-500 mb-6">Start adding tours you're interested in to your wishlist.</p>
@@ -72,125 +79,117 @@ export default function WishlistPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <p className="text-gray-600">{wishlistItems.length} tour{wishlistItems.length !== 1 ? 's' : ''} in your wishlist</p>
-            <div className="text-sm text-gray-500">
-              Sorted by date added (newest first)
-            </div>
-          </div>
+        <div className="bg-white rounded-lg shadow border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tour
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Location
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Guide
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Rating
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {wishlistItems.map((item: any) => {
+                  const tour = item.tourId || item;
+                  const itemId = item._id || item.id;
+                  const tourId = tour._id || tour.tourId || item.tourId;
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {wishlistItems.map((item: any) => {
-              // Handle both real API data and mock data structure
-              const tour = item.tourId || item;
-              const itemId = item._id || item.id;
-              const tourId = tour._id || tour.tourId || item.tourId;
-              
-              return (
-              <div key={itemId} className="bg-white rounded-lg shadow border overflow-hidden hover:shadow-lg transition-shadow">
-                {/* Tour Image */}
-                <div className="relative">
-                  <img 
-                    src={tour.images?.[0] || tour.image || 'https://via.placeholder.com/300x200'} 
-                    alt={tour.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <button
-                    onClick={() => handleRemoveFromWishlist(tourId)}
-                    className="absolute top-3 right-3 p-2 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-all"
-                    title="Remove from wishlist"
-                  >
-                    <Heart className="w-5 h-5 text-red-500 fill-current" />
-                  </button>
-                  <div className="absolute top-3 left-3">
-                    {getAvailabilityBadge(tour.availability || tour.status?.toLowerCase())}
-                  </div>
-                </div>
-
-                {/* Tour Details */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900 text-sm leading-tight">{tour.title}</h3>
-                  </div>
-
-                  <div className="flex items-center text-xs text-gray-600 mb-2">
-                    <MapPin className="w-3 h-3 mr-1" />
-                    <span>{tour.location}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-gray-600 mb-3">
-                    <div className="flex items-center">
-                      <Clock className="w-3 h-3 mr-1" />
-                      <span>{tour.maxDuration || tour.duration}h</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="w-3 h-3 mr-1" />
-                      <span>Max {tour.maxGroupSize}</span>
-                    </div>
-                  </div>
-
-                  {/* Guide Info */}
-                  <div className="flex items-center mb-3">
-                    <img 
-                      src={tour.guideId?.image || tour.guide?.image || 'https://via.placeholder.com/24x24'} 
-                      alt={tour.guideId?.name || tour.guide?.name || 'Guide'}
-                      className="w-6 h-6 rounded-full object-cover mr-2"
-                    />
-                    <span className="text-xs text-gray-600">{tour.guideId?.name || tour.guide?.name || 'Local Guide'}</span>
-                  </div>
-
-                  {/* Rating */}
-                  <div className="flex items-center mb-3">
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-                      <span className="text-sm font-medium">{tour.rating || 4.8}</span>
-                      <span className="text-xs text-gray-500 ml-1">({tour.reviewCount || 0})</span>
-                    </div>
-                  </div>
-
-                  {/* Price and Actions */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <span className="text-lg font-bold text-gray-900">${tour.tourFee || tour.price}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 text-xs text-gray-500">
-                    Added {new Date(item.addedAt || item.addedDate || new Date()).toLocaleDateString()}
-                  </div>
-
-                  {/* Simple Action Buttons */}
-                  <div className="mt-4 space-y-2">
-                              <Link
-                                href={`/tours/${tour.slug || tourId}`}
-                                className="block w-full text-center px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] transition-colors text-sm"
-                              >
-                                View Details
-                              </Link>
-                    <button
-                      onClick={() => handleRemoveFromWishlist(tourId)}
-                      disabled={isRemoving}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm disabled:opacity-50"
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      {isRemoving ? 'Removing...' : 'Remove from Wishlist'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-              );
-            })}
-          </div>
-
-          {/* Simple Call to Action */}
-          <div className="text-center mt-8">
-            <Link 
-              href="/explore-tours"
-              className="inline-block bg-[#1FB67A] text-white px-8 py-3 rounded-lg hover:bg-[#1dd489] transition-colors font-medium"
-            >
-              Discover More Tours
-            </Link>
+                  return (
+                    <tr key={itemId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-16 w-24 relative">
+                            <img 
+                              className="h-16 w-24 rounded object-cover" 
+                              src={tour.images?.[0] || tour.image || 'https://via.placeholder.com/300x200'}
+                              alt={tour.title}
+                            />
+                             <div className="absolute top-0 right-0 -mr-1 -mt-1">
+                               {getAvailabilityBadge(tour.availability || tour.status)}
+                             </div>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900 line-clamp-1" title={tour.title}>
+                              {tour.title}
+                            </div>
+                            <div className="text-xs text-gray-500 flex items-center mt-1">
+                              <Clock className="w-3 h-3 mr-1" />
+                              {tour.maxDuration || tour.duration}h
+                              <span className="mx-1">•</span>
+                              <Users className="w-3 h-3 mr-1" />
+                              Max {tour.maxGroupSize}
+                            </div>
+                             <div className="text-xs text-gray-400 mt-1">
+                                Added {new Date(item.addedAt || item.addedDate || new Date()).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center text-sm text-gray-900">
+                           <MapPin className="w-3 h-3 mr-1 text-gray-400" />
+                           {tour.location}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                         <div className="flex items-center">
+                            <img 
+                              className="h-6 w-6 rounded-full object-cover mr-2" 
+                              src={tour.guideId?.image || tour.guide?.image || 'https://via.placeholder.com/24x24'}
+                              alt={tour.guideId?.name}
+                            />
+                            <div className="text-sm text-gray-900">{tour.guideId?.name || tour.guide?.name || 'Local Guide'}</div>
+                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-gray-900">${tour.tourFee || tour.price}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center text-sm text-gray-900">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
+                          {tour.rating || 4.8}
+                          <span className="text-xs text-gray-500 ml-1">({tour.reviewCount || 0})</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end gap-2 items-center">
+                           <Link
+                              href={`/tours/${tour.slug || tourId}`}
+                              className="text-[#1FB67A] hover:text-[#1dd489] font-medium"
+                            >
+                              View
+                           </Link>
+                           <button
+                            onClick={() => handleRemoveFromWishlist(tourId)}
+                            disabled={isRemoving}
+                            className="p-1 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                            title="Remove from wishlist"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

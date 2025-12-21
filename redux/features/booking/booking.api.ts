@@ -2,7 +2,6 @@ import { baseApi } from "@/redux/baseApi";
 
 export const bookingApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Tourist routes
     createBooking: builder.mutation({
       query: (data) => ({
         url: "/booking",
@@ -28,26 +27,9 @@ export const bookingApi = baseApi.injectEndpoints({
       invalidatesTags: ["booking"],
     }),
     
-    // Guide routes
-    getUpcomingBookings: builder.query({
-      query: () => ({
-        url: "/booking/guide/upcoming",
-        method: "GET",
-      }),
-      providesTags: ["booking"],
-    }),
-    
     getPendingBookings: builder.query({
       query: () => ({
         url: "/booking/guide/pending",
-        method: "GET",
-      }),
-      providesTags: ["booking"],
-    }),
-    
-    getAllGuideBookings: builder.query({
-      query: () => ({
-        url: "/booking/guide/all",
         method: "GET",
       }),
       providesTags: ["booking"],
@@ -61,20 +43,11 @@ export const bookingApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["booking"],
     }),
-    
+
     // Admin routes
     getAllBookings: builder.query({
       query: () => ({
-        url: "/booking/admin/all",
-        method: "GET",
-      }),
-      providesTags: ["booking"],
-    }),
-    
-    // Common routes
-    getBookingById: builder.query({
-      query: (id) => ({
-        url: `/booking/${id}`,
+        url: "/booking/admin/all-bookings",
         method: "GET",
       }),
       providesTags: ["booking"],
@@ -86,10 +59,7 @@ export const {
   useCreateBookingMutation,
   useGetMyBookingsQuery,
   useInitiatePaymentMutation,
-  useGetUpcomingBookingsQuery,
   useGetPendingBookingsQuery,
-  useGetAllGuideBookingsQuery,
   useUpdateBookingStatusMutation,
   useGetAllBookingsQuery,
-  useGetBookingByIdQuery,
 } = bookingApi;

@@ -6,7 +6,7 @@ import { Upload, X, Plus, Minus, ArrowLeft } from 'lucide-react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useGetMyToursQuery, useUpdateTourMutation, useGetTourEnumsQuery } from '@/redux/features/tour/tour.api';
+import { useGetGuideMyToursQuery, useUpdateTourMutation, useGetTourEnumsQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { toast } from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
@@ -74,7 +74,7 @@ export default function EditTourPage() {
   const tourId = params.id as string;
   
   const { data: me } = useGetMeQuery(undefined) as { data: any };
-  const { data: myToursData, isLoading: toursLoading } = useGetMyToursQuery({});
+  const { data: myToursData, isLoading: toursLoading } = useGetGuideMyToursQuery({});
   const { data: enumsData } = useGetTourEnumsQuery({});
   const [updateTour, { isLoading: isUpdating }] = useUpdateTourMutation();
   
@@ -548,9 +548,9 @@ export default function EditTourPage() {
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((category: string) => (
+                        {enumsData?.data?.categories?.map((category: string) => (
                           <SelectItem key={category} value={category}>
-                            {category.charAt(0) + category.slice(1).toLowerCase()}
+                            {category.charAt(0) + category.slice(1).toLowerCase().replace(/_/g, ' ')}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -578,8 +578,11 @@ export default function EditTourPage() {
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="DEACTIVATE">Deactivate</SelectItem>
+                        {enumsData?.data?.statuses?.map((stat: string) => (
+                          <SelectItem key={stat} value={stat}>
+                            {stat.charAt(0) + stat.slice(1).toLowerCase().replace(/_/g, ' ')}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   )}

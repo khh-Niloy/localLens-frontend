@@ -59,15 +59,6 @@ export default function HomePage() {
     );
   }
 
-  // Handle errors gracefully
-  if (userError) {
-    console.error('Error loading user data:', userError);
-    // Don't block the page, just show a toast
-    if (typeof window !== 'undefined') {
-      toast.error('Unable to load user information. Some features may be limited.');
-    }
-  }
-
   if (toursError) {
     console.error('Error loading tours:', toursError);
     // Don't block the page, just show a toast

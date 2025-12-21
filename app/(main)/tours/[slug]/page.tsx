@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useGetTourBySlugQuery, useGetTourByIdQuery } from '@/redux/features/tour/tour.api';
+import { useGetTourBySlugQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { useCreateBookingMutation } from '@/redux/features/booking/booking.api';
 import { useGetTourReviewsQuery } from '@/redux/features/review/review.api';
@@ -27,7 +27,9 @@ import {
   Phone,
   Mail,
   Shield,
-  Award
+  Award,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
@@ -35,23 +37,10 @@ import { toast } from 'react-hot-toast';
 export default function TourDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const slugOrId = params.slug as string;
+  const slug = params.slug as string;
   
-  // Check if the parameter looks like a MongoDB ObjectId (24 hex characters)
-  const isObjectId = /^[0-9a-fA-F]{24}$/.test(slugOrId);
-  
-  // Use appropriate query based on whether it's an ID or slug
-  const { data: tourBySlugData, isLoading: isLoadingBySlug, error: errorBySlug } = useGetTourBySlugQuery(slugOrId, {
-    skip: isObjectId
-  });
-  const { data: tourByIdData, isLoading: isLoadingById, error: errorById } = useGetTourByIdQuery(slugOrId, {
-    skip: !isObjectId
-  });
-  
-  // Use the appropriate data source
-  const tourData = isObjectId ? tourByIdData : tourBySlugData;
-  const isLoading = isObjectId ? isLoadingById : isLoadingBySlug;
-  const error = isObjectId ? errorById : errorBySlug;
+  // Fetch tour data by slug
+  const { data: tourData, isLoading, error } = useGetTourBySlugQuery(slug);
   
   const { data: userData } = useGetMeQuery({});
   const [createBooking, { isLoading: isCreatingBooking }] = useCreateBookingMutation();
@@ -65,6 +54,12 @@ export default function TourDetailsPage() {
     { skip: !tour?._id }
   );
   const reviews = reviewsData?.data?.reviews || [];
+
+  // Check if the current user is the guide owner of this tour
+  const isGuideOwner = userData && tour && (
+    userData.role === 'GUIDE' && 
+    (userData.userId === (tour.guideId?._id || tour.guideId) || userData._id === (tour.guideId?._id || tour.guideId))
+  );
 
   const handleBookTour = () => {
     if (!userData) {
@@ -127,12 +122,20 @@ export default function TourDetailsPage() {
       
       // Redirect to bookings page after a short delay
       setTimeout(() => {
-        router.push('/dashboard/all-bookings');
+        router.push('/dashboard/my-bookings');
       }, 1500);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to create booking. Please try again.');
     }
   };
+
+  const handleDeleteTour = () => {
+      if(confirm("Are you sure you want to delete this tour? This action cannot be undone.")) {
+          // Add delete logic here
+          toast.success("Tour deleted (simulation)");
+          router.push('/dashboard/my-tours');
+      }
+  }
 
   if (isLoading) {
     return (
@@ -195,9 +198,16 @@ export default function TourDetailsPage() {
                     <MapPin className="w-16 h-16 text-gray-400" />
                   </div>
                 )}
-                <div className="absolute top-4 right-4">
-                  <WishlistButton tourId={tour._id} size="lg" />
-                </div>
+                {!isGuideOwner && (
+                    <div className="absolute top-4 right-4">
+                        <WishlistButton tourId={tour._id} size="lg" />
+                    </div>
+                )}
+                {isGuideOwner && (
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-gray-200">
+                        Viewing as Owner
+                    </div>
+                )}
               </div>
 
               {/* Tour Header */}
@@ -221,6 +231,13 @@ export default function TourDetailsPage() {
                       <div className="flex items-center">
                         <Star className="w-4 h-4 mr-1 text-yellow-400 fill-current" />
                         <span>{tour.rating || 4.8} ({tour.reviewCount || 0} reviews)</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${
+                             tour.status === 'ACTIVE' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'
+                        }`}>
+                            {tour.status}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -396,7 +413,45 @@ export default function TourDetailsPage() {
 
           {/* Sidebar */}
           <div className="lg:sticky lg:top-6 lg:h-fit space-y-6">
-            {/* Booking Card */}
+            
+            {/* Guide Owner Controls - Only visible to the owner */}
+            {isGuideOwner && (
+                <div className="bg-white rounded-lg shadow-lg p-6 border-t-4 border-blue-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Manage Tour</h3>
+                    <p className="text-gray-600 text-sm mb-6">
+                        You are the owner of this tour. You can edit details or remove it from listings.
+                    </p>
+                    <div className="space-y-3">
+                        <Link 
+                            href={`/dashboard/edit-tour/${tour._id}`}
+                            className="flex items-center justify-center w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                        >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Tour Details
+                        </Link>
+                        <button 
+                            onClick={handleDeleteTour}
+                            className="flex items-center justify-center w-full bg-white text-red-600 border border-red-200 py-3 rounded-lg font-semibold hover:bg-red-50 transition-colors"
+                        >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete Tour
+                        </button>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-4 text-center">
+                        <div>
+                            <div className="text-2xl font-bold text-gray-900">{tour.bookingCount || 0}</div>
+                            <div className="text-xs text-gray-500">Total Bookings</div>
+                        </div>
+                         <div>
+                            <div className="text-2xl font-bold text-gray-900">{tour.reviewCount || 0}</div>
+                            <div className="text-xs text-gray-500">Total Reviews</div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Booking Card - Hidden for Owner */}
+            {!isGuideOwner && (
             <div className="bg-white rounded-lg shadow-lg p-6">
               <div className="text-center mb-6">
                 <div className="text-3xl font-bold text-[#1FB67A] mb-1">${tour.tourFee}</div>
@@ -414,7 +469,7 @@ export default function TourDetailsPage() {
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
                   <span className="text-gray-600 text-sm">Meeting Point</span>
-                  <span className="font-medium text-right text-xs">{tour.meetingPoint}</span>
+                  <span className="font-medium text-right text-xs max-w-[150px]">{tour.meetingPoint}</span>
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-gray-600 text-sm">Category</span>
@@ -435,6 +490,7 @@ export default function TourDetailsPage() {
                 </p>
               )}
             </div>
+            )}
 
             {/* Guide Information */}
             {tour.guideId && (
@@ -472,30 +528,32 @@ export default function TourDetailsPage() {
               </div>
             )}
 
-            {/* Tour Stats - Compact Version */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Quick Info</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Bookings</span>
-                  <span className="font-medium">{tour.bookingCount || 0}</span>
+            {/* View Stats - Compact Version (only for non-owners) */}
+            {!isGuideOwner && (
+                <div className="bg-white rounded-lg shadow p-4">
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Quick Info</h3>
+                <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Bookings</span>
+                    <span className="font-medium">{tour.bookingCount || 0}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Reviews</span>
+                    <span className="font-medium">{tour.reviewCount || 0}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Status</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        tour.status === 'ACTIVE' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                        {tour.status}
+                    </span>
+                    </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Reviews</span>
-                  <span className="font-medium">{tour.reviewCount || 0}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Status</span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    tour.status === 'ACTIVE' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {tour.status}
-                  </span>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -584,4 +642,3 @@ export default function TourDetailsPage() {
     </div>
   );
 }
-

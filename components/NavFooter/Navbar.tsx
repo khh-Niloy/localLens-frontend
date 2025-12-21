@@ -38,8 +38,8 @@ export function NavbarDemo() {
         return [
           { name: "Home", link: "/" },
           { name: "Explore Tours", link: "/explore-tours" },
-          { name: "My Bookings", link: "/dashboard/all-bookings" },
-          { name: "Profile", link: "/dashboard/profile" },
+          { name: "My Bookings", link: "/dashboard/my-bookings" },
+          { name: "Profile", link: "/profile" },
           { name: "Logout", link: "#", isAction: true },
         ];
       case 'guide':
@@ -47,7 +47,7 @@ export function NavbarDemo() {
           { name: "Home", link: "/" },
           { name: "Explore Tours", link: "/explore-tours" },
           { name: "Dashboard", link: "/dashboard" },
-          { name: "Profile", link: "/dashboard/profile" },
+          { name: "Profile", link: "/profile" },
           { name: "Logout", link: "#", isAction: true },
         ];
       case 'admin':
@@ -55,8 +55,8 @@ export function NavbarDemo() {
           { name: "Home", link: "/" },
           { name: "Admin Dashboard", link: "/dashboard" },
           { name: "Manage Users", link: "/dashboard/all-users" },
-          { name: "Manage Listings", link: "/dashboard/listings" },
-          { name: "Profile", link: "/dashboard/profile" },
+          { name: "Manage Listings", link: "/dashboard/all-tours" },
+          { name: "Profile", link: "/profile" },
           { name: "Logout", link: "#", isAction: true },
         ];
       default:

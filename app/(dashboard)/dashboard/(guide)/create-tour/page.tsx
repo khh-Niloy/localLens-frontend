@@ -6,7 +6,7 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { useCreateTourMutation } from '@/redux/features/tour/tour.api';
+import { useCreateTourMutation, useGetTourEnumsQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { toast } from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
@@ -24,10 +24,10 @@ const tourFormSchema = z.object({
   maxDuration: z.number().min(0.1, "Duration must be greater than 0"),
   meetingPoint: z.string().min(1, "Meeting point is required"),
   maxGroupSize: z.number().min(1, "Group size must be at least 1"),
-  category: z.enum(["FOOD", "HISTORICAL", "ART", "NATURE", "ADVENTURE", "CULTURAL"]),
+  category: z.string().min(1, "Category is required"),
   location: z.string().min(1, "Location is required"),
   cancellationPolicy: z.string().optional(),
-  status: z.enum(["ACTIVE", "DEACTIVATE"]).optional(),
+  status: z.string().optional(),
   itinerary: z.array(z.object({
     time: z.string().min(1, "Time is required"),
     title: z.string().min(1, "Title is required"),
@@ -41,8 +41,10 @@ type TourFormData = z.infer<typeof tourFormSchema>;
 export default function CreateTourPage() {
   const router = useRouter();
   const { data: me } = useGetMeQuery(undefined) as { data: any };
+  const { data: enumsResponse, isLoading: enumsLoading } = useGetTourEnumsQuery(undefined);
   const [createTour, { isLoading }] = useCreateTourMutation();
   
+  const tourEnums = enumsResponse?.data;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -368,12 +370,15 @@ export default function CreateTourPage() {
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="CULTURAL">Cultural</SelectItem>
-                        <SelectItem value="FOOD">Food & Drink</SelectItem>
-                        <SelectItem value="HISTORICAL">Historical</SelectItem>
-                        <SelectItem value="ADVENTURE">Adventure</SelectItem>
-                        <SelectItem value="NATURE">Nature</SelectItem>
-                        <SelectItem value="ART">Art & Museums</SelectItem>
+                        {enumsLoading ? (
+                          <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+                        ) : (
+                          tourEnums?.categories?.map((cat: string) => (
+                            <SelectItem key={cat} value={cat}>
+                              {cat.charAt(0) + cat.slice(1).toLowerCase().replace(/_/g, ' ')}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   )}
@@ -396,8 +401,15 @@ export default function CreateTourPage() {
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="DEACTIVATE">Deactivate</SelectItem>
+                        {enumsLoading ? (
+                          <SelectItem value="loading" disabled>Loading statuses...</SelectItem>
+                        ) : (
+                          tourEnums?.statuses?.map((stat: string) => (
+                            <SelectItem key={stat} value={stat}>
+                              {stat.charAt(0) + stat.slice(1).toLowerCase().replace(/_/g, ' ')}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   )}

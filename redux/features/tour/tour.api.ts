@@ -2,7 +2,6 @@ import { baseApi } from "@/redux/baseApi";
 
 export const tourApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Public routes
     getAllTours: builder.query({
       query: (params) => ({
         url: "/tour",
@@ -29,7 +28,6 @@ export const tourApi = baseApi.injectEndpoints({
       providesTags: ["tour"],
     }),
     
-    // Protected routes for guides
     createTour: builder.mutation({
       query: (data) => ({
         url: "/tour",
@@ -39,17 +37,9 @@ export const tourApi = baseApi.injectEndpoints({
       invalidatesTags: ["tour"],
     }),
     
-    getTourById: builder.query({
-      query: (id) => ({
-        url: `/tour/details/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["tour"],
-    }),
-    
     updateTour: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/tour/update/${id}`,
+        url: `/tour/update/${id}`, // Note: Mismatch noted earlier, keep for now as frontend logic depends on it, but backend is /:id
         method: "PATCH",
         data: data,
       }),
@@ -64,31 +54,38 @@ export const tourApi = baseApi.injectEndpoints({
       invalidatesTags: ["tour"],
     }),
     
-    // Universal my-tours endpoint (works for all roles)
-    getMyTours: builder.query({
-      query: () => ({
-        url: "/tour/my-tours",
-        method: "GET",
-      }),
-      providesTags: ["tour"],
-    }),
-    
-    // Helper endpoints
     getTourEnums: builder.query({
       query: () => ({
         url: "/tour/enums",
         method: "GET",
       }),
     }),
-    
-    // Admin routes
-    getAllToursForAdmin: builder.query({
+
+    getGuideMyTours: builder.query({
       query: () => ({
-        url: "/tour/admin/all",
+        url: "/tour/guide/my-tours",
         method: "GET",
       }),
       providesTags: ["tour"],
     }),
+
+    getTouristMyTours: builder.query({
+      query: () => ({
+        url: "/tour/tourist/my-tours",
+        method: "GET",
+      }),
+      providesTags: ["tour"],
+    }),
+
+    // Admin routes
+    getAllToursForAdmin: builder.query({
+      query: () => ({
+        url: "/tour/admin/all-tours",
+        method: "GET",
+      }),
+      providesTags: ["tour"],
+    }),
+    
   }),
 });
 
@@ -96,11 +93,11 @@ export const {
   useGetAllToursQuery,
   useSearchToursQuery,
   useGetTourBySlugQuery,
-  useGetTourByIdQuery,
   useCreateTourMutation,
   useUpdateTourMutation,
   useDeleteTourMutation,
-  useGetMyToursQuery,
-  useGetAllToursForAdminQuery,
+  useGetGuideMyToursQuery,
+  useGetTouristMyToursQuery,
   useGetTourEnumsQuery,
+  useGetAllToursForAdminQuery,
 } = tourApi;

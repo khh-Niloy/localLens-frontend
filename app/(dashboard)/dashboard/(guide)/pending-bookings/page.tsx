@@ -142,261 +142,126 @@ export default function PendingBookingsPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {pendingBookings.map((booking: any) => {
-            const tour = booking.tourId || {};
-            const user = isGuide ? (booking.userId || {}) : (booking.guideId || {});
-            const payment = booking.payment || {};
-            const paymentStatus = payment.status || 'UNPAID';
-            
-            return (
-              <div key={booking._id} className="bg-white rounded-lg shadow border overflow-hidden">
-                <div className="md:flex">
-                  {/* Tour Image */}
-                  <div className="md:w-1/3">
-                    <img 
-                      src={tour.images?.[0] || 'https://via.placeholder.com/300x200'} 
-                      alt={tour.title}
-                      className="w-full h-48 md:h-full object-cover"
-                    />
-                  </div>
-                  
-                  {/* Booking Details */}
-                  <div className="md:w-2/3 p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">{tour.title}</h3>
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-2">
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-2" />
-                            <span>{new Date(booking.bookingDate).toLocaleDateString('en-US', { 
-                              weekday: 'long', 
-                              year: 'numeric', 
-                              month: 'long', 
-                              day: 'numeric' 
-                            })}</span>
+        <div className="overflow-x-auto bg-white rounded-lg shadow border">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tour
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {isGuide ? 'Tourist' : 'Guide'}
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date & Time
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Details
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {pendingBookings.map((booking: any) => {
+                const tour = booking.tourId || {};
+                const user = isGuide ? (booking.userId || {}) : (booking.guideId || {});
+                const payment = booking.payment || {};
+                const paymentStatus = payment.status || 'UNPAID';
+                
+                return (
+                  <tr key={booking._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <img 
+                            className="h-10 w-10 rounded-lg object-cover" 
+                            src={tour.images?.[0] || 'https://via.placeholder.com/40x40'} 
+                            alt={tour.title} 
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900 max-w-[200px] truncate" title={tour.title}>
+                            {tour.title}
                           </div>
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-2" />
-                            <span>{booking.bookingTime} • {tour.maxDuration || 'N/A'} hours</span>
-                          </div>
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            <span>{tour.location || 'Location TBD'}</span>
-                          </div>
+                          <div className="text-xs text-gray-500">{tour.location}</div>
                         </div>
                       </div>
-                      <div className="text-right ml-4">
-                        <div className="text-2xl font-bold text-[#1FB67A] mb-2">${booking.totalAmount || 0}</div>
-                        <div className="text-xs text-gray-500 mb-2">Booking #{booking._id.slice(-6)}</div>
-                        <span className={`inline-block px-3 py-1 text-xs rounded-full font-medium ${getStatusColor(booking.status)}`}>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-8 w-8">
+                          <img 
+                            className="h-8 w-8 rounded-full object-cover" 
+                            src={user.image || 'https://via.placeholder.com/32x32'} 
+                            alt={user.name} 
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                          {user.email && <div className="text-xs text-gray-500">{user.email}</div>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {new Date(booking.bookingDate).toLocaleDateString()}
+                      </div>
+                      <div className="text-xs text-gray-500">{booking.bookingTime}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">${booking.totalAmount}</div>
+                      <div className="text-xs text-gray-500">{booking.numberOfGuests} Guests</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col gap-1">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-max ${getStatusColor(booking.status)}`}>
                           {booking.status}
                         </span>
-                      </div>
-                    </div>
-
-                    {/* Status and Payment Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <div className="text-xs text-gray-500 mb-1">Booking Status</div>
-                        <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
-                          {booking.status}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-500 mb-1">Payment Status</div>
-                        <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(paymentStatus)}`}>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-max ${getPaymentStatusColor(paymentStatus)}`}>
                           {paymentStatus}
-                        </div>
-                        {payment.transactionId && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            Txn: {payment.transactionId}
-                          </div>
-                        )}
+                        </span>
                       </div>
-                    </div>
-
-                    {/* User Information (Guide sees Tourist, Tourist sees Guide) */}
-                    {user && (
-                      <div className="border-t pt-4 mb-4">
-                        <h4 className="font-medium text-gray-900 mb-3">
-                          {isGuide ? 'Tourist Information' : 'Guide Information'}
-                        </h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <img 
-                              src={user.image || 'https://via.placeholder.com/48x48'} 
-                              alt={user.name}
-                              className="w-12 h-12 rounded-full object-cover mr-3"
-                            />
-                            <div>
-                              <p className="font-medium text-gray-900">{user.name}</p>
-                              {user.email && (
-                                <div className="flex items-center text-xs text-gray-600">
-                                  <Mail className="w-3 h-3 mr-1" />
-                                  <span>{user.email}</span>
-                                </div>
-                              )}
-                              {user.phone && (
-                                <div className="flex items-center text-xs text-gray-600">
-                                  <Phone className="w-3 h-3 mr-1" />
-                                  <span>{user.phone}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center">
-                              <Users className="w-4 h-4 text-gray-400 mr-1" />
-                              <span className="text-sm text-gray-600">{booking.numberOfGuests} guest{booking.numberOfGuests > 1 ? 's' : ''}</span>
-                            </div>
-                            {isGuide && (
-                              <div className="flex space-x-2">
-                                {user.phone && (
-                                  <a 
-                                    href={`tel:${user.phone}`}
-                                    className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                    title="Call tourist"
-                                  >
-                                    <Phone className="w-4 h-4" />
-                                  </a>
-                                )}
-                                {user.email && (
-                                  <a 
-                                    href={`mailto:${user.email}`}
-                                    className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                    title="Email tourist"
-                                  >
-                                    <Mail className="w-4 h-4" />
-                                  </a>
-                                )}
-                              </div>
-                            )}
-                            {isTourist && (
-                              <div className="flex space-x-2">
-                                {user.phone && (
-                                  <a 
-                                    href={`tel:${user.phone}`}
-                                    className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                    title="Call guide"
-                                  >
-                                    <Phone className="w-4 h-4" />
-                                  </a>
-                                )}
-                                {user.email && (
-                                  <a 
-                                    href={`mailto:${user.email}`}
-                                    className="p-2 text-gray-400 hover:text-[#1FB67A] transition-colors"
-                                    title="Email guide"
-                                  >
-                                    <Mail className="w-4 h-4" />
-                                  </a>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Additional Booking Info */}
-                    <div className="border-t pt-4 mb-4">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500">Created:</span>
-                          <span className="ml-2 text-gray-900">
-                            {new Date(booking.createdAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
-                        </div>
-                        {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
-                          <div>
-                            <span className="text-gray-500">Last Updated:</span>
-                            <span className="ml-2 text-gray-900">
-                              {new Date(booking.updatedAt).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex justify-between items-center mt-6 pt-4 border-t">
-                      <Link
-                        href={`/tours/${tour.slug || tour._id}`}
-                        className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium"
-                      >
-                        View Tour Details
-                      </Link>
-                      {isGuide && (
-                        <div className="flex space-x-3">
-                          {booking.status === 'PENDING' && (
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                       <div className="flex justify-end gap-2">
+                          <Link
+                            href={`/tours/${tour.slug || tour._id}`}
+                            className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium px-2 py-1"
+                          >
+                            View
+                          </Link>
+                          {isGuide && booking.status === 'PENDING' && (
                             <>
-                              <button
-                                onClick={() => handleDeclineBooking(booking._id)}
-                                disabled={isUpdating}
-                                className="flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-sm disabled:opacity-50"
-                              >
-                                <XCircle className="w-4 h-4 mr-2" />
-                                Decline
-                              </button>
                               <button
                                 onClick={() => handleAcceptBooking(booking._id)}
                                 disabled={isUpdating}
-                                className="flex items-center px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] transition-colors text-sm disabled:opacity-50"
+                                className="text-blue-600 hover:text-blue-900 disabled:opacity-50 px-2 py-1"
+                                title="Accept"
                               >
-                                <CheckCircle className="w-4 h-4 mr-2" />
-                                {isUpdating ? 'Processing...' : 'Accept Booking'}
+                                <CheckCircle className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeclineBooking(booking._id)}
+                                disabled={isUpdating}
+                                className="text-red-600 hover:text-red-900 disabled:opacity-50 px-2 py-1"
+                                title="Decline"
+                              >
+                                <XCircle className="w-5 h-5" />
                               </button>
                             </>
                           )}
-                          {booking.status === 'CONFIRMED' && (
-                            <button
-                              onClick={() => handleCompleteBooking(booking._id)}
-                              disabled={isUpdating}
-                              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm disabled:opacity-50"
-                            >
-                              <CheckCircle className="w-4 h-4 mr-2" />
-                              {isUpdating ? 'Processing...' : 'Mark as Completed'}
-                            </button>
-                          )}
-                          {booking.status === 'COMPLETED' && paymentStatus === 'PAID' && (
-                            <div className="flex items-center text-green-600 text-sm">
-                              <DollarSign className="w-4 h-4 mr-1" />
-                              <span>Payment Received</span>
-                            </div>
-                          )}
-                          {booking.status === 'COMPLETED' && paymentStatus === 'UNPAID' && (
-                            <div className="flex items-center text-yellow-600 text-sm">
-                              <DollarSign className="w-4 h-4 mr-1" />
-                              <span>Awaiting Payment</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {isTourist && (
-                        <div className="text-sm text-gray-600">
-                          Waiting for guide approval
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                       </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

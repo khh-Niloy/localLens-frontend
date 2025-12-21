@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useGetMyToursQuery } from '@/redux/features/tour/tour.api';
+import { useGetGuideMyToursQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import Link from 'next/link';
 import { Edit, Eye } from 'lucide-react';
@@ -19,7 +19,7 @@ interface Tour {
 }
 
 export default function EditTourListPage() {
-  const { data: myToursData, isLoading: toursLoading, error: toursError } = useGetMyToursQuery({});
+  const { data: myToursData, isLoading: toursLoading, error: toursError } = useGetGuideMyToursQuery({});
   const { data: userData } = useGetMeQuery({});
   
   const tours: Tour[] = myToursData?.data || [];

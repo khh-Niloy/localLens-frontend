@@ -10,14 +10,6 @@ export const userApi = baseApi.injectEndpoints({
       }),
     }),
     
-    getPublicProfile: builder.query({
-      query: (id) => ({
-        url: `/user/profile/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["user"],
-    }),
-    
     // Protected routes
     getProfile: builder.query({
       query: () => ({
@@ -44,46 +36,17 @@ export const userApi = baseApi.injectEndpoints({
     // Admin routes
     getAllUsers: builder.query({
       query: () => ({
-        url: "/user/admin/all",
+        url: "/user/admin/all-users",
         method: "GET",
       }),
       providesTags: ["user"],
-    }),
-    
-    getUsersByRole: builder.query({
-      query: (role) => ({
-        url: `/user/admin/role/${role}`,
-        method: "GET",
-      }),
-      providesTags: ["user"],
-    }),
-    
-    updateUser: builder.mutation({
-      query: ({ id, ...data }) => ({
-        url: `/user/admin/${id}`,
-        method: "PATCH",
-        data: data,
-      }),
-      invalidatesTags: ["user"],
-    }),
-    
-    deleteUser: builder.mutation({
-      query: (id) => ({
-        url: `/user/admin/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["user"],
     }),
   }),
 });
 
 export const {
   useGetUserEnumsQuery,
-  useGetPublicProfileQuery,
   useGetProfileQuery,
   useUpdateProfileMutation,
   useGetAllUsersQuery,
-  useGetUsersByRoleQuery,
-  useUpdateUserMutation,
-  useDeleteUserMutation,
 } = userApi;
