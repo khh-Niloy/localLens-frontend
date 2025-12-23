@@ -13,6 +13,7 @@ import {
   CheckCircle,
   User,
   Home,
+  MessageSquare,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -45,6 +46,7 @@ const iconMap: Record<string, any> = {
   "Upcoming Bookings": Clock,
   "Pending Bookings": CheckCircle,
   "Past Bookings": BarChart3,
+  "Reviews": MessageSquare,
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

@@ -53,7 +53,7 @@ export default function TourDetailsPage() {
     { tourId: tour?._id || '', page: 1, limit: 10 },
     { skip: !tour?._id }
   );
-  const reviews = reviewsData?.data?.reviews || [];
+  const reviews = reviewsData?.reviews || [];
 
   // Check if the current user is the guide owner of this tour
   const isGuideOwner = userData && tour && (
@@ -392,6 +392,7 @@ export default function TourDetailsPage() {
                                   }`}
                                 />
                               ))}
+                              <span className="ml-2 text-sm font-bold text-gray-700">{review.rating.toFixed(1)}</span>
                             </div>
                           </div>
                         </div>
@@ -403,7 +404,7 @@ export default function TourDetailsPage() {
                           })}
                         </span>
                       </div>
-                      <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                      <p className="text-gray-700 leading-relaxed italic">"{review.comment || 'No comment provided'}"</p>
                     </div>
                   ))}
                 </div>

@@ -5,6 +5,9 @@ import { Calendar, MapPin, Clock, Users, Phone, Mail, DollarSign, CheckCircle } 
 import Link from 'next/link';
 import { useGetTouristMyToursQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
+import { useGetUserReviewsQuery } from '@/redux/features/review/review.api';
+import ReviewModal from '@/components/Review/ReviewModal';
+import { useState } from 'react';
 
 type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'FAILED';
 type PaymentStatus = 'PAID' | 'UNPAID' | 'CANCELLED' | 'FAILED' | 'REFUNDED';
@@ -48,6 +51,15 @@ export default function MyTripsPage() {
   const { data: bookingsData, isLoading, error } = useGetTouristMyToursQuery(undefined, { 
     skip: !userData || userData.role !== 'TOURIST' 
   });
+  
+  const { data: userReviews } = useGetUserReviewsQuery(
+    { userId: userData?._id as string, limit: 100 },
+    { skip: !userData?._id }
+  );
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [existingReview, setExistingReview] = useState<any>(null);
 
   const allBookings = bookingsData?.data || [];
 
@@ -172,12 +184,26 @@ export default function MyTripsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link
-                          href={`/tours/${tour.slug || tour._id}`}
-                          className="text-[#1FB67A] hover:text-[#1dd489] font-medium"
-                      >
-                          View Details
-                      </Link>
+                      <div className="flex flex-col items-end gap-2">
+                        <Link
+                            href={`/tours/${typeof tour === 'object' ? (tour.slug || tour._id) : tour}`}
+                            className="text-[#1FB67A] hover:text-[#1dd489] font-medium"
+                        >
+                            View Details
+                        </Link>
+                        {booking.status === 'COMPLETED' && (
+                          <button
+                            onClick={() => {
+                              setSelectedBooking(booking);
+                              setExistingReview(userReviews?.reviews?.find((r: any) => r.bookingId === booking._id));
+                              setIsModalOpen(true);
+                            }}
+                            className="text-white bg-[#1FB67A] hover:bg-[#1dd489] px-3 py-1 rounded text-xs transition-colors"
+                          >
+                            {userReviews?.reviews?.some((r: any) => r.bookingId === booking._id) ? 'Edit Feedback' : 'Give Feedback'}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -185,6 +211,19 @@ export default function MyTripsPage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {selectedBooking && (
+        <ReviewModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedBooking(null);
+            setExistingReview(null);
+          }}
+          booking={selectedBooking}
+          existingReview={existingReview}
+        />
       )}
     </div>
   );

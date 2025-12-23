@@ -77,6 +77,10 @@ const routes: Record<string, IRoleRoute[]> = {
         },
       ],
     },
+    {
+      title: "Reviews",
+      url: "/dashboard/reviews",
+    },
   ],
   tourist: [
     {
@@ -90,6 +94,10 @@ const routes: Record<string, IRoleRoute[]> = {
     {
       title: "My Completed Tours",
       url: "/dashboard/my-trips",
+    },
+    {
+      title: "Reviews",
+      url: "/dashboard/reviews",
     },
     {
       title: "Wishlist",

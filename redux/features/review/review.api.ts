@@ -21,13 +21,7 @@ export const reviewApi = baseApi.injectEndpoints({
       invalidatesTags: ["review"],
     }),
     
-    deleteReview: builder.mutation({
-      query: (id) => ({
-        url: `/review/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["review"],
-    }),
+
     
     // Public routes - view reviews
     getTourReviews: builder.query({
@@ -36,6 +30,7 @@ export const reviewApi = baseApi.injectEndpoints({
         method: "GET",
         params: { page, limit },
       }),
+      transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
@@ -45,6 +40,7 @@ export const reviewApi = baseApi.injectEndpoints({
         method: "GET",
         params: { page, limit },
       }),
+      transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
@@ -54,36 +50,18 @@ export const reviewApi = baseApi.injectEndpoints({
         method: "GET",
         params: { page, limit },
       }),
+      transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
-    // Admin routes
-    getAllReviews: builder.query({
-      query: ({ page = 1, limit = 20 }) => ({
-        url: "/review/admin/all",
-        method: "GET",
-        params: { page, limit },
-      }),
-      providesTags: ["review"],
-    }),
-    
-    adminDeleteReview: builder.mutation({
-      query: (id) => ({
-        url: `/review/admin/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["review"],
-    }),
+
   }),
 });
 
 export const {
   useCreateReviewMutation,
   useUpdateReviewMutation,
-  useDeleteReviewMutation,
   useGetTourReviewsQuery,
   useGetGuideReviewsQuery,
   useGetUserReviewsQuery,
-  useGetAllReviewsQuery,
-  useAdminDeleteReviewMutation,
 } = reviewApi;
