@@ -67,7 +67,7 @@ export default function MyTripsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
         </div>
       </div>
     );
@@ -101,7 +101,7 @@ export default function MyTripsPage() {
           </p>
           <Link
             href="/explore-tours"
-            className="inline-block bg-[#1FB67A] text-white px-6 py-2 rounded-md hover:bg-[#1dd489] transition-colors"
+            className="inline-block bg-[#4088FD] text-white px-6 py-2 rounded-md hover:bg-[#357ae8] transition-colors"
           >
             Browse Tours
           </Link>
@@ -187,7 +187,7 @@ export default function MyTripsPage() {
                       <div className="flex flex-col items-end gap-2">
                         <Link
                             href={`/tours/${typeof tour === 'object' ? (tour.slug || tour._id) : tour}`}
-                            className="text-[#1FB67A] hover:text-[#1dd489] font-medium"
+                            className="text-[#4088FD] hover:text-[#357ae8] font-medium"
                         >
                             View Details
                         </Link>
@@ -198,7 +198,7 @@ export default function MyTripsPage() {
                               setExistingReview(userReviews?.reviews?.find((r: any) => r.bookingId === booking._id));
                               setIsModalOpen(true);
                             }}
-                            className="text-white bg-[#1FB67A] hover:bg-[#1dd489] px-3 py-1 rounded text-xs transition-colors"
+                            className="text-white bg-[#4088FD] hover:bg-[#357ae8] px-3 py-1 rounded text-xs transition-colors"
                           >
                             {userReviews?.reviews?.some((r: any) => r.bookingId === booking._id) ? 'Edit Feedback' : 'Give Feedback'}
                           </button>

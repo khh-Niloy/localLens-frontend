@@ -57,7 +57,7 @@ export default function GuideMyBookingsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
         </div>
       </div>
     );
@@ -88,7 +88,7 @@ export default function GuideMyBookingsPage() {
             onClick={() => setActiveTab(status)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               activeTab === status
-                ? 'bg-[#1FB67A] text-white shadow-md'
+                ? 'bg-[#4088FD] text-white shadow-md'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border'
             }`}
           >
@@ -195,7 +195,7 @@ export default function GuideMyBookingsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
                           href={`/tours/${tour.slug || tour._id}`}
-                          className="text-[#1FB67A] hover:text-[#1dd489] font-medium"
+                          className="text-[#4088FD] hover:text-[#357ae8] font-medium"
                       >
                           View Tour
                       </Link>

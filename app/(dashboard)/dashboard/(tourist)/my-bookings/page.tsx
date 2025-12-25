@@ -74,7 +74,7 @@ export default function MyBookingsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
         </div>
       </div>
     );
@@ -105,7 +105,7 @@ export default function MyBookingsPage() {
             onClick={() => setActiveTab(status)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               activeTab === status
-                ? 'bg-[#1FB67A] text-white shadow-md'
+                ? 'bg-[#4088FD] text-white shadow-md'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border'
             }`}
           >
@@ -124,7 +124,7 @@ export default function MyBookingsPage() {
           <p className="text-gray-500 mb-6">You don't have any bookings with this status.</p>
           <Link
             href="/explore-tours"
-            className="inline-block bg-[#1FB67A] text-white px-6 py-2 rounded-md hover:bg-[#1dd489] transition-colors"
+            className="inline-block bg-[#4088FD] text-white px-6 py-2 rounded-md hover:bg-[#357ae8] transition-colors"
           >
             Explore Tours
           </Link>
@@ -201,7 +201,7 @@ export default function MyBookingsPage() {
                       <div className="flex justify-end gap-2 items-center">
                         <Link
                             href={`/tours/${tour.slug || tour._id}`}
-                            className="text-[#1FB67A] hover:text-[#1dd489] underline"
+                            className="text-[#4088FD] hover:text-[#357ae8] underline"
                         >
                             View
                         </Link>
@@ -209,7 +209,7 @@ export default function MyBookingsPage() {
                           <button
                             onClick={() => handlePayment(booking._id)}
                             disabled={isPaying}
-                            className="ml-2 px-3 py-1 bg-[#1FB67A] text-white rounded text-xs hover:bg-[#1dd489] transition-colors disabled:opacity-50"
+                            className="ml-2 px-3 py-1 bg-[#4088FD] text-white rounded text-xs hover:bg-[#357ae8] transition-colors disabled:opacity-50"
                           >
                             {isPaying ? 'Processing...' : 'Pay'}
                           </button>

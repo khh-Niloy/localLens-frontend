@@ -600,7 +600,7 @@ export default function EditTourPage() {
                   type="button"
                   onClick={() => appendItinerary({ time: '', title: '', description: '', location: '' })}
                   size="sm"
-                  className="bg-[#1FB67A] hover:bg-[#1dd489]"
+                  className="bg-[#4088FD] hover:bg-[#357ae8]"
                 >
                   <Plus className="w-4 h-4" />
                   Add Item
@@ -703,7 +703,7 @@ export default function EditTourPage() {
                   type="button"
                   onClick={addHighlight}
                   size="sm"
-                  className="bg-[#1FB67A] hover:bg-[#1dd489]"
+                  className="bg-[#4088FD] hover:bg-[#357ae8]"
                 >
                   <Plus className="w-4 h-4" />
                   Add Highlight
@@ -744,7 +744,7 @@ export default function EditTourPage() {
                   type="button"
                   onClick={addIncluded}
                   size="sm"
-                  className="bg-[#1FB67A] hover:bg-[#1dd489]"
+                  className="bg-[#4088FD] hover:bg-[#357ae8]"
                 >
                   <Plus className="w-4 h-4" />
                   Add Item
@@ -785,7 +785,7 @@ export default function EditTourPage() {
                   type="button"
                   onClick={addNotIncluded}
                   size="sm"
-                  className="bg-[#1FB67A] hover:bg-[#1dd489]"
+                  className="bg-[#4088FD] hover:bg-[#357ae8]"
                 >
                   <Plus className="w-4 h-4" />
                   Add Item
@@ -826,7 +826,7 @@ export default function EditTourPage() {
                   type="button"
                   onClick={addImportantInfo}
                   size="sm"
-                  className="bg-[#1FB67A] hover:bg-[#1dd489]"
+                  className="bg-[#4088FD] hover:bg-[#357ae8]"
                 >
                   <Plus className="w-4 h-4" />
                   Add Info
@@ -905,8 +905,8 @@ export default function EditTourPage() {
               <div 
                 className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
                   isDragOver 
-                    ? 'border-[#1FB67A] bg-green-50' 
-                    : 'border-gray-300 hover:border-[#1FB67A]'
+                    ? 'border-[#4088FD] bg-green-50' 
+                    : 'border-gray-300 hover:border-[#4088FD]'
                 }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -925,7 +925,7 @@ export default function EditTourPage() {
                 <Button 
                   type="button" 
                   onClick={handleFileSelect}
-                  className="bg-[#1FB67A] hover:bg-[#1dd489]"
+                  className="bg-[#4088FD] hover:bg-[#357ae8]"
                 >
                   Choose Files
                 </Button>
@@ -965,7 +965,7 @@ export default function EditTourPage() {
               <Button 
                 type="submit"
                 disabled={isUpdating}
-                className="bg-[#1FB67A] hover:bg-[#1dd489]"
+                className="bg-[#4088FD] hover:bg-[#357ae8]"
               >
                 {isUpdating ? 'Updating...' : 'Update Tour'}
               </Button>

@@ -47,7 +47,7 @@ export default function AllBookingsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
         </div>
       </div>
     );
@@ -90,9 +90,9 @@ export default function AllBookingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Revenue</p>
-              <p className="text-xl font-bold text-[#1FB67A]">${totalRevenue.toLocaleString()}</p>
+              <p className="text-xl font-bold text-[#4088FD]">${totalRevenue.toLocaleString()}</p>
             </div>
-            <DollarSign className="w-6 h-6 text-[#1FB67A]" />
+            <DollarSign className="w-6 h-6 text-[#4088FD]" />
           </div>
         </div>
 
@@ -191,7 +191,7 @@ export default function AllBookingsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-[#1FB67A]">
+                      <div className="text-sm font-semibold text-[#4088FD]">
                         ${booking.totalAmount}
                       </div>
                       <div className="text-xs text-gray-500">

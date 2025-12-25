@@ -27,7 +27,7 @@ function PaymentFailContent() {
         <div className="space-y-3">
           <Link
             href="/explore-tours"
-            className="block w-full bg-[#1FB67A] text-white px-6 py-3 rounded-lg hover:bg-[#1dd489] transition-colors font-medium"
+            className="block w-full bg-[#4088FD] text-white px-6 py-3 rounded-lg hover:bg-[#357ae8] transition-colors font-medium"
           >
             Try Again
           </Link>
@@ -47,7 +47,7 @@ export default function PaymentFailPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
       </div>
     }>
       <PaymentFailContent />

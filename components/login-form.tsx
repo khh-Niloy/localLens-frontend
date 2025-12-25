@@ -42,10 +42,15 @@ export function LoginForm({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
+
+  const handleAutoLogin = async (email: string) => {
+    await onSubmit({ email, password: "12345678" });
+  };
 
   const onSubmit = async (data: LoginSchema) => {
     try {
@@ -78,7 +83,7 @@ export function LoginForm({
                   type="email"
                   placeholder="m@example.com"
                   required
-                  className="focus-visible:ring-[#1FB67A]"
+                  className="focus-visible:ring-[#4088FD]"
                   {...register("email")}
                 />
               </Field>
@@ -94,7 +99,7 @@ export function LoginForm({
                     id="password"
                     type={showPassword ? "text" : "password"}
                     required
-                    className="focus-visible:ring-[#1FB67A]"
+                    className="focus-visible:ring-[#4088FD]"
                     {...register("password")}
                   />
                   <button
@@ -119,24 +124,54 @@ export function LoginForm({
                 <Button 
                   type="submit" 
                   disabled={isLoading}
-                  style={{ backgroundColor: '#1FB67A', color: 'white' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1dd489'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1FB67A'}
+                  style={{ backgroundColor: '#4088FD', color: 'white' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#357ae8'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4088FD'}
                 >
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account?{" "}
-                  <Link href="/register/tourist" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Sign up</Link>
+                  <Link href="/register/tourist" className="text-[#4088FD] hover:text-[#357ae8] hover:underline transition-colors">Sign up</Link>
                 </FieldDescription>
+
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-[10px] h-7 px-2 border-[#4088FD]/30 text-[#4088FD] hover:bg-[#4088FD]/10"
+                    onClick={() => handleAutoLogin("khhniloy01@gmail.com")}
+                  >
+                    Tourist
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-[10px] h-7 px-2 border-[#4088FD]/30 text-[#4088FD] hover:bg-[#4088FD]/10"
+                    onClick={() => handleAutoLogin("niloy.dev.101@gmail.com")}
+                  >
+                    Guide
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-[10px] h-7 px-2 border-[#4088FD]/30 text-[#4088FD] hover:bg-[#4088FD]/10"
+                    onClick={() => handleAutoLogin("khhniloy0@gmail.com")}
+                  >
+                    Admin
+                  </Button>
+                </div>
               </Field>
             </FieldGroup>
           </form>
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Terms of Service</a>{" "}
-        and <a href="#" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#" className="text-[#4088FD] hover:text-[#357ae8] hover:underline transition-colors">Terms of Service</a>{" "}
+        and <a href="#" className="text-[#4088FD] hover:text-[#357ae8] hover:underline transition-colors">Privacy Policy</a>.
       </FieldDescription>
     </div>
   );

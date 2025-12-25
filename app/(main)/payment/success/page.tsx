@@ -25,7 +25,7 @@ function PaymentSuccessContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="w-16 h-16 text-[#1FB67A] animate-spin mx-auto mb-4" />
+          <Loader2 className="w-16 h-16 text-[#4088FD] animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Processing your payment...</p>
         </div>
       </div>
@@ -49,7 +49,7 @@ function PaymentSuccessContent() {
               {amount && (
                 <>
                   <p className="text-sm text-gray-600 mb-1 mt-3">Amount Paid:</p>
-                  <p className="text-lg font-bold text-[#1FB67A]">${amount}</p>
+                  <p className="text-lg font-bold text-[#4088FD]">${amount}</p>
                 </>
               )}
             </div>
@@ -58,7 +58,7 @@ function PaymentSuccessContent() {
           <div className="space-y-3">
             <Link
               href="/dashboard/all-bookings"
-              className="block w-full bg-[#1FB67A] text-white px-6 py-3 rounded-lg hover:bg-[#1dd489] transition-colors font-medium"
+              className="block w-full bg-[#4088FD] text-white px-6 py-3 rounded-lg hover:bg-[#357ae8] transition-colors font-medium"
             >
               View My Bookings
             </Link>
@@ -86,7 +86,7 @@ function PaymentSuccessContent() {
         <div className="space-y-3">
           <Link
             href="/explore-tours"
-            className="block w-full bg-[#1FB67A] text-white px-6 py-3 rounded-lg hover:bg-[#1dd489] transition-colors font-medium"
+            className="block w-full bg-[#4088FD] text-white px-6 py-3 rounded-lg hover:bg-[#357ae8] transition-colors font-medium"
           >
             Try Again
           </Link>
@@ -107,7 +107,7 @@ export default function PaymentSuccessPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="w-16 h-16 text-[#1FB67A] animate-spin mx-auto mb-4" />
+          <Loader2 className="w-16 h-16 text-[#4088FD] animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>

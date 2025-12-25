@@ -118,7 +118,7 @@ export default function ReviewModal({ isOpen, onClose, booking, existingReview }
           <Button variant="outline" onClick={onClose} disabled={isCreating || isUpdating}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={isCreating || isUpdating} className="bg-[#1FB67A] hover:bg-[#1dd489]">
+          <Button onClick={handleSubmit} disabled={isCreating || isUpdating} className="bg-[#4088FD] hover:bg-[#357ae8]">
             {isCreating || isUpdating ? 'Submitting...' : existingReview ? 'Update Review' : 'Submit Review'}
           </Button>
         </DialogFooter>

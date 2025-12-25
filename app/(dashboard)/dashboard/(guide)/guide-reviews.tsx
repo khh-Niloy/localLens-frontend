@@ -17,7 +17,7 @@ export default function GuideReviews() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1FB67A]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4088FD]"></div>
       </div>
     );
   }

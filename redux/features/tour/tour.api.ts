@@ -8,7 +8,13 @@ export const tourApi = baseApi.injectEndpoints({
         method: "GET",
         params: params,
       }),
-      providesTags: ["tour"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
     }),
     
     searchTours: builder.query({
@@ -17,7 +23,13 @@ export const tourApi = baseApi.injectEndpoints({
         method: "GET",
         params: params,
       }),
-      providesTags: ["tour"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
     }),
     
     getTourBySlug: builder.query({
@@ -25,7 +37,7 @@ export const tourApi = baseApi.injectEndpoints({
         url: `/tour/${slug}`,
         method: "GET",
       }),
-      providesTags: ["tour"],
+      providesTags: (result, error, slug) => [{ type: 'tour', id: slug }],
     }),
     
     createTour: builder.mutation({
@@ -34,16 +46,19 @@ export const tourApi = baseApi.injectEndpoints({
         method: "POST",
         data: data,
       }),
-      invalidatesTags: ["tour"],
+      invalidatesTags: [{ type: 'tour', id: 'LIST' }],
     }),
     
     updateTour: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/tour/update/${id}`, // Note: Mismatch noted earlier, keep for now as frontend logic depends on it, but backend is /:id
+        url: `/tour/${id}`,
         method: "PATCH",
         data: data,
       }),
-      invalidatesTags: ["tour"],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'tour', id: 'LIST' },
+        { type: 'tour', id }
+      ],
     }),
     
     deleteTour: builder.mutation({
@@ -51,7 +66,10 @@ export const tourApi = baseApi.injectEndpoints({
         url: `/tour/delete/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["tour"],
+      invalidatesTags: (result, error, id) => [
+        { type: 'tour', id: 'LIST' },
+        { type: 'tour', id }
+      ],
     }),
     
     getTourEnums: builder.query({
@@ -66,7 +84,13 @@ export const tourApi = baseApi.injectEndpoints({
         url: "/tour/guide/my-tours",
         method: "GET",
       }),
-      providesTags: ["tour"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
     }),
 
     getTouristMyTours: builder.query({
@@ -74,7 +98,13 @@ export const tourApi = baseApi.injectEndpoints({
         url: "/tour/tourist/my-tours",
         method: "GET",
       }),
-      providesTags: ["tour"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
     }),
 
     // Admin routes
@@ -83,7 +113,13 @@ export const tourApi = baseApi.injectEndpoints({
         url: "/tour/admin/all-tours",
         method: "GET",
       }),
-      providesTags: ["tour"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
     }),
     
   }),

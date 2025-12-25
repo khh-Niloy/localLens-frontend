@@ -104,7 +104,7 @@ export default function PendingBookingsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
         </div>
       </div>
     );
@@ -231,7 +231,7 @@ export default function PendingBookingsPage() {
                        <div className="flex justify-end gap-2">
                           <Link
                             href={`/tours/${tour.slug || tour._id}`}
-                            className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium px-2 py-1"
+                            className="text-[#4088FD] hover:text-[#357ae8] text-sm font-medium px-2 py-1"
                           >
                             View
                           </Link>

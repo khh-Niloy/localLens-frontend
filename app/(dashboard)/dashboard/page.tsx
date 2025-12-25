@@ -30,9 +30,9 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Upcoming Bookings</p>
-              <p className="text-2xl font-bold text-[#1FB67A]">0</p>
+              <p className="text-2xl font-bold text-[#4088FD]">0</p>
             </div>
-            <Calendar className="w-8 h-8 text-[#1FB67A]" />
+            <Calendar className="w-8 h-8 text-[#4088FD]" />
           </div>
         </div>
         
@@ -108,9 +108,9 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Upcoming Trips</p>
-              <p className="text-2xl font-bold text-[#1FB67A]">0</p>
+              <p className="text-2xl font-bold text-[#4088FD]">0</p>
             </div>
-            <Calendar className="w-8 h-8 text-[#1FB67A]" />
+            <Calendar className="w-8 h-8 text-[#4088FD]" />
           </div>
         </div>
         
@@ -142,7 +142,7 @@ export default function DashboardPage() {
             <h2 className="text-lg font-semibold">Upcoming Trips</h2>
             <a 
               href="/dashboard/all-bookings"
-              className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium"
+              className="text-[#4088FD] hover:text-[#357ae8] text-sm font-medium"
             >
               View All
             </a>
@@ -152,7 +152,7 @@ export default function DashboardPage() {
             <div className="text-center">
               <a 
                 href="/explore-tours"
-                className="inline-block bg-[#1FB67A] text-white px-4 py-2 rounded-md hover:bg-[#1dd489] transition-colors text-sm"
+                className="inline-block bg-[#4088FD] text-white px-4 py-2 rounded-md hover:bg-[#357ae8] transition-colors text-sm"
               >
                 Browse Tours
               </a>
@@ -166,7 +166,7 @@ export default function DashboardPage() {
             <h2 className="text-lg font-semibold">Wishlist</h2>
             <a 
               href="/dashboard/wishlist"
-              className="text-[#1FB67A] hover:text-[#1dd489] text-sm font-medium"
+              className="text-[#4088FD] hover:text-[#357ae8] text-sm font-medium"
             >
               View All
             </a>
@@ -197,7 +197,7 @@ export default function DashboardPage() {
               className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-[#1FB67A]" />
+                <Calendar className="w-5 h-5 text-[#4088FD]" />
                 <span>View Upcoming Trips</span>
               </div>
               <span className="text-gray-400">→</span>
@@ -244,9 +244,9 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-[#1FB67A]">0</p>
+              <p className="text-2xl font-bold text-[#4088FD]">0</p>
             </div>
-            <Users className="w-8 h-8 text-[#1FB67A]" />
+            <Users className="w-8 h-8 text-[#4088FD]" />
           </div>
         </div>
         
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-[#1FB67A]" />
+                  <Users className="w-5 h-5 text-[#4088FD]" />
                   <span>Manage Users</span>
                 </div>
                 <span className="text-gray-400">→</span>

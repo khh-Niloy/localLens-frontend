@@ -1,16 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Heart, MapPin, Clock, Users, Star, Trash2 } from 'lucide-react';
+import { Heart, Search, Loader2, Trash2 } from 'lucide-react';
 import { useGetWishlistQuery, useRemoveFromWishlistMutation } from '@/redux/features/wishlist/wishlist.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import TourCard from '@/components/TourCard';
 
 export default function WishlistPage() {
   const { data: userData } = useGetMeQuery({});
   const { data: wishlistData, isLoading, error } = useGetWishlistQuery({}, { skip: !userData || userData.role !== 'TOURIST' });
-  const [removeFromWishlistMutation, { isLoading: isRemoving }] = useRemoveFromWishlistMutation();
+  const [removeFromWishlistMutation] = useRemoveFromWishlistMutation();
 
   const wishlistItems = wishlistData?.data || [];
 
@@ -23,176 +25,107 @@ export default function WishlistPage() {
     }
   };
 
-  const getAvailabilityBadge = (availability: string | undefined) => {
-    if (!availability) return null;
-    
-    switch (availability.toLowerCase()) {
-      case 'available':
-      case 'active':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Available</span>;
-      case 'limited':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Limited</span>;
-      case 'unavailable':
-        return <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Unavailable</span>;
-      default:
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">{availability}</span>;
-    }
+  // Mock onBook for TourCard
+  const handleBook = () => {
+    // Navigating to tour details usually happens via the card itself
   };
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
-        </div>
+      <div className="min-h-[400px] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[#4088FD] animate-spin" />
       </div>
     );
   }
 
-  if (!!error) {
+  if (error) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-          <p className="text-red-800">{(error as any)?.data?.message || 'Failed to load wishlist. Please try again.'}</p>
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-100 rounded-3xl p-6 text-center">
+          <p className="text-red-600 font-bold">{(error as any)?.data?.message || 'Failed to load wishlist. Please try again.'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Wishlist</h1>
-        <p className="text-gray-600">Tours and experiences you want to book</p>
+    <div className="p-8 max-w-[1600px] mx-auto">
+      <div className="mb-12">
+        <motion.div
+           initial={{ opacity: 0, x: -20 }}
+           animate={{ opacity: 1, x: 0 }}
+           className="flex items-center gap-3 mb-2"
+        >
+          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+            <Heart className="w-5 h-5 fill-current" />
+          </div>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Saved Experiences</h1>
+        </motion.div>
+        <motion.p 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-gray-500 font-medium ml-1"
+        >
+          {wishlistItems.length} adventures waiting for your next journey in Bangladesh.
+        </motion.p>
       </div>
 
-      {wishlistItems.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow border border-dashed border-gray-300">
-          <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Your wishlist is empty</h3>
-          <p className="text-gray-500 mb-6">Start adding tours you're interested in to your wishlist.</p>
-          <Link 
-            href="/explore-tours"
-            className="inline-block bg-[#1FB67A] text-white px-6 py-2 rounded-md hover:bg-[#1dd489] transition-colors"
+      <AnimatePresence mode="popLayout">
+        {wishlistItems.length === 0 ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="text-center py-24 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 shadow-blue-100/20"
           >
-            Browse Tours
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tour
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Guide
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rating
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {wishlistItems.map((item: any) => {
-                  const tour = item.tourId || item;
-                  const itemId = item._id || item.id;
-                  const tourId = tour._id || tour.tourId || item.tourId;
-
-                  return (
-                    <tr key={itemId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-16 w-24 relative">
-                            <img 
-                              className="h-16 w-24 rounded object-cover" 
-                              src={tour.images?.[0] || tour.image || 'https://via.placeholder.com/300x200'}
-                              alt={tour.title}
-                            />
-                             <div className="absolute top-0 right-0 -mr-1 -mt-1">
-                               {getAvailabilityBadge(tour.availability || tour.status)}
-                             </div>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900 line-clamp-1" title={tour.title}>
-                              {tour.title}
-                            </div>
-                            <div className="text-xs text-gray-500 flex items-center mt-1">
-                              <Clock className="w-3 h-3 mr-1" />
-                              {tour.maxDuration || tour.duration}h
-                              <span className="mx-1">•</span>
-                              <Users className="w-3 h-3 mr-1" />
-                              Max {tour.maxGroupSize}
-                            </div>
-                             <div className="text-xs text-gray-400 mt-1">
-                                Added {new Date(item.addedAt || item.addedDate || new Date()).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm text-gray-900">
-                           <MapPin className="w-3 h-3 mr-1 text-gray-400" />
-                           {tour.location}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                         <div className="flex items-center">
-                            <img 
-                              className="h-6 w-6 rounded-full object-cover mr-2" 
-                              src={tour.guideId?.image || tour.guide?.image || 'https://via.placeholder.com/24x24'}
-                              alt={tour.guideId?.name}
-                            />
-                            <div className="text-sm text-gray-900">{tour.guideId?.name || tour.guide?.name || 'Local Guide'}</div>
-                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-bold text-gray-900">${tour.tourFee || tour.price}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-                          {tour.rating || 4.8}
-                          <span className="text-xs text-gray-500 ml-1">({tour.reviewCount || 0})</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end gap-2 items-center">
-                           <Link
-                              href={`/tours/${tour.slug || tourId}`}
-                              className="text-[#1FB67A] hover:text-[#1dd489] font-medium"
-                            >
-                              View
-                           </Link>
-                           <button
-                            onClick={() => handleRemoveFromWishlist(tourId)}
-                            disabled={isRemoving}
-                            className="p-1 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                            title="Remove from wishlist"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="w-24 h-24 bg-blue-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8">
+              <Heart className="w-10 h-10 text-[#4088FD]" />
+            </div>
+            <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">Your Wishlist is Empty</h3>
+            <p className="text-gray-500 mb-10 max-w-sm mx-auto font-medium leading-relaxed">
+              Discover unique tours and save your favorites to plan the perfect trip!
+            </p>
+            <Link 
+              href="/explore-tours"
+              className="inline-flex items-center px-8 py-4 bg-[#4088FD] text-white rounded-2xl font-black text-lg hover:bg-blue-600 transition-all shadow-xl shadow-blue-100"
+            >
+              Start Exploring
+            </Link>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {wishlistItems.map((item: any, index: number) => {
+              const tour = item.tourId || item;
+              return (
+                <motion.div
+                  key={item._id || item.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="relative group"
+                >
+                  <TourCard 
+                    tour={tour} 
+                    userData={userData}
+                    onBook={handleBook}
+                  />
+                  {/* Remove Overlay Button for Wishlist context */}
+                  <button
+                    onClick={() => handleRemoveFromWishlist(tour._id || tour.id)}
+                    className="absolute top-4 left-4 z-20 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center text-red-500 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50"
+                    title="Remove from wishlist"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </motion.div>
+              );
+            })}
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

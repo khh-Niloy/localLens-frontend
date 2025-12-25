@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { useGetProfileQuery, useUpdateProfileMutation } from '@/redux/features/user/user.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { User, Mail, Phone, MapPin, Globe, Briefcase, DollarSign, Heart, Save, X } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe, Briefcase, DollarSign, Heart, Save, X, Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -12,6 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
+interface ProfileFormData {
+  name: string;
+  phone: string;
+  address: string;
+  bio: string;
+  language: string[];
+  expertise: string[];
+  dailyRate: string;
+  travelPreferences: string[];
+}
 
 const EXPERTISE_OPTIONS = [
   'History',
@@ -63,18 +76,27 @@ export default function ProfilePage() {
   const { data: profileData, isLoading: isLoadingProfile, refetch: refetchProfile } = useGetProfileQuery({}, { skip: !userData });
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    image: '',
-    phone: '',
-    address: '',
-    bio: '',
-    language: [] as string[],
-    expertise: [] as string[],
-    dailyRate: '',
-    travelPreferences: [] as string[],
+  const { 
+    register, 
+    handleSubmit: handleFormSubmit, 
+    reset, 
+    watch, 
+    setValue, 
+    formState: { isDirty, dirtyFields } 
+  } = useForm<ProfileFormData>({
+    defaultValues: {
+      name: '',
+      phone: '',
+      address: '',
+      bio: '',
+      language: [],
+      expertise: [],
+      dailyRate: '',
+      travelPreferences: [],
+    }
   });
 
+  const formData = watch();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
 
@@ -85,9 +107,8 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profileData?.data) {
       const profile = profileData.data;
-      setFormData({
+      reset({
         name: profile.name || '',
-        image: profile.image || '',
         phone: profile.phone || '',
         address: profile.address || '',
         bio: profile.bio || '',
@@ -98,18 +119,16 @@ export default function ProfilePage() {
       });
       setImagePreview(profile.image || '');
     }
-  }, [profileData]);
+  }, [profileData, reset]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         toast.error('Please select an image file');
         return;
       }
       
-      // Validate file size (5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error('Image size must be less than 5MB');
         return;
@@ -117,7 +136,6 @@ export default function ProfilePage() {
 
       setSelectedImage(file);
       
-      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -126,114 +144,78 @@ export default function ProfilePage() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   const addLanguage = () => {
     if (tempLanguage && !formData.language.includes(tempLanguage)) {
-      setFormData(prev => ({
-        ...prev,
-        language: [...prev.language, tempLanguage],
-      }));
+      setValue('language', [...formData.language, tempLanguage], { shouldDirty: true });
       setTempLanguage('');
     }
   };
 
   const removeLanguage = (lang: string) => {
-    setFormData(prev => ({
-      ...prev,
-      language: prev.language.filter(l => l !== lang),
-    }));
+    setValue('language', formData.language.filter(l => l !== lang), { shouldDirty: true });
   };
 
   const addExpertise = () => {
     if (tempExpertise && !formData.expertise.includes(tempExpertise)) {
-      setFormData(prev => ({
-        ...prev,
-        expertise: [...prev.expertise, tempExpertise],
-      }));
+      setValue('expertise', [...formData.expertise, tempExpertise], { shouldDirty: true });
       setTempExpertise('');
     }
   };
 
   const removeExpertise = (exp: string) => {
-    setFormData(prev => ({
-      ...prev,
-      expertise: prev.expertise.filter(e => e !== exp),
-    }));
+    setValue('expertise', formData.expertise.filter(e => e !== exp), { shouldDirty: true });
   };
 
   const addTravelPreference = () => {
     if (tempTravelPreference && !formData.travelPreferences.includes(tempTravelPreference)) {
-      setFormData(prev => ({
-        ...prev,
-        travelPreferences: [...prev.travelPreferences, tempTravelPreference],
-      }));
+      setValue('travelPreferences', [...formData.travelPreferences, tempTravelPreference], { shouldDirty: true });
       setTempTravelPreference('');
     }
   };
 
   const removeTravelPreference = (pref: string) => {
-    setFormData(prev => ({
-      ...prev,
-      travelPreferences: prev.travelPreferences.filter(p => p !== pref),
-    }));
+    setValue('travelPreferences', formData.travelPreferences.filter(p => p !== pref), { shouldDirty: true });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const onProfileSubmit = async (data: ProfileFormData) => {
     try {
-      // Create FormData for file upload
       const formDataToSend = new FormData();
       
-      // Add text fields
-      formDataToSend.append('name', formData.name);
-      if (formData.phone) formDataToSend.append('phone', formData.phone);
-      if (formData.address) formDataToSend.append('address', formData.address);
-      if (formData.bio) formDataToSend.append('bio', formData.bio);
+      formDataToSend.append('name', data.name);
+      if (data.phone) formDataToSend.append('phone', data.phone);
+      if (data.address) formDataToSend.append('address', data.address);
+      if (data.bio) formDataToSend.append('bio', data.bio);
       
-      // Add arrays as JSON strings
-      if (formData.language.length > 0) {
-        formDataToSend.append('language', JSON.stringify(formData.language));
+      if (data.language.length > 0) {
+        formDataToSend.append('language', JSON.stringify(data.language));
       }
 
-      // Add role-specific fields
       if (userData?.role === 'GUIDE') {
-        if (formData.expertise.length > 0) {
-          formDataToSend.append('expertise', JSON.stringify(formData.expertise));
+        if (data.expertise.length > 0) {
+          formDataToSend.append('expertise', JSON.stringify(data.expertise));
         }
-        if (formData.dailyRate) {
-          formDataToSend.append('dailyRate', formData.dailyRate);
+        if (data.dailyRate) {
+          formDataToSend.append('dailyRate', data.dailyRate);
         }
       } else if (userData?.role === 'TOURIST') {
-        if (formData.travelPreferences.length > 0) {
-          formDataToSend.append('travelPreferences', JSON.stringify(formData.travelPreferences));
+        if (data.travelPreferences.length > 0) {
+          formDataToSend.append('travelPreferences', JSON.stringify(data.travelPreferences));
         }
       }
 
-      // Add image file if selected
       if (selectedImage) {
         formDataToSend.append('image', selectedImage);
-        console.log('Sending image file:', selectedImage.name, selectedImage.size);
       }
 
       const result = await updateProfile(formDataToSend).unwrap();
       
-      // Update image preview with the new image URL from response
       if (result?.data?.image) {
         setImagePreview(result.data.image);
-        setFormData(prev => ({ ...prev, image: result.data.image }));
       }
       
-      setSelectedImage(null); // Clear selected image after successful upload
+      setSelectedImage(null);
       
-      // Refresh profile data to show updated image
       await refetchProfile();
-      
-      // Refetch user data to update address/phone in booking validation
       await refetchUserData();
       
       toast.success('Profile updated successfully!');
@@ -246,7 +228,7 @@ export default function ProfilePage() {
     return (
       <div className="p-6">
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
         </div>
       </div>
     );
@@ -257,332 +239,412 @@ export default function ProfilePage() {
   const isTourist = userData?.role === 'TOURIST';
 
   return (
-    <div className="p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Profile Settings</h1>
+    <div className="min-h-screen bg-gray-50/50 py-12 px-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-4xl mx-auto"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight">Profile <span className="text-[#4088FD]">Settings</span></h1>
+            <p className="text-gray-500 mt-1 font-medium">Manage your personal information and preferences</p>
+          </div>
+          <div className="flex gap-3">
+             <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-white hover:border-gray-300 transition-all text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleFormSubmit(onProfileSubmit)}
+              disabled={isUpdating || (!isDirty && !selectedImage)}
+              className="px-8 py-2.5 bg-[#4088FD] text-white rounded-xl font-bold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg shadow-blue-100 transition-all text-sm"
+              title={!isDirty && !selectedImage ? "No changes to save" : "Save changes"}
+            >
+              {isUpdating ? (
+                 <>
+                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                   Saving...
+                 </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleFormSubmit(onProfileSubmit)} className="space-y-8">
           {/* Profile Picture & Basic Info */}
-          <div className="bg-white rounded-lg shadow border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <User className="w-5 h-5 mr-2" />
-              Basic Information
-            </h2>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8"
+          >
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+                <User className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">Basic Information</h2>
+            </div>
 
-            <div className="flex items-start gap-6 mb-6">
-              <div className="flex-shrink-0">
+            <div className="flex flex-col sm:flex-row items-center gap-8 mb-8 p-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+              <div className="relative group">
                 {imagePreview ? (
                   <img
                     src={imagePreview}
                     alt="Profile"
-                    className="w-30 h-30 rounded-full object-cover border-4 border-gray-200"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
+                    className="w-32 h-32 rounded-3xl object-cover border-4 border-white shadow-xl"
                   />
                 ) : (
-                  <div className="w-30 h-30 rounded-full bg-gray-200 flex items-center justify-center text-4xl font-bold text-gray-400">
+                  <div className="w-32 h-32 rounded-3xl bg-blue-100 flex items-center justify-center text-4xl font-black text-[#4088FD]">
                     {formData.name.charAt(0).toUpperCase() || '?'}
                   </div>
                 )}
+                <div className="absolute inset-0 bg-black/40 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <p className="text-white text-[10px] font-bold uppercase tracking-widest text-center px-4">Change Photo</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Profile Picture
-                </label>
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Your Profile Photo</h3>
+                <p className="text-sm text-gray-500 mb-4 max-w-sm">
+                  Recommended: Square image, max 5MB. This photo will be visible to other users.
+                </p>
                 <input
+                  id="profile-upload"
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1FB67A] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#1FB67A] file:text-white hover:file:bg-[#1dd489]"
+                  className="hidden"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Maximum file size: 5MB. Accepted formats: JPG, PNG, GIF, WebP
-                </p>
+                <label 
+                  htmlFor="profile-upload"
+                  className="inline-flex cursor-pointer px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
+                >
+                  Upload New Photo
+                </label>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
                   Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
+                  {...register('name', { required: true })}
+                  className="w-full px-5 py-3.5 bg-gray-50 rounded-xl border border-transparent focus:bg-white focus:border-[#4088FD] focus:ring-4 focus:ring-blue-50 transition-all outline-none text-gray-900 font-medium"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <Mail className="w-4 h-4 mr-1" />
-                  Email
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+                  Email Address
                 </label>
-                <input
-                  type="email"
-                  value={profile?.email || ''}
-                  disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed"
-                />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <Phone className="w-4 h-4 mr-1" />
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="+1 234 567 8900"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  Address
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  placeholder="Your address"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
-                />
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bio
-              </label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-                rows={4}
-                placeholder="Tell us about yourself..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
-              />
-            </div>
-          </div>
-
-          {/* Languages Spoken */}
-          <div className="bg-white rounded-lg shadow border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <Globe className="w-5 h-5 mr-2" />
-              Languages Spoken
-            </h2>
-
-            <div className="mb-4">
-              <div className="flex gap-2">
-                <Select value={tempLanguage} onValueChange={setTempLanguage}>
-                  <SelectTrigger className="flex-1 w-full">
-                    <SelectValue placeholder="Select a language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {LANGUAGE_OPTIONS.map(lang => (
-                      <SelectItem key={lang} value={lang}>
-                        {lang}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <button
-                  type="button"
-                  onClick={addLanguage}
-                  className="px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489]"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {formData.language.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {formData.language.map(lang => (
-                  <span
-                    key={lang}
-                    className="inline-flex items-center px-3 py-1 bg-[#1FB67A]/10 text-[#1FB67A] rounded-full text-sm"
-                  >
-                    {lang}
-                    <button
-                      type="button"
-                      onClick={() => removeLanguage(lang)}
-                      className="ml-2 text-[#1FB67A] hover:text-red-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Guide-Specific Fields */}
-          {isGuide && (
-            <>
-              <div className="bg-white rounded-lg shadow border p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                  <Briefcase className="w-5 h-5 mr-2" />
-                  Guide Expertise
-                </h2>
-
-                <div className="mb-4">
-                  <div className="flex gap-2">
-                    <Select value={tempExpertise} onValueChange={setTempExpertise}>
-                      <SelectTrigger className="flex-1 w-full">
-                        <SelectValue placeholder="Select expertise area" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {EXPERTISE_OPTIONS.map(exp => (
-                          <SelectItem key={exp} value={exp}>
-                            {exp}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <button
-                      type="button"
-                      onClick={addExpertise}
-                      className="px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489]"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
-
-                {formData.expertise.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {formData.expertise.map(exp => (
-                      <span
-                        key={exp}
-                        className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                      >
-                        {exp}
-                        <button
-                          type="button"
-                          onClick={() => removeExpertise(exp)}
-                          className="ml-2 text-blue-800 hover:text-red-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-white rounded-lg shadow border p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                  <DollarSign className="w-5 h-5 mr-2" />
-                  Daily Rate
-                </h2>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    How much do you charge per day? (USD)
-                  </label>
-                  <input
-                    type="number"
-                    name="dailyRate"
-                    value={formData.dailyRate}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
+                <div className="relative group">
+                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#4088FD] transition-colors" />
+                   <input
+                    type="email"
+                    value={profile?.email || ''}
+                    disabled
+                    className="w-full pl-12 pr-5 py-3.5 bg-gray-100 rounded-xl border border-transparent text-gray-500 cursor-not-allowed font-medium"
                   />
                 </div>
               </div>
-            </>
-          )}
 
-          {/* Tourist-Specific Fields */}
-          {isTourist && (
-            <div className="bg-white rounded-lg shadow border p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                <Heart className="w-5 h-5 mr-2" />
-                Travel Preferences
-              </h2>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+                  Phone Number
+                </label>
+                <div className="relative group">
+                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#4088FD] transition-colors" />
+                   <input
+                    type="tel"
+                    {...register('phone')}
+                    placeholder="+880 1234 567890"
+                    className="w-full pl-12 pr-5 py-3.5 bg-gray-50 rounded-xl border border-transparent focus:bg-white focus:border-[#4088FD] focus:ring-4 focus:ring-blue-50 transition-all outline-none text-gray-900 font-medium font-mono"
+                  />
+                </div>
+              </div>
 
-              <div className="mb-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+                  Your Location
+                </label>
+                <div className="relative group">
+                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#4088FD] transition-colors" />
+                   <input
+                    type="text"
+                    {...register('address')}
+                    placeholder="Dhaka, Bangladesh"
+                    className="w-full pl-12 pr-5 py-3.5 bg-gray-50 rounded-xl border border-transparent focus:bg-white focus:border-[#4088FD] focus:ring-4 focus:ring-blue-50 transition-all outline-none text-gray-900 font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+                Short Bio
+              </label>
+              <textarea
+                {...register('bio')}
+                rows={4}
+                placeholder="Share your passion for travel and local experiences..."
+                className="w-full px-5 py-4 bg-gray-50 rounded-2xl border border-transparent focus:bg-white focus:border-[#4088FD] focus:ring-4 focus:ring-blue-50 transition-all outline-none text-gray-900 font-medium resize-none leading-relaxed"
+              />
+            </div>
+          </motion.div>
+
+          {/* Languages Spoken */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8"
+          >
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+                <Globe className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">Communication</h2>
+            </div>
+
+            <div className="space-y-6">
+              <div className="max-w-md">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Add Languages</label>
                 <div className="flex gap-2">
-                  <Select value={tempTravelPreference} onValueChange={setTempTravelPreference}>
-                    <SelectTrigger className="flex-1 w-full">
-                      <SelectValue placeholder="Select travel preference" />
+                  <Select value={tempLanguage} onValueChange={setTempLanguage}>
+                    <SelectTrigger className="rounded-xl border border-gray-100 bg-gray-50 h-12 outline-none focus:ring-4 focus:ring-blue-50 focus:border-[#4088FD] transition-all">
+                      <SelectValue placeholder="Select language..." />
                     </SelectTrigger>
-                    <SelectContent>
-                      {TRAVEL_PREFERENCES_OPTIONS.map(pref => (
-                        <SelectItem key={pref} value={pref}>
-                          {pref}
+                    <SelectContent className="rounded-xl border-gray-100 shadow-xl">
+                      {LANGUAGE_OPTIONS.map(lang => (
+                        <SelectItem key={lang} value={lang} className="rounded-lg">
+                          {lang}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   <button
                     type="button"
-                    onClick={addTravelPreference}
-                    className="px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489]"
+                    onClick={addLanguage}
+                    className="px-6 h-12 bg-white border border-[#4088FD] text-[#4088FD] font-bold rounded-xl hover:bg-[#4088FD] hover:text-white transition-all shadow-sm"
                   >
                     Add
                   </button>
                 </div>
               </div>
 
-              {formData.travelPreferences.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {formData.travelPreferences.map(pref => (
-                    <span
-                      key={pref}
-                      className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
+              <div className="flex flex-wrap gap-2 pt-2">
+                {formData.language.length > 0 ? (
+                  formData.language.map(lang => (
+                    <motion.span
+                      layout
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      key={lang}
+                      className="inline-flex items-center px-4 py-2 bg-blue-50 text-[#4088FD] rounded-xl text-sm font-bold border border-blue-100 shadow-sm"
                     >
-                      {pref}
+                      {lang}
                       <button
                         type="button"
-                        onClick={() => removeTravelPreference(pref)}
-                        className="ml-2 text-purple-800 hover:text-red-600"
+                        onClick={() => removeLanguage(lang)}
+                        className="ml-2.5 p-0.5 hover:bg-white rounded-md transition-colors"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
-                    </span>
-                  ))}
-                </div>
-              )}
+                    </motion.span>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400 font-medium italic">No languages added yet...</p>
+                )}
+              </div>
             </div>
+          </motion.div>
+
+          {/* Guide-Specific Fields */}
+          {isGuide && (
+            <>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8"
+              >
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+                    <Briefcase className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900">Your Expertise</h2>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="max-w-md">
+                     <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Add Specialties</label>
+                    <div className="flex gap-2">
+                      <Select value={tempExpertise} onValueChange={setTempExpertise}>
+                        <SelectTrigger className="rounded-xl border border-gray-100 bg-gray-50 h-12 outline-none focus:ring-4 focus:ring-blue-50 focus:border-[#4088FD] transition-all">
+                          <SelectValue placeholder="Select expertise area..." />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-gray-100 shadow-xl">
+                          {EXPERTISE_OPTIONS.map(exp => (
+                            <SelectItem key={exp} value={exp} className="rounded-lg">
+                              {exp}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <button
+                        type="button"
+                        onClick={addExpertise}
+                        className="px-6 h-12 bg-white border border-[#4088FD] text-[#4088FD] font-bold rounded-xl hover:bg-[#4088FD] hover:text-white transition-all shadow-sm"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {formData.expertise.length > 0 ? (
+                      formData.expertise.map(exp => (
+                        <motion.span
+                          layout
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          key={exp}
+                          className="inline-flex items-center px-4 py-2 bg-gray-50 text-gray-800 rounded-xl text-sm font-bold border border-gray-200 shadow-sm"
+                        >
+                          {exp}
+                          <button
+                            type="button"
+                            onClick={() => removeExpertise(exp)}
+                            className="ml-2.5 p-0.5 hover:bg-white rounded-md transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </motion.span>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-400 font-medium italic">Share your expertise to attract more tourists!</p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8"
+              >
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900">Service Rate</h2>
+                </div>
+
+                <div className="max-w-md">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-3 block">
+                    Daily Service Rate (TK)
+                  </label>
+                  <div className="relative group">
+                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-900 font-black">TK</span>
+                    <input
+                      type="number"
+                      {...register('dailyRate')}
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="w-full pl-12 pr-5 py-4 bg-gray-50 rounded-2xl border border-transparent focus:bg-white focus:border-[#4088FD] focus:ring-4 focus:ring-blue-50 transition-all outline-none text-gray-900 font-black text-xl"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400 mt-3 font-medium leading-relaxed">
+                    Set a competitive daily rate to attract more bookings. You can update this anytime based on demand.
+                  </p>
+                </div>
+              </motion.div>
+            </>
           )}
 
-          {/* Submit Button */}
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={() => window.history.back()}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+          {/* Tourist-Specific Fields */}
+          {isTourist && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8"
             >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isUpdating}
-              className="px-6 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] disabled:opacity-50 flex items-center"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {isUpdating ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center text-pink-500">
+                  <Heart className="w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Travel Style</h2>
+              </div>
+
+              <div className="space-y-6">
+                <div className="max-w-md">
+                   <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Your Preferences</label>
+                  <div className="flex gap-2">
+                    <Select value={tempTravelPreference} onValueChange={setTempTravelPreference}>
+                      <SelectTrigger className="rounded-xl border border-gray-100 bg-gray-50 h-12 outline-none focus:ring-4 focus:ring-blue-50 focus:border-[#4088FD] transition-all">
+                        <SelectValue placeholder="Select lifestyle preference..." />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-gray-100 shadow-xl">
+                        {TRAVEL_PREFERENCES_OPTIONS.map(pref => (
+                          <SelectItem key={pref} value={pref} className="rounded-lg">
+                            {pref}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <button
+                      type="button"
+                      onClick={addTravelPreference}
+                      className="px-6 h-12 bg-white border border-[#4088FD] text-[#4088FD] font-bold rounded-xl hover:bg-[#4088FD] hover:text-white transition-all shadow-sm"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {formData.travelPreferences.length > 0 ? (
+                    formData.travelPreferences.map(pref => (
+                      <motion.span
+                        layout
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        key={pref}
+                        className="inline-flex items-center px-4 py-2 bg-pink-50 text-pink-600 rounded-xl text-sm font-bold border border-pink-100 shadow-sm"
+                      >
+                        {pref}
+                        <button
+                          type="button"
+                          onClick={() => removeTravelPreference(pref)}
+                          className="ml-2.5 p-0.5 hover:bg-white rounded-md transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </motion.span>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-400 font-medium italic">Tell guides what you love to get better recommendations!</p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }

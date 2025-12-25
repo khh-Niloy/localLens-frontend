@@ -3,19 +3,14 @@
 import React, { useState } from 'react';
 import { useGetAllToursQuery, useGetTourEnumsQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
-import WishlistButton from '@/components/ui/WishlistButton';
+import { motion, AnimatePresence } from 'framer-motion';
+import TourCard from '@/components/TourCard';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog';
 import { 
   MapPin, 
-  Clock, 
-  Users, 
-  Star, 
   Search,
   Filter,
   SlidersHorizontal
@@ -95,89 +90,121 @@ export default function ExploreToursPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-white py-8 sm:py-12 md:py-16 lg:py-20 border-b border-gray-200">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 text-gray-900">
-            Explore Amazing Tours
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-2xl mx-auto px-4 text-gray-600">
-            Discover unique experiences curated by passionate local guides around the world
-          </p>
-          
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto px-4">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
-              <input
-                type="text"
-                placeholder="Search tours, locations, or experiences..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-lg bg-gray-50 text-gray-900 text-lg shadow-md border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#1FB67A] focus:border-[#1FB67A] placeholder:text-gray-400 transition-all"
-              />
-            </div>
+    <div className="min-h-screen bg-gray-50/50">
+      {/* Premium Hero Section */}
+      <section className="relative overflow-hidden bg-white pt-16 pb-24 md:pt-24 md:pb-32 border-b border-gray-100">
+        {/* Background Decorative Elements */}
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-blue-50/50 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-sky-50/50 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-[#4088FD] text-xs font-black uppercase tracking-widest mb-6"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-[#4088FD] animate-pulse" />
+              Bangladesh Awaits
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] mb-6 tracking-tight"
+            >
+              Explore Amazing <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4088FD] to-blue-600">Experiences</span>
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed mb-10 font-medium"
+            >
+              Discover unique adventures, authentic local culture, and hidden gems curated by passionate Bangladeshi guides.
+            </motion.p>
+            
+            {/* Search Bar Container */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="max-w-2xl mx-auto relative group"
+            >
+              <div className="absolute inset-0 bg-blue-100/50 rounded-[2rem] blur-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+              <div className="relative">
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-focus-within:text-[#4088FD] transition-colors" />
+                <input
+                  type="text"
+                  placeholder="Search experiences, cities, or guides..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-16 pr-8 py-6 rounded-[2rem] bg-white border border-gray-100 shadow-xl shadow-blue-100/20 text-lg text-gray-900 outline-none focus:ring-4 focus:ring-blue-50 focus:border-[#4088FD] transition-all placeholder:text-gray-400 font-medium"
+                />
+              </div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="container mx-auto px-6 py-8">
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-8">
-          <div className="flex items-center mb-4">
-            <SlidersHorizontal className="w-5 h-5 mr-2 text-[#1FB67A]" />
-            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+      <div className="container mx-auto px-6 -mt-10 relative z-20 pb-20">
+        {/* Filters Panel */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-blue-100/10 border border-white/50 p-8 mb-16"
+        >
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+              <Filter className="w-5 h-5" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Refine Discovery</h2>
+            <button
+               onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('');
+                setSelectedDestination('');
+                setSelectedLanguage('');
+                setPriceRange({ min: '', max: '' });
+              }}
+              className="ml-auto text-xs font-bold uppercase tracking-widest text-[#4088FD] hover:text-blue-600 transition-colors"
+            >
+              Reset Filters
+            </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Destination/City Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Destination / City</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Destination Filter */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Destination</label>
               <select
                 value={selectedDestination}
                 onChange={(e) => setSelectedDestination(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
+                className="w-full bg-gray-50/50 border border-transparent hover:border-blue-100 rounded-2xl px-5 py-4 text-sm font-bold text-gray-700 focus:bg-white focus:border-[#4088FD] transition-all outline-none appearance-none cursor-pointer"
               >
-                <option value="">All Destinations</option>
+                <option value="">All Regions</option>
                 {uniqueDestinations.map((destination: string) => (
-                  <option key={destination} value={destination}>
-                    {destination}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Language Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
-              >
-                <option value="">All Languages</option>
-                {uniqueLanguages.map((language: string) => (
-                  <option key={language} value={language}>
-                    {language}
-                  </option>
+                  <option key={destination} value={destination}>{destination}</option>
                 ))}
               </select>
             </div>
 
             {/* Category Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Experience Type</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
+                className="w-full bg-gray-50/50 border border-transparent hover:border-blue-100 rounded-2xl px-5 py-4 text-sm font-bold text-gray-700 focus:bg-white focus:border-[#4088FD] transition-all outline-none appearance-none cursor-pointer"
               >
                 <option value="">All Categories</option>
                 {categories.map((category: string) => (
@@ -188,216 +215,157 @@ export default function ExploreToursPage() {
               </select>
             </div>
 
+            {/* Language Filter */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Communication</label>
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className="w-full bg-gray-50/50 border border-transparent hover:border-blue-100 rounded-2xl px-5 py-4 text-sm font-bold text-gray-700 focus:bg-white focus:border-[#4088FD] transition-all outline-none appearance-none cursor-pointer"
+              >
+                <option value="">Any Language</option>
+                {uniqueLanguages.map((language: string) => (
+                  <option key={language} value={language}>{language}</option>
+                ))}
+              </select>
+            </div>
+
             {/* Price Range */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Min Price</label>
-              <input
-                type="number"
-                placeholder="$0"
-                value={priceRange.min}
-                onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
-              <input
-                type="number"
-                placeholder="$1000"
-                value={priceRange.max}
-                onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1FB67A]"
-              />
-            </div>
-          </div>
-
-          {/* Clear Filters Button */}
-          <div className="mt-4">
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedCategory('');
-                setSelectedDestination('');
-                setSelectedLanguage('');
-                setPriceRange({ min: '', max: '' });
-              }}
-              className="bg-gray-100 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
-            >
-              Clear All Filters
-            </button>
-          </div>
-        </div>
-
-        {/* Results Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {filteredTours.length} Tour{filteredTours.length !== 1 ? 's' : ''} Found
-          </h2>
-          <div className="text-sm text-gray-600">
-            Showing {filteredTours.length} of {tours.length} tours
-          </div>
-        </div>
-
-        {/* Tours Grid */}
-        {filteredTours.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-gray-400 mb-4">
-              <Search className="w-16 h-16 mx-auto" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No tours found</h3>
-            <p className="text-gray-600 mb-6">Try adjusting your search criteria or filters</p>
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedCategory('');
-                setSelectedDestination('');
-                setSelectedLanguage('');
-                setPriceRange({ min: '', max: '' });
-              }}
-              className="bg-[#1FB67A] text-white px-6 py-3 rounded-lg hover:bg-[#1dd489] transition-colors"
-            >
-              View All Tours
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredTours.map((tour: any) => (
-              <div key={tour._id} className="bg-white rounded-lg shadow-lg border overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="relative h-48">
-                  {tour.images && tour.images.length > 0 ? (
-                    <img 
-                      src={tour.images[0]} 
-                      alt={tour.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <MapPin className="w-12 h-12 text-gray-400" />
-                    </div>
-                  )}
-                  
-                  <div className="absolute top-3 right-3">
-                    <WishlistButton tourId={tour._id} />
-                  </div>
-                </div>
-                
-                <div className="p-6">
-                  <div className="mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{tour.title}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">{tour.description}</p>
-                  </div>
-                  
-                  <div className="flex items-center text-gray-600 mb-3">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    <span className="text-sm">{tour.location}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" />
-                      <span>{tour.maxDuration}h</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="w-4 h-4 mr-1" />
-                      <span>Max {tour.maxGroupSize}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 mr-1 text-yellow-400 fill-current" />
-                      <span>{tour.rating || 4.8}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <span className="text-2xl font-bold text-[#1FB67A]">${tour.tourFee}</span>
-                      <div className="text-xs text-gray-600">per person</div>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {tour.guideId?.name || 'Local Guide'}
-                    </div>
-                  </div>
-                  
-                  {/* Action Buttons */}
-                  <div className="flex space-x-2">
-                    <Link 
-                      href={`/tours/${tour.slug || tour._id}`}
-                      className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-center font-medium text-sm"
-                    >
-                      View Details
-                    </Link>
-                    {userData && userData.role === 'TOURIST' ? (
-                      <button 
-                        onClick={() => handleBookTour(tour)}
-                        className="flex-1 bg-[#1FB67A] text-white py-2 px-4 rounded-lg hover:bg-[#1dd489] transition-colors font-medium text-sm"
-                      >
-                        Book Now
-                      </button>
-                    ) : !userData ? (
-                      <Link 
-                        href="/login"
-                        className="flex-1 bg-[#1FB67A] text-white py-2 px-4 rounded-lg hover:bg-[#1dd489] transition-colors text-center font-medium text-sm"
-                      >
-                        Login to Book
-                      </Link>
-                    ) : (
-                      <button 
-                        disabled
-                        className="flex-1 bg-gray-300 text-gray-500 py-2 px-4 rounded-lg cursor-not-allowed font-medium text-sm"
-                        title="Only tourists can book tours"
-                      >
-                        Book Now
-                      </button>
-                    )}
-                  </div>
-                </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Price Range (TK)</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={priceRange.min}
+                  onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                  className="w-full bg-gray-50/50 border border-transparent focus:bg-white focus:border-[#4088FD] rounded-2xl px-4 py-4 text-sm font-bold text-gray-700 transition-all outline-none"
+                />
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={priceRange.max}
+                  onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                  className="w-full bg-gray-50/50 border border-transparent focus:bg-white focus:border-[#4088FD] rounded-2xl px-4 py-4 text-sm font-bold text-gray-700 transition-all outline-none"
+                />
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        </motion.div>
 
-        {/* Load More Button (if needed) */}
-        {filteredTours.length > 0 && filteredTours.length < tours.length && (
-          <div className="text-center mt-12">
-            <button className="bg-[#1FB67A] text-white px-8 py-3 rounded-lg hover:bg-[#1dd489] transition-colors font-medium">
-              Load More Tours
-            </button>
+        {/* Results Info */}
+        <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4 mb-10 px-4">
+          <div>
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight">
+              {filteredTours.length} <span className="text-gray-400 text-2xl font-bold ml-1">Experiences Found</span>
+            </h2>
           </div>
-        )}
+          <div className="flex items-center gap-2 text-sm text-gray-400 font-bold uppercase tracking-widest">
+            <SlidersHorizontal className="w-4 h-4" />
+            Sorted by relevance
+          </div>
+        </div>
+
+        {/* Dynamic Grid with AnimatePresence */}
+        <div className="relative min-h-[400px]">
+          <AnimatePresence mode="popLayout">
+            {filteredTours.length === 0 ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="flex flex-col items-center justify-center py-24 text-center"
+              >
+                <div className="w-24 h-24 bg-blue-50 rounded-[2rem] flex items-center justify-center mb-8">
+                  <Search className="w-10 h-10 text-[#4088FD]" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">No Experiences Found</h3>
+                <p className="text-gray-500 max-w-sm font-medium mb-10 leading-relaxed">
+                  We couldn't find any tours matching your current filters. Try adjusting your preferences!
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('');
+                    setSelectedDestination('');
+                    setSelectedLanguage('');
+                    setPriceRange({ min: '', max: '' });
+                  }}
+                  className="px-8 py-3.5 bg-gray-900 text-white rounded-2xl font-bold hover:bg-[#4088FD] transition-all shadow-xl shadow-gray-100"
+                >
+                  View All Experiences
+                </button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="grid"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+              >
+                {filteredTours.map((tour: any, index: number) => (
+                  <motion.div
+                    key={tour._id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <TourCard 
+                      tour={tour} 
+                      userData={userData} 
+                      onBook={handleBookTour} 
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Booking Modal */}
+      {/* Modernized Booking Modal */}
       <Dialog open={showBookingModal} onOpenChange={setShowBookingModal}>
         {selectedTour && (
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Book Your Experience</DialogTitle>
-              <DialogDescription>
-                View full tour details to complete your booking
-              </DialogDescription>
-            </DialogHeader>
+          <DialogContent className="max-w-md rounded-[2.5rem] border-none shadow-2xl overflow-hidden p-0">
+             <div className="h-24 bg-gradient-to-r from-[#4088FD] to-blue-600 flex items-center justify-center">
+               <h3 className="text-xl font-black text-white tracking-tight">Experience Summary</h3>
+             </div>
             
-            {/* Tour Summary */}
-            <div className="mb-3 p-3 bg-gray-50 rounded-lg">
-              <h4 className="font-medium text-gray-900 text-sm mb-1">{selectedTour.title}</h4>
-              <div className="flex items-center text-xs text-gray-600 mb-2">
-                <MapPin className="w-3 h-3 mr-1" />
-                <span>{selectedTour.location}</span>
+            <div className="p-8">
+              <div className="mb-6 p-6 bg-blue-50 rounded-[2rem] border border-blue-100">
+                <h4 className="font-black text-gray-900 text-lg mb-2 leading-tight">{selectedTour.title}</h4>
+                <div className="flex items-center text-sm text-[#4088FD] font-bold mb-4">
+                  <MapPin className="w-4 h-4 mr-1.5" />
+                  <span>{selectedTour.location}</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                   <span className="text-2xl font-black text-gray-900">{selectedTour.tourFee}</span>
+                   <span className="text-sm font-black text-gray-900 uppercase">TK</span>
+                   <span className="text-xs text-gray-400 font-bold ml-1 uppercase">/ Experience</span>
+                </div>
               </div>
-              <div className="text-base font-bold text-[#1FB67A]">${selectedTour.tourFee} per person</div>
-            </div>
 
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-3">
-                Click "View Details" to see the full tour information and complete your booking.
-              </p>
-              <Link
-                href={`/tours/${selectedTour.slug || selectedTour._id}`}
-                onClick={() => setShowBookingModal(false)}
-                className="inline-block bg-[#1FB67A] text-white px-6 py-3 rounded-lg hover:bg-[#1dd489] transition-colors font-medium"
-              >
-                View Full Details & Book
-              </Link>
+              <div className="text-center space-y-4">
+                <p className="text-gray-500 font-medium leading-relaxed px-4">
+                  View authentic photos, guide profile, and complete details to secure your spot.
+                </p>
+                <Link
+                  href={`/tours/${selectedTour.slug || selectedTour._id}`}
+                  onClick={() => setShowBookingModal(false)}
+                  className="w-full flex items-center justify-center py-4 bg-[#4088FD] text-white rounded-2xl font-black text-lg hover:bg-blue-600 transition-all shadow-xl shadow-blue-100"
+                >
+                  Confirm Details & Book
+                </Link>
+                <button
+                  onClick={() => setShowBookingModal(false)}
+                  className="text-gray-400 text-sm font-bold uppercase tracking-widest hover:text-gray-600 transition-colors"
+                >
+                  Change Mind
+                </button>
+              </div>
             </div>
           </DialogContent>
         )}

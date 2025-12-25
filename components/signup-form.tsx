@@ -89,7 +89,7 @@ export function SignupForm({
                   type="text"
                   placeholder="John Doe"
                   required
-                  className="focus-visible:ring-[#1FB67A]"
+                  className="focus-visible:ring-[#4088FD]"
                   {...register("name")}
                 />
                 {errors.name && (
@@ -105,7 +105,7 @@ export function SignupForm({
                   type="email"
                   placeholder="m@example.com"
                   required
-                  className="focus-visible:ring-[#1FB67A]"
+                  className="focus-visible:ring-[#4088FD]"
                   {...register("email")}
                 />
                 {errors.email && (
@@ -123,7 +123,7 @@ export function SignupForm({
                         id="password"
                         type={showPassword ? "text" : "password"}
                         required
-                        className="focus-visible:ring-[#1FB67A]"
+                        className="focus-visible:ring-[#4088FD]"
                         {...register("password")}
                       />
                       <button
@@ -153,7 +153,7 @@ export function SignupForm({
                         id="confirm-password"
                         type={showConfirmPassword ? "text" : "password"}
                         required
-                        className="focus-visible:ring-[#1FB67A]"
+                        className="focus-visible:ring-[#4088FD]"
                         {...register("confirmPassword")}
                       />
                       <button
@@ -185,14 +185,14 @@ export function SignupForm({
                 <Button 
                   type="submit" 
                   disabled={isLoading}
-                  style={{ backgroundColor: '#1FB67A', color: 'white' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1dd489'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1FB67A'}
+                  style={{ backgroundColor: '#4088FD', color: 'white' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#357ae8'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4088FD'}
                 >
                   {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
                 <FieldDescription className="text-center">
-                  Already have an account? <Link href="/login" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Sign in</Link>
+                  Already have an account? <Link href="/login" className="text-[#4088FD] hover:text-[#357ae8] hover:underline transition-colors">Sign in</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -200,8 +200,8 @@ export function SignupForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Terms of Service</a>{" "}
-        and <a href="#" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#" className="text-[#4088FD] hover:text-[#357ae8] hover:underline transition-colors">Terms of Service</a>{" "}
+        and <a href="#" className="text-[#4088FD] hover:text-[#357ae8] hover:underline transition-colors">Privacy Policy</a>.
       </FieldDescription>
     </div>
   );

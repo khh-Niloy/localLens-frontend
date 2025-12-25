@@ -72,7 +72,7 @@ export default function EditTourListPage() {
               <p className="text-gray-500 mb-4">No tours found to edit.</p>
               <Link 
                 href="/dashboard/create-tour"
-                className="inline-block bg-[#1FB67A] text-white px-6 py-2 rounded-md hover:bg-[#1dd489] transition-colors"
+                className="inline-block bg-[#4088FD] text-white px-6 py-2 rounded-md hover:bg-[#357ae8] transition-colors"
               >
                 Create Your First Tour
               </Link>

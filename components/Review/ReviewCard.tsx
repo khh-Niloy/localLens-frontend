@@ -40,14 +40,14 @@ export default function ReviewCard({ review, type, onEdit }: ReviewCardProps) {
       </div>
 
       <div className="mb-6">
-        <h3 className="text-base font-bold text-[#1FB67A] mb-2 line-clamp-1">{tour.title}</h3>
+        <h3 className="text-base font-bold text-[#4088FD] mb-2 line-clamp-1">{tour.title}</h3>
         <p className="text-sm text-gray-600 line-clamp-4 italic bg-gray-50 p-3 rounded-lg">"{review.comment || 'No comment provided'}"</p>
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-gray-50 gap-2 mt-auto">
         <Link
           href={`/tours/${typeof tour === 'object' ? (tour.slug || tour._id) : tour}`}
-          className="text-xs font-semibold text-gray-700 hover:text-[#1FB67A] transition-colors flex items-center gap-1"
+          className="text-xs font-semibold text-gray-700 hover:text-[#4088FD] transition-colors flex items-center gap-1"
         >
           See Tour Details
         </Link>

@@ -20,7 +20,7 @@ export default function AllUsersPage() {
     return (
       <div className="p-6">
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
         </div>
       </div>
     );
@@ -78,7 +78,7 @@ export default function AllUsersPage() {
         {roles.map((role: string) => {
           const count = getRoleCount(role);
           const roleConfig = {
-            'GUIDE': { label: 'Guides', icon: MapPin, color: 'text-[#1FB67A]', bgColor: 'text-[#1FB67A]' },
+            'GUIDE': { label: 'Guides', icon: MapPin, color: 'text-[#4088FD]', bgColor: 'text-[#4088FD]' },
             'TOURIST': { label: 'Tourists', icon: User, color: 'text-green-600', bgColor: 'text-green-600' },
             'ADMIN': { label: 'Admins', icon: Shield, color: 'text-purple-600', bgColor: 'text-purple-600' },
           }[role] || { label: role, icon: User, color: 'text-gray-600', bgColor: 'text-gray-600' };

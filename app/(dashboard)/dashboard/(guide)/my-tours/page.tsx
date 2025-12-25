@@ -1,22 +1,11 @@
 'use client';
 
-import React from 'react';
-import { useGetGuideMyToursQuery } from '@/redux/features/tour/tour.api';
+import { MapPin, Loader2, Plus, Edit, Trash2, Settings, Briefcase, Users } from 'lucide-react';
+import { useGetGuideMyToursQuery, useUpdateTourMutation } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import Link from 'next/link';
-
-interface Tour {
-  _id: string;
-  title: string;
-  description: string;
-  tourFee: number;
-  status: string;
-  images: string[];
-  createdAt: string;
-  maxGroupSize: number;
-  location: string;
-  slug?: string;
-}
+import { toast } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function MyToursPage() {
   const { data: userData } = useGetMeQuery({});
@@ -25,6 +14,18 @@ export default function MyToursPage() {
   const { data: guideToursData, isLoading: guideToursLoading, error: guideToursError } = useGetGuideMyToursQuery(undefined, {
     skip: userRole !== 'GUIDE'
   });
+
+  const [updateTour, { isLoading: isUpdating }] = useUpdateTourMutation();
+
+  const handleToggleFeatured = async (tourId: string, currentFeatured: boolean) => {
+    try {
+      const newFeatured = !currentFeatured;
+      await updateTour({ id: tourId, isFeatured: newFeatured }).unwrap();
+      toast.success(newFeatured ? 'Tour added to featured' : 'Tour removed from featured');
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to update featured status');
+    }
+  };
   
   const tours: any[] = userRole === 'GUIDE' 
     ? (guideToursData?.data || []) 
@@ -33,195 +34,203 @@ export default function MyToursPage() {
   const isLoading = userRole === 'GUIDE' ? guideToursLoading : false;
   const error = userRole === 'GUIDE' ? guideToursError : null;
   
-  // Calculate stats
   const totalTours = tours.length;
   const activeTours = tours.filter(tour => tour.status === 'ACTIVE').length;
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse">
-           <div className="h-8 bg-gray-200 rounded w-48 mb-4"></div>
-           <div className="space-y-4">
-             {[1, 2, 3].map((i) => (
-               <div key={i} className="h-16 bg-gray-200 rounded w-full"></div>
-             ))}
-           </div>
-        </div>
+      <div className="min-h-[400px] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[#4088FD] animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <h3 className="text-red-800 font-medium">Error loading tours</h3>
-          <p className="text-red-600 text-sm mt-1">
-            {(error as any)?.data?.message || 'Failed to load tours. Please try again.'}
-          </p>
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-100 rounded-3xl p-6 text-center">
+          <p className="text-red-600 font-bold">{(error as any)?.data?.message || 'Failed to load tours. Please try again.'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          {userRole === 'GUIDE' ? 'My Tours' : 'All Tours'}
-        </h1>
-        <p className="text-gray-600">
-          {userRole === 'GUIDE' 
-            ? 'Manage your tour listings' 
-            : 'Manage all tours in the system'
-          }
-        </p>
+    <div className="p-8 space-y-10 max-w-[1600px] mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 mb-2"
+          >
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">My Experiences</h1>
+          </motion.div>
+          <motion.p 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-500 font-medium ml-1"
+          >
+            Manage and showcase your professional tour listings.
+          </motion.p>
+        </div>
+
+        <div className="flex flex-wrap gap-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white px-6 py-4 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 min-w-[180px]"
+          >
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+              <Settings className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-gray-400 tracking-widest uppercase">Total</p>
+              <p className="text-xl font-black text-gray-900">{totalTours}</p>
+            </div>
+          </motion.div>
+          
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white px-6 py-4 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 min-w-[180px]"
+          >
+            <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-500">
+              <Plus className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-gray-400 tracking-widest uppercase">Active</p>
+              <p className="text-xl font-black text-green-600">{activeTours}</p>
+            </div>
+          </motion.div>
+
+          <Link 
+            href="/dashboard/create-tour"
+            className="bg-[#4088FD] text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 hover:bg-blue-600 transition-all shadow-xl shadow-blue-100"
+          >
+            <Plus className="w-5 h-5" />
+            Create New
+          </Link>
+        </div>
       </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Tours</h3>
-          <p className="text-3xl font-bold text-[#1FB67A]">{totalTours}</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Active Tours</h3>
-          <p className="text-3xl font-bold text-blue-600">{activeTours}</p>
-        </div>
-      </div>
-      
-      <div className="bg-white rounded-lg shadow border">
-        <div className="p-6 border-b">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">
-              {userRole === 'GUIDE' ? 'Your Tours' : 'All Tours'}
-            </h2>
-            {userRole === 'GUIDE' && (
-              <Link 
-                href="/dashboard/create-tour"
-                className="bg-[#1FB67A] text-white px-4 py-2 rounded-md hover:bg-[#1dd489] transition-colors"
-              >
-                Create New Tour
-              </Link>
-            )}
-          </div>
-        </div>
-        
+
+      <AnimatePresence mode="popLayout">
         {tours.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500 mb-4">
-              {userRole === 'GUIDE' 
-                ? 'No tours created yet. Create your first tour to get started!' 
-                : 'No tours found in the system.'
-              }
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-24 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 shadow-blue-100/10"
+          >
+            <div className="w-24 h-24 bg-blue-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8">
+              <Briefcase className="w-10 h-10 text-[#4088FD]" />
+            </div>
+            <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">No Tours Created Yet</h3>
+            <p className="text-gray-500 mb-10 max-w-sm mx-auto font-medium leading-relaxed">
+              Start your journey as a guide by creating your first amazing experience for tourists!
             </p>
-            {userRole === 'GUIDE' && (
-              <Link 
-                href="/dashboard/create-tour"
-                className="inline-block bg-[#1FB67A] text-white px-6 py-2 rounded-md hover:bg-[#1dd489] transition-colors"
-              >
-                Create Your First Tour
-              </Link>
-            )}
-          </div>
+            <Link 
+              href="/dashboard/create-tour"
+              className="inline-flex items-center px-8 py-4 bg-[#4088FD] text-white rounded-2xl font-black text-lg hover:bg-blue-600 transition-all shadow-xl shadow-blue-100"
+            >
+              <Plus className="w-6 h-6 mr-2" />
+              Create Your First Tour
+            </Link>
+          </motion.div>
         ) : (
-          <div className="overflow-x-auto">
-             <table className="min-w-full divide-y divide-gray-200">
-               <thead className="bg-gray-50">
-                 <tr>
-                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Tour
-                   </th>
-                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Status
-                   </th>
-                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Price
-                   </th>
-                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Guests
-                   </th>
-                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Location
-                   </th>
-                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                     Actions
-                   </th>
-                 </tr>
-               </thead>
-               <tbody className="bg-white divide-y divide-gray-200">
-                 {tours.map((tour) => (
-                   <tr key={tour._id} className="hover:bg-gray-50">
-                     <td className="px-6 py-4 whitespace-nowrap">
-                       <div className="flex items-center">
-                         <div className="flex-shrink-0 h-10 w-10">
-                           {tour.images && tour.images[0] ? (
-                             <img 
-                               className="h-10 w-10 rounded-lg object-cover" 
-                               src={tour.images[0]} 
-                               alt={tour.title} 
-                             />
-                           ) : (
-                             <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center text-xs text-gray-500">
-                               No Img
-                             </div>
-                           )}
-                         </div>
-                         <div className="ml-4">
-                           <div className="text-sm font-medium text-gray-900 max-w-[200px] truncate" title={tour.title}>
-                             {tour.title}
-                           </div>
-                         </div>
-                       </div>
-                     </td>
-                     <td className="px-6 py-4 whitespace-nowrap">
-                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                         tour.status === 'ACTIVE' 
-                           ? 'bg-green-100 text-green-800' 
-                           : 'bg-gray-100 text-gray-800'
-                       }`}>
-                         {tour.status}
-                       </span>
-                     </td>
-                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                       ${tour.tourFee}
-                     </td>
-                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                       Max {tour.maxGroupSize}
-                     </td>
-                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                       {tour.location}
-                     </td>
-                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                       <div className="flex justify-end gap-3">
-                         {userRole === 'GUIDE' && (
-                            <>
-                              <Link 
-                                href={`/dashboard/edit-tour/${tour._id}`}
-                                className="text-blue-600 hover:text-blue-900"
-                              >
-                                Edit
-                              </Link>
-                              <button className="text-red-600 hover:text-red-900">
-                                Delete
-                              </button>
-                            </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {tours.map((tour, index) => (
+              <motion.div
+                key={tour._id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="group flex flex-col"
+              >
+                <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden flex-1 flex flex-col">
+                  {/* Tour Card Content */}
+                  <div className="p-2 flex-1 flex flex-col">
+                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4">
+                       <img 
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                          src={tour.images?.[0] || 'https://via.placeholder.com/400x300'} 
+                          alt={tour.title} 
+                        />
+                        <div className="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-widest text-gray-900">
+                           {tour.status}
+                        </div>
+                    </div>
+                    
+                    <div className="px-3 pb-4 space-y-3 flex-1">
+                      <h3 className="font-black text-gray-900 text-lg leading-tight line-clamp-2">{tour.title}</h3>
+                      <div className="flex items-center text-gray-400 font-bold text-xs gap-3">
+                         <span className="flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-[#4088FD]" />
+                            {tour.location}
+                         </span>
+                         <span className="flex items-center gap-1">
+                            <Users className="w-3.5 h-3.5 text-[#4088FD]" />
+                            Max {tour.maxGroupSize}
+                         </span>
+                      </div>
+                      <div className="text-xl font-black text-[#4088FD]">
+                        {tour.tourFee} <span className="text-xs uppercase tracking-tighter">TK</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Guide Actions Bar */}
+                  <div className="bg-gray-50/50 p-4 border-t border-gray-100 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                       <Link 
+                          href={`/dashboard/edit-tour/${tour._id}`}
+                          className="w-9 h-9 flex items-center justify-center bg-white rounded-xl text-gray-500 hover:text-[#4088FD] transition-colors border border-gray-100 shadow-sm"
+                          title="Edit Experience"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Link>
+                        <button 
+                          className="w-9 h-9 flex items-center justify-center bg-white rounded-xl text-gray-500 hover:text-red-500 transition-colors border border-gray-100 shadow-sm"
+                          title="Delete Experience"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <div className="flex items-center gap-3 ml-auto">
+                       <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Featured</span>
+                       <button
+                          onClick={() => handleToggleFeatured(tour._id, tour.isFeatured)}
+                          disabled={isUpdating}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-4 focus:ring-blue-50 ${
+                            tour.isFeatured ? 'bg-[#4088FD]' : 'bg-gray-200'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
+                              tour.isFeatured ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                          />
+                          {isUpdating && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/20 rounded-full">
+                              <Loader2 className="w-3 h-3 animate-spin text-white" />
+                            </div>
                           )}
-                          <Link
-                            href={`/tours/${tour.slug || tour._id}`}
-                            className="text-[#1FB67A] hover:text-[#1dd489]"
-                          >
-                            View
-                          </Link>
-                       </div>
-                     </td>
-                   </tr>
-                 ))}
-               </tbody>
-             </table>
+                        </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         )}
-      </div>
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
-import { MapPin, Eye, Star, Calendar, Users } from 'lucide-react';
-import Link from 'next/link';
+import { MapPin, Eye, Briefcase, Globe, Loader2 } from 'lucide-react';
 import { useGetAllToursForAdminQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
+import { motion, AnimatePresence } from 'framer-motion';
+import TourCard from '@/components/TourCard';
 
 export default function AllToursPage() {
   const { data: userData } = useGetMeQuery({});
@@ -16,35 +16,21 @@ export default function AllToursPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
-        </div>
+      <div className="min-h-[400px] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[#4088FD] animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <p className="text-red-800">Failed to load tours. Please try again.</p>
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-100 rounded-3xl p-6 text-center">
+          <p className="text-red-600 font-bold">Failed to load tours. Please try again.</p>
         </div>
       </div>
     );
   }
-
-  const getStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
-      case 'ACTIVE':
-        return 'bg-green-100 text-green-800';
-      case 'INACTIVE':
-      case 'DEACTIVATE':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   const totalStats = {
     totalTours: tours.length,
@@ -52,127 +38,97 @@ export default function AllToursPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-8 space-y-10 max-w-[1600px] mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">All Tours</h1>
-          <p className="text-gray-600">Manage all tours in the system</p>
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 mb-2"
+          >
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+              <Globe className="w-5 h-5" />
+            </div>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">System Tours</h1>
+          </motion.div>
+          <motion.p 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-500 font-medium ml-1"
+          >
+            Monitor and manage all experiences across the platform.
+          </motion.p>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="flex gap-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 min-w-[200px]"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
+              <Briefcase className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Tours</p>
+              <p className="text-2xl font-black text-gray-900">{totalStats.totalTours}</p>
+            </div>
+          </motion.div>
+          
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 min-w-[200px]"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-500">
+              <Eye className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Active</p>
+              <p className="text-2xl font-black text-green-600">{totalStats.activeTours}</p>
+            </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Tours</p>
-              <p className="text-xl font-bold text-gray-900">{totalStats.totalTours}</p>
+      {/* Dynamic Grid */}
+      <AnimatePresence mode="popLayout">
+        {tours.length === 0 ? (
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-[2.5rem] border border-dashed border-gray-200"
+          >
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+              <MapPin className="w-8 h-8 text-gray-300" />
             </div>
-            <MapPin className="w-6 h-6 text-blue-600" />
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No Tours in Database</h3>
+            <p className="text-gray-500">When guides create tours, they will appear here.</p>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {tours.map((tour: any, index: number) => (
+              <motion.div
+                key={tour._id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03 }}
+              >
+                <TourCard 
+                  tour={tour} 
+                  userData={userData}
+                  onBook={() => {}} // Admin doesn't book
+                />
+              </motion.div>
+            ))}
           </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Active</p>
-              <p className="text-xl font-bold text-[#1FB67A]">{totalStats.activeTours}</p>
-            </div>
-            <Eye className="w-6 h-6 text-[#1FB67A]" />
-          </div>
-        </div>
-      </div>
-
-      {/* Tours Table */}
-      <div className="bg-white rounded-lg shadow border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="text-left py-3 px-6 font-medium text-gray-700 w-[40%]">Tour Details</th>
-                <th className="text-left py-3 px-6 font-medium text-gray-700">Guide</th>
-                <th className="text-left py-3 px-6 font-medium text-gray-700">Status</th>
-                <th className="text-left py-3 px-6 font-medium text-gray-700">Price</th>
-                <th className="text-right py-3 px-6 font-medium text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {tours.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-gray-500">
-                    No tours found.
-                  </td>
-                </tr>
-              ) : (
-                tours.map((tour: any) => (
-                  <tr key={tour._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="flex items-start gap-4">
-                        <div className="w-20 h-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
-                          {tour.images?.[0] ? (
-                            <img 
-                              src={tour.images[0]} 
-                              alt={tour.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                              <MapPin className="w-6 h-6" />
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900 line-clamp-1 mb-1">{tour.title}</h3>
-                          <div className="flex items-center text-xs text-gray-500 mb-1">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            <span className="line-clamp-1">{tour.location}</span>
-                          </div>
-                          <div className="flex gap-3 text-xs text-gray-500">
-                            <span className="flex items-center">
-                              <Calendar className="w-3 h-3 mr-1" />
-                              {tour.maxDuration}h
-                            </span>
-                            <span className="flex items-center">
-                              <Users className="w-3 h-3 mr-1" />
-                              Max {tour.maxGroupSize}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      {tour.guideId && (
-                        <div>
-                          <p className="font-medium text-gray-900">{tour.guideId.name}</p>
-                          <p className="text-xs text-gray-500">{tour.guideId.email}</p>
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(tour.status)}`}>
-                        {tour.status?.toLowerCase() || 'N/A'}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="font-bold text-[#1FB67A]">${tour.tourFee}</div>
-                      <div className="text-xs text-gray-500">per person</div>
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <Link
-                        href={`/tours/${tour.slug || tour._id}`}
-                        className="inline-flex items-center justify-center w-8 h-8 text-blue-600 bg-blue-100 rounded-full hover:bg-blue-200 transition-colors"
-                        title="View Tour"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
