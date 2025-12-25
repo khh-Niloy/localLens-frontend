@@ -5,28 +5,39 @@ import { useGetAllToursQuery, useGetTourEnumsQuery } from '@/redux/features/tour
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { motion, AnimatePresence } from 'framer-motion';
 import TourCard from '@/components/TourCard';
-import {
+import { 
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog';
 import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
   MapPin, 
   Search,
   Filter,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Compass
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+import { useSearchParams } from 'next/navigation';
 
 export default function ExploreToursPage() {
+  const searchParams = useSearchParams();
+  const initialLocation = searchParams.get('location') || '';
+  const initialCategory = searchParams.get('category') || '';
+
   const { data: toursData, isLoading } = useGetAllToursQuery({});
   const { data: enumsResponse } = useGetTourEnumsQuery(undefined);
   const { data: userData } = useGetMeQuery({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedDestination, setSelectedDestination] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('');
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedDestination, setSelectedDestination] = useState(initialLocation);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedTour, setSelectedTour] = useState<any>(null);
 
@@ -34,33 +45,19 @@ export default function ExploreToursPage() {
 
   // Extract unique destinations and languages from tours
   const uniqueDestinations: string[] = Array.from(new Set(tours.map((tour: any) => tour.location).filter(Boolean))).sort() as string[];
-  const uniqueLanguages: string[] = Array.from(
-    new Set(
-      tours
-        .map((tour: any) => tour.guideId?.language || [])
-        .flat()
-        .filter(Boolean)
-    )
-  ).sort() as string[];
 
   // Filter tours based on search and filters
   const filteredTours = tours.filter((tour: any) => {
-    const matchesSearch = tour.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = !searchTerm || 
+                         tour.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          tour.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          tour.location.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCategory = !selectedCategory || tour.category === selectedCategory;
+    const matchesCategory = !selectedCategory || tour.category === selectedCategory || selectedCategory === 'all';
     
-    const matchesDestination = !selectedDestination || tour.location === selectedDestination;
+    const matchesDestination = !selectedDestination || tour.location === selectedDestination || selectedDestination === 'all';
     
-    const matchesLanguage = !selectedLanguage || 
-                           (tour.guideId?.language && Array.isArray(tour.guideId.language) && 
-                            tour.guideId.language.includes(selectedLanguage));
-    
-    const matchesPrice = (!priceRange.min || tour.tourFee >= parseFloat(priceRange.min)) &&
-                        (!priceRange.max || tour.tourFee <= parseFloat(priceRange.max));
-    
-    return matchesSearch && matchesCategory && matchesDestination && matchesLanguage && matchesPrice;
+    return matchesSearch && matchesCategory && matchesDestination;
   });
 
   const categories = enumsResponse?.data?.categories || [];
@@ -98,27 +95,18 @@ export default function ExploreToursPage() {
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Premium Hero Section */}
-      <section className="relative overflow-hidden bg-white pt-16 pb-24 md:pt-24 md:pb-32 border-b border-gray-100">
+      <section className="relative overflow-hidden bg-white pt-8 pb-16 sm:pt-12 sm:pb-20 md:pt-16 md:pb-24 lg:pt-24 lg:pb-32 border-b border-gray-100">
         {/* Background Decorative Elements */}
         <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-blue-50/50 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-sky-50/50 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-[#4088FD] text-xs font-black uppercase tracking-widest mb-6"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-[#4088FD] animate-pulse" />
-              Bangladesh Awaits
-            </motion.div>
-            
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] mb-6 tracking-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-gray-900 leading-[1.1] mb-4 sm:mb-6 tracking-tight"
             >
               Explore Amazing <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4088FD] to-blue-600">Experiences</span>
             </motion.h1>
@@ -127,7 +115,7 @@ export default function ExploreToursPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed mb-10 font-medium"
+              className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 md:mb-10 font-medium px-2"
             >
               Discover unique adventures, authentic local culture, and hidden gems curated by passionate Bangladeshi guides.
             </motion.p>
@@ -147,7 +135,7 @@ export default function ExploreToursPage() {
                   placeholder="Search experiences, cities, or guides..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-16 pr-8 py-6 rounded-[2rem] bg-white border border-gray-100 shadow-xl shadow-blue-100/20 text-lg text-gray-900 outline-none focus:ring-4 focus:ring-blue-50 focus:border-[#4088FD] transition-all placeholder:text-gray-400 font-medium"
+                  className="w-full pl-12 sm:pl-16 pr-4 sm:pr-8 py-4 sm:py-5 md:py-6 rounded-2xl sm:rounded-[2rem] bg-white border border-gray-100 shadow-xl shadow-blue-100/20 text-sm sm:text-base md:text-lg text-gray-900 outline-none focus:ring-4 focus:ring-blue-50 focus:border-[#4088FD] transition-all placeholder:text-gray-400 font-medium"
                 />
               </div>
             </motion.div>
@@ -155,15 +143,15 @@ export default function ExploreToursPage() {
         </div>
       </section>
 
-      <div className="container mx-auto px-6 -mt-10 relative z-20 pb-20">
+      <div className="container mx-auto px-4 sm:px-6 -mt-6 sm:-mt-8 md:-mt-10 relative z-20 pb-12 sm:pb-16 md:pb-20">
         {/* Filters Panel */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-blue-100/10 border border-white/50 p-8 mb-16"
+          className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-[2rem] md:rounded-[2.5rem] shadow-2xl shadow-blue-100/10 border border-white/50 p-4 sm:p-6 md:p-8 mb-8 sm:mb-12 md:mb-16"
         >
-          <div className="flex items-center gap-3 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6 sm:mb-8">
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
               <Filter className="w-5 h-5" />
             </div>
@@ -173,8 +161,6 @@ export default function ExploreToursPage() {
                 setSearchTerm('');
                 setSelectedCategory('');
                 setSelectedDestination('');
-                setSelectedLanguage('');
-                setPriceRange({ min: '', max: '' });
               }}
               className="ml-auto text-xs font-bold uppercase tracking-widest text-[#4088FD] hover:text-blue-600 transition-colors"
             >
@@ -182,85 +168,57 @@ export default function ExploreToursPage() {
             </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
             {/* Destination Filter */}
-            <div className="space-y-2">
+            <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Destination</label>
-              <select
-                value={selectedDestination}
-                onChange={(e) => setSelectedDestination(e.target.value)}
-                className="w-full bg-gray-50/50 border border-transparent hover:border-blue-100 rounded-2xl px-5 py-4 text-sm font-bold text-gray-700 focus:bg-white focus:border-[#4088FD] transition-all outline-none appearance-none cursor-pointer"
-              >
-                <option value="">All Regions</option>
-                {uniqueDestinations.map((destination: string) => (
-                  <option key={destination} value={destination}>{destination}</option>
-                ))}
-              </select>
+              <Select value={selectedDestination || 'all'} onValueChange={setSelectedDestination}>
+                <SelectTrigger className="w-full h-14 bg-gray-50/50 border border-transparent hover:border-blue-100 rounded-2xl px-5 text-sm font-bold text-gray-700 focus:bg-white focus:border-[#4088FD] transition-all outline-none">
+                   <div className="flex items-center gap-3">
+                      <MapPin className="w-4 h-4 text-[#4088FD]" />
+                      <SelectValue placeholder="All Regions" />
+                   </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-gray-100 shadow-xl">
+                  <SelectItem value="all" className="rounded-lg">All Regions</SelectItem>
+                  {uniqueDestinations.map((destination: string) => (
+                    <SelectItem key={destination} value={destination} className="rounded-lg">{destination}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Category Filter */}
-            <div className="space-y-2">
+            <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Experience Type</label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full bg-gray-50/50 border border-transparent hover:border-blue-100 rounded-2xl px-5 py-4 text-sm font-bold text-gray-700 focus:bg-white focus:border-[#4088FD] transition-all outline-none appearance-none cursor-pointer"
-              >
-                <option value="">All Categories</option>
-                {categories.map((category: string) => (
-                  <option key={category} value={category}>
-                    {category.charAt(0) + category.slice(1).toLowerCase().replace(/_/g, ' ')}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Language Filter */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Communication</label>
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="w-full bg-gray-50/50 border border-transparent hover:border-blue-100 rounded-2xl px-5 py-4 text-sm font-bold text-gray-700 focus:bg-white focus:border-[#4088FD] transition-all outline-none appearance-none cursor-pointer"
-              >
-                <option value="">Any Language</option>
-                {uniqueLanguages.map((language: string) => (
-                  <option key={language} value={language}>{language}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Price Range */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Price Range (TK)</label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={priceRange.min}
-                  onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                  className="w-full bg-gray-50/50 border border-transparent focus:bg-white focus:border-[#4088FD] rounded-2xl px-4 py-4 text-sm font-bold text-gray-700 transition-all outline-none"
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={priceRange.max}
-                  onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                  className="w-full bg-gray-50/50 border border-transparent focus:bg-white focus:border-[#4088FD] rounded-2xl px-4 py-4 text-sm font-bold text-gray-700 transition-all outline-none"
-                />
-              </div>
+              <Select value={selectedCategory || 'all'} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full h-14 bg-gray-50/50 border border-transparent hover:border-blue-100 rounded-2xl px-5 text-sm font-bold text-gray-700 focus:bg-white focus:border-[#4088FD] transition-all outline-none">
+                   <div className="flex items-center gap-3">
+                      <Compass className="w-4 h-4 text-[#4088FD]" />
+                      <SelectValue placeholder="All Categories" />
+                   </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-gray-100 shadow-xl">
+                  <SelectItem value="all" className="rounded-lg">All Categories</SelectItem>
+                  {categories.map((category: string) => (
+                    <SelectItem key={category} value={category} className="rounded-lg">
+                      {category.charAt(0) + category.slice(1).toLowerCase().replace(/_/g, ' ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </motion.div>
 
         {/* Results Info */}
-        <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4 mb-10 px-4">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 sm:gap-4 mb-6 sm:mb-8 md:mb-10 px-2 sm:px-4">
           <div>
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight">
-              {filteredTours.length} <span className="text-gray-400 text-2xl font-bold ml-1">Experiences Found</span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
+              {filteredTours.length} <span className="text-gray-400 text-lg sm:text-xl md:text-2xl font-bold ml-1">Experiences Found</span>
             </h2>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-400 font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400 font-bold uppercase tracking-widest">
             <SlidersHorizontal className="w-4 h-4" />
             Sorted by relevance
           </div>
@@ -289,8 +247,6 @@ export default function ExploreToursPage() {
                     setSearchTerm('');
                     setSelectedCategory('');
                     setSelectedDestination('');
-                    setSelectedLanguage('');
-                    setPriceRange({ min: '', max: '' });
                   }}
                   className="px-8 py-3.5 bg-gray-900 text-white rounded-2xl font-bold hover:bg-[#4088FD] transition-all shadow-xl shadow-gray-100"
                 >
@@ -303,7 +259,7 @@ export default function ExploreToursPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8"
               >
                 {filteredTours.map((tour: any, index: number) => (
                   <motion.div

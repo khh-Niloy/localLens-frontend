@@ -31,26 +31,26 @@ export default function CategoryTours({ userData, handleBookTour }: CategoryTour
   const tours = toursData?.data.slice(0, 8) || [];
 
   return (
-    <section className="py-24 bg-white overflow-hidden">
-      <div className="container mx-auto px-6">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6">
           <div className="w-full flex flex-col items-center justify-center">
-            <h4 className="text-[#4088FD] font-bold tracking-widest uppercase text-sm mb-3">Our Collections</h4>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+            <h4 className="text-[#4088FD] font-bold tracking-widest uppercase text-xs sm:text-sm mb-2 sm:mb-3">Our Collections</h4>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight text-center px-2">
               Adventure based on your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4088FD] to-blue-600">Interests</span>
             </h2>
 
-             <div className="flex gap-3 mt-5">
+             <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-4 sm:mt-5 px-2">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold transition-all duration-300 ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold transition-all duration-300 ${
                   activeCategory === cat.id
                     ? 'bg-[#4088FD] text-white shadow-xl shadow-blue-200 scale-105'
                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
-                <span className="text-sm">{cat.label}</span>
+                <span className="text-xs sm:text-sm">{cat.label}</span>
               </button>
             ))}
           </div>
@@ -60,7 +60,7 @@ export default function CategoryTours({ userData, handleBookTour }: CategoryTour
 
         <motion.div 
           layout
-          className="relative min-h-[400px] mt-16"
+          className="relative min-h-[300px] sm:min-h-[350px] md:min-h-[400px] mt-8 sm:mt-12 md:mt-16"
         >
           <AnimatePresence mode="wait">
             {isLoading ? (
@@ -96,7 +96,7 @@ export default function CategoryTours({ userData, handleBookTour }: CategoryTour
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6"
               >
                 {tours.map((tour: any, index: number) => (
                   <motion.div
@@ -117,10 +117,10 @@ export default function CategoryTours({ userData, handleBookTour }: CategoryTour
           </AnimatePresence>
         </motion.div>
       </div>
-      <div className="text-center mt-12">
+      <div className="text-center mt-8 sm:mt-10 md:mt-12">
                             <Link 
                               href="/explore-tours"
-                              className="inline-block bg-[#4088FD] text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium shadow-lg shadow-blue-100"
+                              className="inline-block bg-[#4088FD] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm sm:text-base shadow-lg shadow-blue-100"
                             >
                               View All Experiences
                             </Link>

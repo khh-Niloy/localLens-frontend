@@ -11,8 +11,9 @@ export default function ReviewsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4088FD]"></div>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+        <div className="w-16 h-16 rounded-full border-4 border-blue-50 border-t-[#4088FD] animate-spin" />
+        <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[10px] animate-pulse">Synchronizing reviews...</p>
       </div>
     );
   }

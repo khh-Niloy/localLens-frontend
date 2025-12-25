@@ -67,8 +67,8 @@ export default function HomePage() {
       <Hero7 userData={userData} />
 
       {/* Features Section */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-6">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <motion.h4 
               initial={{ opacity: 0, y: 10 }}
@@ -83,12 +83,12 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
             >
               High quality service for your <span className="text-[#4088FD]">Experience</span>
             </motion.h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 max-w-[1400px] mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 max-w-[1400px] mx-auto">
             {/* Feature 1 - Purple */}
             <motion.div 
                initial={{ opacity: 0, y: 20 }}
@@ -188,12 +188,12 @@ export default function HomePage() {
       <FeaturedTours />
 
       {/* How It Works Section */}
-      <section className="py-24 bg-white relative overflow-hidden">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white relative overflow-hidden">
         {/* Subtle Background Pattern */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4088FD 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
         
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-20">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-10 sm:mb-14 md:mb-20">
             <motion.h4 
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -207,15 +207,15 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
             >
               Simple steps to <span className="text-[#4088FD]">Explore</span>
             </motion.h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto relative px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 max-w-7xl mx-auto relative px-2 sm:px-4">
             {/* Steps Connector Line */}
-            <div className="hidden lg:block absolute top-[60px] left-[15%] right-[15%] h-[2px] bg-gradient-to-r from-transparent via-gray-100 to-transparent"></div>
+            <div className="hidden xl:block absolute top-[60px] left-[15%] right-[15%] h-[2px] bg-gradient-to-r from-transparent via-gray-100 to-transparent"></div>
 
             {/* Step 1 */}
             <motion.div 
@@ -224,7 +224,7 @@ export default function HomePage() {
                viewport={{ once: true }}
                className="flex flex-col items-center text-center group"
             >
-              <div className="relative mb-8">
+              <div className="relative mb-4 sm:mb-6 md:mb-8">
                 <div className="w-24 h-24 rounded-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex items-center justify-center relative z-10 border border-gray-50 group-hover:scale-110 group-hover:border-purple-100 transition-all duration-500">
                   <span className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-purple-500 to-indigo-600">1</span>
                 </div>
@@ -244,7 +244,7 @@ export default function HomePage() {
                transition={{ delay: 0.1 }}
                className="flex flex-col items-center text-center group"
             >
-              <div className="relative mb-8">
+              <div className="relative mb-4 sm:mb-6 md:mb-8">
                 <div className="w-24 h-24 rounded-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex items-center justify-center relative z-10 border border-gray-50 group-hover:scale-110 group-hover:border-blue-100 transition-all duration-500">
                   <span className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-blue-500 to-blue-700">2</span>
                 </div>
@@ -264,7 +264,7 @@ export default function HomePage() {
                transition={{ delay: 0.2 }}
                className="flex flex-col items-center text-center group"
             >
-              <div className="relative mb-8">
+              <div className="relative mb-4 sm:mb-6 md:mb-8">
                 <div className="w-24 h-24 rounded-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex items-center justify-center relative z-10 border border-gray-50 group-hover:scale-110 group-hover:border-cyan-100 transition-all duration-500">
                   <span className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-cyan-500 to-cyan-700">3</span>
                 </div>
@@ -284,7 +284,7 @@ export default function HomePage() {
                transition={{ delay: 0.3 }}
                className="flex flex-col items-center text-center group"
             >
-              <div className="relative mb-8">
+              <div className="relative mb-4 sm:mb-6 md:mb-8">
                 <div className="w-24 h-24 rounded-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex items-center justify-center relative z-10 border border-gray-50 group-hover:scale-110 group-hover:border-emerald-100 transition-all duration-500">
                   <span className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-emerald-500 to-emerald-700">4</span>
                 </div>

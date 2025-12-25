@@ -239,29 +239,29 @@ export default function ProfilePage() {
   const isTourist = userData?.role === 'TOURIST';
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-12 px-6">
+    <div className="min-h-screen bg-gray-50/50 py-6 sm:py-8 md:py-12 px-4 sm:px-6">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto"
       >
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 mb-6 sm:mb-8 md:mb-10">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight">Profile <span className="text-[#4088FD]">Settings</span></h1>
-            <p className="text-gray-500 mt-1 font-medium">Manage your personal information and preferences</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 tracking-tight">Profile <span className="text-[#4088FD]">Settings</span></h1>
+            <p className="text-gray-500 mt-1 font-medium text-sm sm:text-base">Manage your personal information and preferences</p>
           </div>
           <div className="flex gap-3">
              <button
               type="button"
               onClick={() => window.history.back()}
-              className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-white hover:border-gray-300 transition-all text-sm"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-white hover:border-gray-300 transition-all text-xs sm:text-sm"
             >
               Cancel
             </button>
             <button
               onClick={handleFormSubmit(onProfileSubmit)}
               disabled={isUpdating || (!isDirty && !selectedImage)}
-              className="px-8 py-2.5 bg-[#4088FD] text-white rounded-xl font-bold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg shadow-blue-100 transition-all text-sm"
+              className="px-5 sm:px-8 py-2 sm:py-2.5 bg-[#4088FD] text-white rounded-xl font-bold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg shadow-blue-100 transition-all text-xs sm:text-sm"
               title={!isDirty && !selectedImage ? "No changes to save" : "Save changes"}
             >
               {isUpdating ? (
@@ -285,7 +285,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8"
+            className="bg-white rounded-2xl sm:rounded-[2rem] shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8"
           >
             <div className="flex items-center gap-3 mb-8">
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#4088FD]">
@@ -294,7 +294,7 @@ export default function ProfilePage() {
               <h2 className="text-xl font-bold text-gray-900">Basic Information</h2>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-8 mb-8 p-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 p-4 sm:p-6 bg-gray-50/50 rounded-xl sm:rounded-2xl border border-dashed border-gray-200">
               <div className="relative group">
                 {imagePreview ? (
                   <img

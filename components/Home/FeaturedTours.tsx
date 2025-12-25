@@ -53,9 +53,9 @@ export default function FeaturedTours() {
 
   return (
     <>
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
             <motion.h4 
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -69,7 +69,7 @@ export default function FeaturedTours() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
             >
               Featured Tours & <span className="text-[#4088FD]">Experiences</span>
             </motion.h2>
@@ -100,7 +100,7 @@ export default function FeaturedTours() {
               <p className="text-gray-500">Check back soon for amazing local experiences!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
               {tours.slice(0, 8).map((tour: any) => (
                 <TourCard 
                   key={tour._id} 
@@ -114,10 +114,10 @@ export default function FeaturedTours() {
 
         
                   {tours.length > 6 && (
-                    <div className="text-center mt-12">
+                    <div className="text-center mt-8 sm:mt-10 md:mt-12">
                       <Link 
                         href="/explore-tours"
-                        className="inline-block bg-[#4088FD] text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium shadow-lg shadow-blue-100"
+                        className="inline-block bg-[#4088FD] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm sm:text-base shadow-lg shadow-blue-100"
                       >
                         View All Experiences
                       </Link>

@@ -4,7 +4,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { authApi, useGetMeQuery, useLogoutMutation } from "@/redux/features/auth/auth.api";
 import { useAppDispatch } from "@/redux/hooks";
 import { ArrowUpRight, Menu, X, ChevronDown } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -86,19 +85,14 @@ export function NavbarDemo() {
       <div className="max-w-[1440px] mx-auto flex items-center justify-between px-6 py-4 md:py-6">
         
         {/* Left: Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center p-2 shadow-lg group-hover:scale-110 transition-transform">
-            <Image
-              src="/logo-icon.svg"
-              alt="Local Lens"
-              width={24}
-              height={24}
-              className="object-contain"
-            />
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="flex items-center bg-white px-3 py-1.5 rounded-lg shadow-sm">
+            <span className="text-2xl sm:text-2xl font-black tracking-tight">
+              <span className="text-black">Local</span>
+              <span className="text-[#4088FD]">Lens</span>
+            </span>
+            <div className="w-2 h-2 bg-[#4088FD] rounded-full ml-1 group-hover:scale-150 transition-transform"></div>
           </div>
-          <span className="text-white font-black text-2xl tracking-tighter uppercase italic">
-            LOCAL LENS
-          </span>
         </Link>
 
         {/* Middle: Navigation Routes */}
@@ -154,7 +148,7 @@ export function NavbarDemo() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+          className="lg:hidden text-black p-2 rounded-full hover:bg-black/10 transition-colors"
         >
           {isMobileMenuOpen ? <X size={30} /> : <Menu size={30} />}
         </button>

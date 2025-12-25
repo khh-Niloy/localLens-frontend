@@ -39,8 +39,12 @@ export default function MyToursPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-[#4088FD] animate-spin" />
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full border-4 border-blue-50 border-t-[#4088FD] animate-spin" />
+          <Loader2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-[#4088FD] animate-pulse" />
+        </div>
+        <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[10px] animate-pulse">Loading your experiences...</p>
       </div>
     );
   }
