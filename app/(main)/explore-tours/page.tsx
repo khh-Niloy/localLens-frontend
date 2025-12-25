@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useGetAllToursQuery, useGetTourEnumsQuery } from '@/redux/features/tour/tour.api';
 import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,7 +27,7 @@ import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation';
 
-export default function ExploreToursPage() {
+function ExploreToursContent() {
   const searchParams = useSearchParams();
   const initialLocation = searchParams.get('location') || '';
   const initialCategory = searchParams.get('category') || '';
@@ -327,5 +327,17 @@ export default function ExploreToursPage() {
         )}
       </Dialog>
     </div>
+  );
+}
+
+export default function ExploreToursPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#4088FD]"></div>
+      </div>
+    }>
+      <ExploreToursContent />
+    </Suspense>
   );
 }
