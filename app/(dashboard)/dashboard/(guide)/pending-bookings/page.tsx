@@ -164,7 +164,7 @@ export default function PendingBookingsPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end items-center gap-2">
-                          <Link href={`/tours/${tour.slug || tour._id}`} className="text-[#4088FD] hover:underline text-sm font-bold">View</Link>
+                          <Link href={`/tours/${tour._id}`} className="text-[#4088FD] hover:underline text-sm font-bold">View</Link>
                           {isGuide && booking.status === 'PENDING' && (
                             <>
                               <button onClick={() => handleAcceptBooking(booking._id)} disabled={isUpdating} className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-50" title="Accept">

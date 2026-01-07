@@ -46,7 +46,7 @@ export default function ReviewCard({ review, type, onEdit }: ReviewCardProps) {
 
       <div className="flex items-center justify-between pt-4 border-t border-gray-50 gap-2 mt-auto">
         <Link
-          href={`/tours/${typeof tour === 'object' ? (tour.slug || tour._id) : tour}`}
+          href={`/tours/${typeof tour === 'object' ? tour._id : tour}`}
           className="text-xs font-semibold text-gray-700 hover:text-[#4088FD] transition-colors flex items-center gap-1"
         >
           See Tour Details

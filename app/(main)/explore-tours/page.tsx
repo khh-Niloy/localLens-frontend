@@ -41,7 +41,7 @@ function ExploreToursContent() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedTour, setSelectedTour] = useState<any>(null);
 
-  const tours = toursData?.data || [];
+  const tours = toursData || [];
 
   // Extract unique destinations and languages from tours
   const uniqueDestinations: string[] = Array.from(new Set(tours.map((tour: any) => tour.location).filter(Boolean))).sort() as string[];
@@ -309,7 +309,7 @@ function ExploreToursContent() {
                   View authentic photos, guide profile, and complete details to secure your spot.
                 </p>
                 <Link
-                  href={`/tours/${selectedTour.slug || selectedTour._id}`}
+                  href={`/tours/${selectedTour._id}`}
                   onClick={() => setShowBookingModal(false)}
                   className="w-full flex items-center justify-center py-4 bg-[#4088FD] text-white rounded-2xl font-black text-lg hover:bg-blue-600 transition-all shadow-xl shadow-blue-100"
                 >

@@ -17,8 +17,8 @@ import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import { MapPin, Users, Star, ArrowRight, Clock, BookOpen, Shield, Headphones } from 'lucide-react';
 import { Hero7 } from '@/components/hero7';
-import CategoryTours from '@/components/CategoryTours';
 import FeaturedTours from '@/components/Home/FeaturedTours';
+import CustomerReviews from '@/components/Home/CustomerReviews';
 
 export default function HomePage() {
   const { data: userData, isLoading: userLoading, error: userError } = useGetMeQuery({});
@@ -67,7 +67,7 @@ export default function HomePage() {
       <Hero7 userData={userData} />
 
       {/* Features Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+      <section className="pt-24 sm:pt-28 md:pt-32 lg:pt-36 pb-12 sm:pb-16 md:pb-20 lg:pb-24 bg-white">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <motion.h4 
@@ -181,14 +181,11 @@ export default function HomePage() {
         </div>
       </section>
       
-      {/* Category Wise Tours Section */}
-      <CategoryTours userData={userData} handleBookTour={handleBookTour} />
-
       {/* Featured Tours Section */}
       <FeaturedTours />
 
       {/* How It Works Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white relative overflow-hidden">
+      <section className="py-20 sm:py-24 md:py-28 lg:py-32 bg-white relative overflow-hidden">
         {/* Subtle Background Pattern */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4088FD 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
         
@@ -298,6 +295,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <CustomerReviews />
 
 
 

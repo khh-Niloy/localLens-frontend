@@ -23,7 +23,7 @@ export default function MyTripsPage() {
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [existingReview, setExistingReview] = useState<any>(null);
 
-  const allBookings = bookingsData?.data || [];
+  const allBookings = bookingsData || [];
 
   if (isLoading) {
     return (
@@ -120,7 +120,7 @@ export default function MyTripsPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end items-center gap-2">
-                          <Link href={`/tours/${tour.slug || tour._id}`} className="text-gray-400 hover:text-[#4088FD] font-bold text-xs uppercase tracking-widest flex items-center gap-1">
+                          <Link href={`/tours/${tour._id}`} className="text-gray-400 hover:text-[#4088FD] font-bold text-xs uppercase tracking-widest flex items-center gap-1">
                             Details <ChevronRight className="w-3.5 h-3.5" />
                           </Link>
                           <button

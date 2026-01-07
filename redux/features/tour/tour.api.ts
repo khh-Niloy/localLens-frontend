@@ -8,8 +8,25 @@ export const tourApi = baseApi.injectEndpoints({
         method: "GET",
         params: params,
       }),
+      transformResponse: (res: any) => res.data,
       providesTags: (result) =>
         result
+          ? [
+              ...result.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
+    }),
+
+    getFeaturedTours: builder.query({
+      query: ({ cursor }) => ({
+        url: "/tour/featured",
+        method: "GET",
+        params: { cursor },
+      }),
+      transformResponse: (res: any) => res.data,
+      providesTags: (result) =>
+        result?.data
           ? [
               ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
               { type: 'tour', id: 'LIST' },
@@ -23,21 +40,23 @@ export const tourApi = baseApi.injectEndpoints({
         method: "GET",
         params: params,
       }),
+      transformResponse: (res: any) => res.data,
       providesTags: (result) =>
-        result
+        result?.tours
           ? [
-              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              ...result.tours.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
               { type: 'tour', id: 'LIST' },
             ]
           : [{ type: 'tour', id: 'LIST' }],
     }),
     
-    getTourBySlug: builder.query({
-      query: (slug) => ({
-        url: `/tour/${slug}`,
+    getTourById: builder.query({
+      query: (id) => ({
+        url: `/tour/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, slug) => [{ type: 'tour', id: slug }],
+      transformResponse: (res: any) => res.data,
+      providesTags: (result, error, id) => [{ type: 'tour', id: id }],
     }),
     
     createTour: builder.mutation({
@@ -84,10 +103,11 @@ export const tourApi = baseApi.injectEndpoints({
         url: "/tour/guide/my-tours",
         method: "GET",
       }),
+      transformResponse: (res: any) => res.data,
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              ...result.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
               { type: 'tour', id: 'LIST' },
             ]
           : [{ type: 'tour', id: 'LIST' }],
@@ -98,10 +118,11 @@ export const tourApi = baseApi.injectEndpoints({
         url: "/tour/tourist/my-tours",
         method: "GET",
       }),
+      transformResponse: (res: any) => res.data,
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              ...result.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
               { type: 'tour', id: 'LIST' },
             ]
           : [{ type: 'tour', id: 'LIST' }],
@@ -113,10 +134,11 @@ export const tourApi = baseApi.injectEndpoints({
         url: "/tour/admin/all-tours",
         method: "GET",
       }),
+      transformResponse: (res: any) => res.data,
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              ...result.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
               { type: 'tour', id: 'LIST' },
             ]
           : [{ type: 'tour', id: 'LIST' }],
@@ -127,8 +149,9 @@ export const tourApi = baseApi.injectEndpoints({
 
 export const {
   useGetAllToursQuery,
+  useGetFeaturedToursQuery,
   useSearchToursQuery,
-  useGetTourBySlugQuery,
+  useGetTourByIdQuery,
   useCreateTourMutation,
   useUpdateTourMutation,
   useDeleteTourMutation,

@@ -153,7 +153,7 @@ export default function GuideMyBookingsPage() {
                         <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${getStatusStyles(booking.status)}`}>{booking.status}</span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <Link href={`/tours/${tour.slug || tour._id}`} className="text-[#4088FD] hover:underline text-sm font-bold inline-flex items-center gap-1">
+                        <Link href={`/tours/${tour._id}`} className="text-[#4088FD] hover:underline text-sm font-bold inline-flex items-center gap-1">
                           View <ChevronRight className="w-4 h-4" />
                         </Link>
                       </td>

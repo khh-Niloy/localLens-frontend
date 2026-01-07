@@ -11,7 +11,7 @@ export default function GuideReviews() {
   const { data: meData } = useGetMeQuery(undefined);
   const me = meData as any;
   const { data: reviewsData, isLoading } = useGetGuideReviewsQuery(
-    { guideId: me?._id, page: 1, limit: 50 },
+    { guideId: me?._id, limit: 50 },
     { skip: !me?._id }
   );
 

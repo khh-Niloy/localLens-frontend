@@ -172,7 +172,7 @@ export default function MyBookingsPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end items-center gap-2">
-                          <Link href={`/tours/${tour.slug || tour._id}`} className="p-2 bg-blue-50 text-[#4088FD] rounded-lg hover:bg-blue-100 transition-colors" title="View Tour">
+                          <Link href={`/tours/${tour._id}`} className="p-2 bg-blue-50 text-[#4088FD] rounded-lg hover:bg-blue-100 transition-colors" title="View Tour">
                             <ExternalLink className="w-4 h-4" />
                           </Link>
                           {booking.status === 'CONFIRMED' && paymentStatus === 'UNPAID' && (

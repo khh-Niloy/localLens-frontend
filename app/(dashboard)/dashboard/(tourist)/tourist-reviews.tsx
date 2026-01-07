@@ -13,7 +13,7 @@ export default function TouristReviews() {
   const { data: meData } = useGetMeQuery(undefined);
   const me = meData as any;
   const { data: reviewsData, isLoading } = useGetUserReviewsQuery(
-    { userId: me?._id, page: 1, limit: 50 },
+    { userId: me?._id, limit: 50 },
     { skip: !me?._id }
   );
 

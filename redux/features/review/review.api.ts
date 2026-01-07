@@ -25,36 +25,45 @@ export const reviewApi = baseApi.injectEndpoints({
     
     // Public routes - view reviews
     getTourReviews: builder.query({
-      query: ({ tourId, page = 1, limit = 10 }) => ({
+      query: ({ tourId, cursor, limit = 10 }) => ({
         url: `/review/tour/${tourId}`,
         method: "GET",
-        params: { page, limit },
+        params: { cursor, limit },
       }),
       transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
     getGuideReviews: builder.query({
-      query: ({ guideId, page = 1, limit = 10 }) => ({
+      query: ({ guideId, cursor, limit = 10 }) => ({
         url: `/review/guide/${guideId}`,
         method: "GET",
-        params: { page, limit },
+        params: { cursor, limit },
       }),
       transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
     getUserReviews: builder.query({
-      query: ({ userId, page = 1, limit = 10 }) => ({
+      query: ({ userId, cursor, limit = 10 }) => ({
         url: `/review/user/${userId}`,
         method: "GET",
-        params: { page, limit },
+        params: { cursor, limit },
       }),
       transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
 
+    getLatestReviews: builder.query({
+      query: (params: { limit?: number } | void) => ({
+        url: "/review/latest",
+        method: "GET",
+        params: params || { limit: 6 },
+      }),
+      transformResponse: (response: any) => response.data,
+      providesTags: ["review"],
+    }),
   }),
 });
 
@@ -64,4 +73,5 @@ export const {
   useGetTourReviewsQuery,
   useGetGuideReviewsQuery,
   useGetUserReviewsQuery,
+  useGetLatestReviewsQuery,
 } = reviewApi;

@@ -28,7 +28,7 @@ export default function MyToursPage() {
   };
   
   const tours: any[] = userRole === 'GUIDE' 
-    ? (guideToursData?.data || []) 
+    ? (guideToursData || []) 
     : [];
   
   const isLoading = userRole === 'GUIDE' ? guideToursLoading : false;
