@@ -47,6 +47,7 @@ export default function TourDetailsPage() {
   const tourId = params.tourId as string;
 
   const { data: tour, isLoading, error } = useGetTourByIdQuery(tourId);
+  console.log(tour)
   const { data: userData } = useGetMeQuery({});
   const [createBooking, { isLoading: isCreatingBooking }] = useCreateBookingMutation();
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -178,27 +179,50 @@ export default function TourDetailsPage() {
             </div>
           </div>
 
-          <div className="relative h-[300px] md:h-[500px] rounded-[2.5rem] overflow-hidden group shadow-2xl shadow-gray-200">
-            <img 
-              src={tour.images?.[0] || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80'} 
-              alt={tour.title}
-              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60" />
-            
+          <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-gray-200 h-[300px] md:h-[500px]">
+             {/* Gallery Grid */}
+             <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 h-full gap-2 bg-gray-100">
+               {(tour.images?.length > 0 ? tour.images.slice(0, 5) : ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80']).map((img: string, index: number, arr: string[]) => {
+                 // Calculate grid spans based on total images to display (max 5)
+                 let spanClass = "";
+                 const total = arr.length;
+                 
+                 if (total === 1) spanClass = "col-span-1 md:col-span-4 row-span-2";
+                 else if (total === 2) spanClass = "col-span-1 md:col-span-2 row-span-2";
+                 else if (total === 3) {
+                   if (index === 0) spanClass = "col-span-1 md:col-span-2 row-span-2";
+                   else spanClass = "col-span-1 md:col-span-2 row-span-1";
+                 }
+                 else if (total === 4) {
+                   if (index === 0) spanClass = "col-span-1 md:col-span-2 row-span-2";
+                   else if (index === 1) spanClass = "col-span-1 md:col-span-2 row-span-1";
+                   else spanClass = "col-span-1 row-span-1";
+                 }
+                 else {
+                   // 5+ images
+                   if (index === 0) spanClass = "col-span-1 md:col-span-2 row-span-2";
+                   else spanClass = "col-span-1 row-span-1";
+                 }
+
+                 return (
+                   <div key={index} className={`relative overflow-hidden group cursor-pointer ${spanClass} ${index > 0 ? 'hidden md:block' : 'block'}`}>
+                      <img 
+                        src={img} 
+                        alt={`${tour.title} ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-300" />
+                   </div>
+                 );
+               })}
+             </div>
+
             {/* Owner/Badge overlay */}
             {isGuideOwner && (
-              <div className="absolute top-6 left-6 px-4 py-2 bg-white/90 backdrop-blur-md rounded-2xl text-[10px] font-black uppercase tracking-widest text-[#4088FD] shadow-xl border border-blue-50">
+              <div className="absolute top-6 left-6 px-4 py-2 bg-white/90 backdrop-blur-md rounded-2xl text-[10px] font-black uppercase tracking-widest text-[#4088FD] shadow-xl border border-blue-50 z-10">
                 You are the Owner
               </div>
             )}
-
-            <div className="absolute bottom-8 right-8">
-              <button className="flex items-center gap-2 text-gray-900 font-bold bg-white/90 backdrop-blur-xl px-6 py-3 rounded-2xl hover:bg-white transition-all shadow-2xl border border-white/50">
-                <Camera className="w-5 h-5 text-[#4088FD]" />
-                View Gallery
-              </button>
-            </div>
           </div>
         </div>
       </section>
@@ -598,6 +622,7 @@ export default function TourDetailsPage() {
                       </div>
                       <div>
                         <h4 className="text-2xl font-black text-gray-900 leading-tight mb-1">{tour.guideId.name}</h4>
+                        <p className='text-xs font-bold text-gray-400'>{tour.guideId.email}</p>
                         <div className="flex items-center gap-2">
                            <div className="flex items-center text-amber-500 gap-0.5">
                              <Star className="w-3.5 h-3.5 fill-current" />

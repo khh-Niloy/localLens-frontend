@@ -84,7 +84,7 @@ export default function EditTourPage() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
 
-  const tours: Tour[] = myToursData?.data || [];
+  const tours: Tour[] = Array.isArray(myToursData) ? myToursData : (myToursData?.data || []);
   const tour = tours.find(t => t._id === tourId);
   const categories = enumsData?.data?.categories || ["FOOD", "HISTORICAL", "ART", "NATURE", "ADVENTURE", "CULTURAL"];
 
@@ -334,7 +334,16 @@ export default function EditTourPage() {
         formData.append('existingImages', JSON.stringify(existingImages));
       }
 
-        const result = await updateTour({ id: tourId, ...Object.fromEntries(formData) }).unwrap();
+      // Debug: Log FormData contents
+      const formDataEntries: Record<string, any> = {};
+      formData.forEach((value, key) => {
+        formDataEntries[key] = value;
+      });
+      console.log('Sending FormData:', formDataEntries);
+
+      const result = await updateTour({ id: tourId, data: formData }).unwrap();
+      console.log('Update Result:', result);
+      
       toast.success("Tour updated successfully!");
       
       // Redirect to my tours

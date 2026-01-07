@@ -59,7 +59,6 @@ export const reviewApi = baseApi.injectEndpoints({
       query: (params: { limit?: number } | void) => ({
         url: "/review/latest",
         method: "GET",
-        params: params || { limit: 6 },
       }),
       transformResponse: (response: any) => response.data,
       providesTags: ["review"],

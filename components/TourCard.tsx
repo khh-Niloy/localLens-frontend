@@ -26,6 +26,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, userData, onBook }) => {
             <img 
               src={tour.images[0]} 
               alt={tour.title}
+              referrerPolicy="no-referrer"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 font-sans"
             />
           ) : (

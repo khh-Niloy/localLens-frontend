@@ -4,20 +4,24 @@ import { motion } from "framer-motion";
 import { Star, Quote, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useGetLatestReviewsQuery } from "@/redux/features/review/review.api";
+import Link from "next/link";
 
 export default function CustomerReviews() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const { data: reviews = [], isLoading } = useGetLatestReviewsQuery({ limit: 6 });
+  const { data: reviews = [], isLoading } = useGetLatestReviewsQuery();
+  console.log(reviews);
 
   // Map backend data to local structure
   const formattedReviews = reviews.map((r: any) => ({
     id: r._id,
     name: r.userId?.name || "Local Explorer",
     role: "Verified Guest",
-    image: r.userId?.image || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+    image: r.userId?.image,
     content: r.comment,
     rating: r.rating,
-    location: r.tourId?.location || "Bangladesh"
+    location: r.tourId?.location || "Bangladesh",
+    tourTitle: r.tourId?.title || "Unknown Tour",
+    tourId: r.tourId?._id || "Unknown Tour ID",
   }));
 
   const nextReview = () => {
@@ -44,6 +48,7 @@ export default function CustomerReviews() {
   }
 
   const activeReview = formattedReviews[activeIndex];
+  console.log(activeReview);
 
   return (
     <section className="py-20 sm:py-24 md:py-28 lg:py-32 bg-[#F8FAFC] relative overflow-hidden">
@@ -141,6 +146,13 @@ export default function CustomerReviews() {
                         <Star className="w-3 h-3 fill-current text-amber-400" /> 
                         {activeReview.location}
                       </p>
+
+                      <h1>{activeReview.title}</h1>
+
+                      <p className="text-sm text-gray-600 font-bold mt-1 flex items-center gap-1">Tour was {activeReview.tourTitle}</p>
+                      <button className="bg-[#4088FD] text-white px-4 py-2 rounded-2xl hover:bg-[#4088FD]/80 transition-all active:scale-95 mt-4">
+                        <Link href={`/tour/${activeReview.tourId}`}>See tour details</Link>
+                      </button>
                     </div>
                   </motion.div>
 

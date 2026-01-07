@@ -22,12 +22,10 @@ export const userApi = baseApi.injectEndpoints({
     updateProfile: builder.mutation({
       query: (data) => {
         // If data is FormData, don't set Content-Type header (let browser set it with boundary)
-        const isFormData = data instanceof FormData;
         return {
           url: "/user/profile",
           method: "PATCH",
           data: data,
-          headers: isFormData ? {} : { 'Content-Type': 'application/json' },
         };
       },
       invalidatesTags: ["user"], // This will invalidate both user and auth queries

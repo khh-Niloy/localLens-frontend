@@ -20,7 +20,7 @@ export default function MyToursPage() {
   const handleToggleFeatured = async (tourId: string, currentFeatured: boolean) => {
     try {
       const newFeatured = !currentFeatured;
-      await updateTour({ id: tourId, isFeatured: newFeatured }).unwrap();
+      await updateTour({ id: tourId, data: { isFeatured: newFeatured } }).unwrap();
       toast.success(newFeatured ? 'Tour added to featured' : 'Tour removed from featured');
     } catch (err: any) {
       toast.error(err?.data?.message || 'Failed to update featured status');

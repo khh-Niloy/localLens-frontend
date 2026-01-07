@@ -69,7 +69,7 @@ export const tourApi = baseApi.injectEndpoints({
     }),
     
     updateTour: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ id, data }) => ({
         url: `/tour/${id}`,
         method: "PATCH",
         data: data,

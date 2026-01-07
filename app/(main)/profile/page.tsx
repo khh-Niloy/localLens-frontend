@@ -24,6 +24,7 @@ interface ProfileFormData {
   expertise: string[];
   dailyRate: string;
   travelPreferences: string[];
+  image?: any;
 }
 
 const EXPERTISE_OPTIONS = [
@@ -76,6 +77,9 @@ export default function ProfilePage() {
   const { data: profileData, isLoading: isLoadingProfile, refetch: refetchProfile } = useGetProfileQuery({}, { skip: !userData });
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
+  let isGuide = userData?.role === 'GUIDE';
+  let isTourist = userData?.role === 'TOURIST';
+
   const { 
     register, 
     handleSubmit: handleFormSubmit, 
@@ -93,12 +97,20 @@ export default function ProfilePage() {
       expertise: [],
       dailyRate: '',
       travelPreferences: [],
+      image: null,
     }
   });
 
   const formData = watch();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+
+  // Debug: Track when selectedImage changes
+  useEffect(() => {
+    if (selectedImage) {
+      console.log('✅ Image state updated:', selectedImage.name, selectedImage.size);
+    }
+  }, [selectedImage]);
 
   const [tempLanguage, setTempLanguage] = useState('');
   const [tempExpertise, setTempExpertise] = useState('');
@@ -123,22 +135,29 @@ export default function ProfilePage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('📁 File input changed:', file ? { name: file.name, type: file.type, size: file.size } : 'No fileSelected');
+    
     if (file) {
       if (!file.type.startsWith('image/')) {
+        console.warn('❌ Invalid file type:', file.type);
         toast.error('Please select an image file');
         return;
       }
       
       if (file.size > 5 * 1024 * 1024) {
+        console.warn('❌ File too large:', file.size);
         toast.error('Image size must be less than 5MB');
         return;
       }
 
+      console.log('✅ Setting selectedImage state...');
       setSelectedImage(file);
+      setValue('image', file, { shouldDirty: true });
       
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+        console.log('✅ Image preview updated');
       };
       reader.readAsDataURL(file);
     }
@@ -178,48 +197,59 @@ export default function ProfilePage() {
   };
 
   const onProfileSubmit = async (data: ProfileFormData) => {
+    console.log('🚀 onProfileSubmit triggered with data:', data);
+
     try {
       const formDataToSend = new FormData();
       
-      formDataToSend.append('name', data.name);
-      if (data.phone) formDataToSend.append('phone', data.phone);
-      if (data.address) formDataToSend.append('address', data.address);
-      if (data.bio) formDataToSend.append('bio', data.bio);
+      // 1. Always add the image if a new one was selected (either from state or data)
+      const imageToUpload = selectedImage || data.image;
+      if (imageToUpload instanceof File) {
+        console.log('Appending image to FormData:', imageToUpload.name);
+        formDataToSend.append('image', imageToUpload);
+      }
+
+      // 2. Add other fields that have changed
+      if (dirtyFields.name) formDataToSend.append('name', data.name);
+      if (dirtyFields.phone) formDataToSend.append('phone', data.phone);
+      if (dirtyFields.address) formDataToSend.append('address', data.address);
+      if (dirtyFields.bio) formDataToSend.append('bio', data.bio);
       
-      if (data.language.length > 0) {
+      if (dirtyFields.language) {
         formDataToSend.append('language', JSON.stringify(data.language));
       }
 
-      if (userData?.role === 'GUIDE') {
-        if (data.expertise.length > 0) {
-          formDataToSend.append('expertise', JSON.stringify(data.expertise));
-        }
-        if (data.dailyRate) {
-          formDataToSend.append('dailyRate', data.dailyRate);
-        }
-      } else if (userData?.role === 'TOURIST') {
-        if (data.travelPreferences.length > 0) {
-          formDataToSend.append('travelPreferences', JSON.stringify(data.travelPreferences));
-        }
+      const isGuide = userData?.role === 'GUIDE';
+      const isTourist = userData?.role === 'TOURIST';
+
+      if (isGuide) {
+        if (dirtyFields.expertise) formDataToSend.append('expertise', JSON.stringify(data.expertise));
+        if (dirtyFields.dailyRate) formDataToSend.append('dailyRate', data.dailyRate);
+      } else if (isTourist) {
+        if (dirtyFields.travelPreferences) formDataToSend.append('travelPreferences', JSON.stringify(data.travelPreferences));
       }
 
-      if (selectedImage) {
-        formDataToSend.append('image', selectedImage);
-      }
+      // Debug: Check if we have anything to send
+      let entryCount = 0;
+      formDataToSend.forEach(() => entryCount++);
 
-      const result = await updateProfile(formDataToSend).unwrap();
-      
-      if (result?.data?.image) {
-        setImagePreview(result.data.image);
+      if (entryCount > 0) {
+        console.log(`Sending request with ${entryCount} items...`);
+        const result = await updateProfile(formDataToSend).unwrap();
+        
+        if (result?.data?.image) setImagePreview(result.data.image);
+        
+        setSelectedImage(null);
+        setValue('image', null, { shouldDirty: false });
+        await refetchProfile();
+        await refetchUserData();
+        
+        toast.success('Profile updated successfully!');
+      } else {
+        toast.error('No changes detected');
       }
-      
-      setSelectedImage(null);
-      
-      await refetchProfile();
-      await refetchUserData();
-      
-      toast.success('Profile updated successfully!');
     } catch (error: any) {
+      console.error('Submit Error:', error);
       toast.error(error?.data?.message || 'Failed to update profile');
     }
   };
@@ -235,8 +265,6 @@ export default function ProfilePage() {
   }
 
   const profile = profileData?.data;
-  const isGuide = userData?.role === 'GUIDE';
-  const isTourist = userData?.role === 'TOURIST';
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-6 sm:py-8 md:py-12 px-4 sm:px-6">
@@ -259,10 +287,21 @@ export default function ProfilePage() {
               Cancel
             </button>
             <button
-              onClick={handleFormSubmit(onProfileSubmit)}
-              disabled={isUpdating || (!isDirty && !selectedImage)}
-              className="px-5 sm:px-8 py-2 sm:py-2.5 bg-[#4088FD] text-white rounded-xl font-bold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg shadow-blue-100 transition-all text-xs sm:text-sm"
-              title={!isDirty && !selectedImage ? "No changes to save" : "Save changes"}
+              type="button"
+              onClick={(e) => {
+                console.log('🖱️ CLICKED: Save Changes Button');
+                console.log('Current state:', { isDirty, hasImage: !!selectedImage });
+                handleFormSubmit(onProfileSubmit, (errors) => {
+                  console.error('❌ Validation Errors:', errors);
+                  toast.error('Please fill in required fields');
+                })(e);
+              }}
+              disabled={isUpdating}
+              className={`px-5 sm:px-8 py-2 sm:py-2.5 rounded-xl font-bold flex items-center shadow-lg transition-all text-xs sm:text-sm ${
+                (isDirty || selectedImage) 
+                  ? 'bg-[#4088FD] text-white hover:bg-blue-600 shadow-blue-100' 
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+              }`}
             >
               {isUpdating ? (
                  <>
