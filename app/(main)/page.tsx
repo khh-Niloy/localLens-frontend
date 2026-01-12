@@ -5,6 +5,7 @@ import { useGetMeQuery } from '@/redux/features/auth/auth.api';
 import { useGetAllToursQuery } from '@/redux/features/tour/tour.api';
 import { useCreateBookingMutation } from '@/redux/features/booking/booking.api';
 import WishlistButton from '@/components/ui/WishlistButton';
+import { motion } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -14,19 +15,18 @@ import {
 } from '@/components/ui/dialog';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
-import { MapPin, Users, Star, ArrowRight, Clock, BookOpen } from 'lucide-react';
+import { MapPin, Users, Star, ArrowRight, Clock, BookOpen, Shield, Headphones } from 'lucide-react';
 import { Hero7 } from '@/components/hero7';
+import FeaturedTours from '@/components/Home/FeaturedTours';
+import CustomerReviews from '@/components/Home/CustomerReviews';
 
 export default function HomePage() {
   const { data: userData, isLoading: userLoading, error: userError } = useGetMeQuery({});
-  const { data: toursData, isLoading: toursLoading, error: toursError } = useGetAllToursQuery({});
   const [createBooking, { isLoading: isCreatingBooking }] = useCreateBookingMutation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedTour, setSelectedTour] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [guestCount, setGuestCount] = useState(1);
-
-  const tours = toursData?.data || [];
 
   const handleBookTour = (tour: any) => {
     if (!userData) {
@@ -54,27 +54,11 @@ export default function HomePage() {
   if (userLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#1FB67A]"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#4088FD]"></div>
       </div>
     );
   }
 
-  // Handle errors gracefully
-  if (userError) {
-    console.error('Error loading user data:', userError);
-    // Don't block the page, just show a toast
-    if (typeof window !== 'undefined') {
-      toast.error('Unable to load user information. Some features may be limited.');
-    }
-  }
-
-  if (toursError) {
-    console.error('Error loading tours:', toursError);
-    // Don't block the page, just show a toast
-    if (typeof window !== 'undefined') {
-      toast.error('Unable to load tours. Please refresh the page or try again later.');
-    }
-  }
 
   // Show landing page for non-authenticated users
   return (
@@ -83,409 +67,281 @@ export default function HomePage() {
       <Hero7 userData={userData} />
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose LocalLens?</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Experience destinations like a local with our trusted community of guides and authentic experiences.
-            </p>
+      <section className="pt-24 sm:pt-28 md:pt-32 lg:pt-36 pb-12 sm:pb-16 md:pb-20 lg:pb-24 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-16">
+            <motion.h4 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-[#4088FD] font-bold tracking-[0.2em] uppercase text-xs mb-4"
+            >
+              Why Choose Us
+            </motion.h4>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
+            >
+              High quality service for your <span className="text-[#4088FD]">Experience</span>
+            </motion.h2>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-white" />
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 max-w-[1400px] mx-auto">
+            {/* Feature 1 - Purple */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               whileHover={{ y: -5, scale: 1.02 }}
+               viewport={{ once: true }}
+               className="bg-[#F9F5FF] p-8 rounded-[2rem] border border-purple-100/50 flex flex-col items-start text-left transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/5 hover:bg-white"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-[#A855F7] to-[#8B5CF6] rounded-full flex items-center justify-center mb-6 shadow-lg shadow-purple-300/40">
+                <MapPin className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Local Expertise</h3>
-              <p className="text-gray-600">
-                Connect with passionate local guides who know the hidden gems and authentic experiences in their cities.
+              <h3 className="text-[17px] font-bold text-gray-900 mb-3">Local Expertise</h3>
+              <p className="text-gray-500 text-[13px] leading-relaxed font-medium opacity-80">
+                Discover authentic hidden gems only passionate local guides know.
               </p>
-            </div>
+            </motion.div>
             
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-white" />
+            {/* Feature 2 - Blue */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               whileHover={{ y: -5, scale: 1.02 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.1 }}
+               className="bg-[#EFF6FF] p-8 rounded-[2rem] border border-blue-100/50 flex flex-col items-start text-left transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/5 hover:bg-white"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-full flex items-center justify-center mb-6 shadow-lg shadow-blue-300/40">
+                <Users className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Small Groups</h3>
-              <p className="text-gray-600">
-                Enjoy intimate experiences with small group sizes for personalized attention and meaningful connections.
+              <h3 className="text-[17px] font-bold text-gray-900 mb-3">Small Groups</h3>
+              <p className="text-gray-500 text-[13px] leading-relaxed font-medium opacity-80">
+                Enjoy intimate experiences designed for meaningful connections.
               </p>
-            </div>
+            </motion.div>
             
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-white" />
+            {/* Feature 3 - Cyan */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               whileHover={{ y: -5, scale: 1.02 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.2 }}
+               className="bg-[#ECFEFF] p-8 rounded-[2rem] border border-cyan-100/50 flex flex-col items-start text-left transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/5 hover:bg-white"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-[#06B6D4] to-[#0891B2] rounded-full flex items-center justify-center mb-6 shadow-lg shadow-cyan-300/40">
+                <Star className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Quality Guaranteed</h3>
-              <p className="text-gray-600">
-                All our guides are verified and rated by fellow travelers to ensure exceptional experiences every time.
+              <h3 className="text-[17px] font-bold text-gray-900 mb-3">Verified Quality</h3>
+              <p className="text-gray-500 text-[13px] leading-relaxed font-medium opacity-80">
+                Hand-picked guides ensuring a safe and premium journey for you.
               </p>
-            </div>
+            </motion.div>
+
+            {/* Feature 4 - Emerald */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               whileHover={{ y: -5, scale: 1.02 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.3 }}
+               className="bg-[#ECFDF5] p-8 rounded-[2rem] border border-emerald-100/50 flex flex-col items-start text-left transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/5 hover:bg-white"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-[#10B981] to-[#059669] rounded-full flex items-center justify-center mb-6 shadow-lg shadow-emerald-300/40">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-[17px] font-bold text-gray-900 mb-3">Secure Payments</h3>
+              <p className="text-gray-500 text-[13px] leading-relaxed font-medium opacity-80">
+                Worry-free transactions with our fully encrypted booking system.
+              </p>
+            </motion.div>
+
+            {/* Feature 5 - Rose */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               whileHover={{ y: -5, scale: 1.02 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.4 }}
+               className="bg-[#FFF1F2] p-8 rounded-[2rem] border border-rose-100/50 flex flex-col items-start text-left transition-all duration-300 hover:shadow-xl hover:shadow-rose-500/5 hover:bg-white"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-[#F43F5E] to-[#E11D48] rounded-full flex items-center justify-center mb-6 shadow-lg shadow-rose-300/40">
+                <Headphones className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-[17px] font-bold text-gray-900 mb-3">24/7 Support</h3>
+              <p className="text-gray-500 text-[13px] leading-relaxed font-medium opacity-80">
+                Our team is always ready to assist you at every step of your trip.
+              </p>
+            </motion.div>
           </div>
         </div>
       </section>
-
-      {/* Tours Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Tours & Experiences</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Discover amazing local experiences curated by passionate guides around the world.
-            </p>
-          </div>
-
-          {toursLoading ? (
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1FB67A]"></div>
-            </div>
-          ) : toursError ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-red-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Unable to load tours</h3>
-              <p className="text-gray-500 mb-4">
-                {(toursError as any)?.data?.message || 'Please refresh the page or try again later.'}
-              </p>
-              <button
-                onClick={() => window.location.reload()}
-                className="bg-[#1FB67A] text-white px-6 py-2 rounded-lg hover:bg-[#1dd489] transition-colors"
-              >
-                Refresh Page
-              </button>
-            </div>
-          ) : tours.length === 0 ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No tours available yet</h3>
-              <p className="text-gray-500">Check back soon for amazing local experiences!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {tours.slice(0, 6).map((tour: any) => (
-                <div key={tour._id} className="bg-white rounded-lg shadow-lg border overflow-hidden hover:shadow-xl transition-shadow">
-                  {/* Tour Image */}
-                  <div className="relative h-48">
-                    {tour.images && tour.images[0] ? (
-                      <img 
-                        src={tour.images[0]} 
-                        alt={tour.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <MapPin className="w-12 h-12 text-gray-400" />
-                      </div>
-                    )}
-                    <div className="absolute top-3 right-3">
-                      <WishlistButton tourId={tour._id} />
-                    </div>
-                  </div>
-
-                  {/* Tour Details */}
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900 text-lg leading-tight">{tour.title}</h3>
-                    </div>
-
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">{tour.description}</p>
-
-                    <div className="flex items-center text-sm text-gray-600 mb-2">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      <span>{tour.location}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                      <div className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        <span>{tour.maxDuration}h</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="w-4 h-4 mr-1" />
-                        <span>Max {tour.maxGroupSize}</span>
-                      </div>
-                    </div>
-
-                    {/* Guide Info */}
-                    {tour.guideId && (
-                      <div className="flex items-center mb-4">
-                        <div className="w-8 h-8 bg-gray-300 rounded-full mr-2"></div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{tour.guideId.name || 'Local Guide'}</p>
-                          <div className="flex items-center">
-                            <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
-                            <span className="text-xs text-gray-600">{tour.rating || 4.8} ({tour.reviewCount || 0})</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Price and Booking */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <span className="text-2xl font-bold text-gray-900">${tour.tourFee}</span>
-                        <span className="text-sm text-gray-500 ml-1">/ person</span>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="mt-4 space-y-2">
-                      <div className="flex space-x-2">
-                        <Link 
-                          href={`/tours/${tour.slug || tour._id}`}
-                          className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-center font-medium"
-                        >
-                          View Details
-                        </Link>
-                        {userData && userData.role === 'TOURIST' ? (
-                          <button 
-                            onClick={() => handleBookTour(tour)}
-                            className="flex-1 bg-[#1FB67A] text-white py-2 px-4 rounded-lg hover:bg-[#1dd489] transition-colors font-medium"
-                          >
-                            Book Now
-                          </button>
-                        ) : !userData ? (
-                          <Link 
-                            href="/login"
-                            className="flex-1 bg-[#1FB67A] text-white py-2 px-4 rounded-lg hover:bg-[#1dd489] transition-colors text-center font-medium"
-                          >
-                            Login to Book
-                          </Link>
-                        ) : (
-                          <button 
-                            disabled
-                            className="flex-1 bg-gray-300 text-gray-500 py-2 px-4 rounded-lg cursor-not-allowed font-medium"
-                            title="Only tourists can book tours"
-                          >
-                            Book Now
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {tours.length > 6 && (
-            <div className="text-center mt-12">
-              <Link 
-                href="/explore-tours"
-                className="inline-block bg-[#1FB67A] text-white px-8 py-3 rounded-lg hover:bg-[#1dd489] transition-colors font-medium"
-              >
-                View All Tours
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
+      
+      {/* Featured Tours Section */}
+      <FeaturedTours />
 
       {/* How It Works Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Booking a local experience is simple and straightforward. Follow these easy steps to get started.
-            </p>
+      <section className="py-20 sm:py-24 md:py-28 lg:py-32 bg-white relative overflow-hidden">
+        {/* Subtle Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4088FD 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+        
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-10 sm:mb-14 md:mb-20">
+            <motion.h4 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="text-[#4088FD] font-bold tracking-[0.3em] uppercase text-xs mb-4"
+            >
+              The Process
+            </motion.h4>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
+            >
+              Simple steps to <span className="text-[#4088FD]">Explore</span>
+            </motion.h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
-                1
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 max-w-7xl mx-auto relative px-2 sm:px-4">
+            {/* Steps Connector Line */}
+            <div className="hidden xl:block absolute top-[60px] left-[15%] right-[15%] h-[2px] bg-gradient-to-r from-transparent via-gray-100 to-transparent"></div>
+
+            {/* Step 1 */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               className="flex flex-col items-center text-center group"
+            >
+              <div className="relative mb-4 sm:mb-6 md:mb-8">
+                <div className="w-24 h-24 rounded-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex items-center justify-center relative z-10 border border-gray-50 group-hover:scale-110 group-hover:border-purple-100 transition-all duration-500">
+                  <span className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-purple-500 to-indigo-600">1</span>
+                </div>
+                <div className="absolute -inset-2 bg-purple-50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Browse Tours</h3>
-              <p className="text-gray-600">
-                Explore our curated collection of authentic local experiences and find the perfect tour for you.
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Browse Tours</h3>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-[220px] font-medium opacity-80">
+                Explore our curated collection of authentic local experiences and find your match.
               </p>
-            </div>
+            </motion.div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
-                2
+            {/* Step 2 */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.1 }}
+               className="flex flex-col items-center text-center group"
+            >
+              <div className="relative mb-4 sm:mb-6 md:mb-8">
+                <div className="w-24 h-24 rounded-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex items-center justify-center relative z-10 border border-gray-50 group-hover:scale-110 group-hover:border-blue-100 transition-all duration-500">
+                  <span className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-blue-500 to-blue-700">2</span>
+                </div>
+                <div className="absolute -inset-2 bg-blue-50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Book Your Experience</h3>
-              <p className="text-gray-600">
-                Select your preferred date, number of guests, and submit your booking request.
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Book Trip</h3>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-[220px] font-medium opacity-80">
+                Select your date, guests, and submit your request with a single click.
               </p>
-            </div>
+            </motion.div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
-                3
+            {/* Step 3 */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.2 }}
+               className="flex flex-col items-center text-center group"
+            >
+              <div className="relative mb-4 sm:mb-6 md:mb-8">
+                <div className="w-24 h-24 rounded-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex items-center justify-center relative z-10 border border-gray-50 group-hover:scale-110 group-hover:border-cyan-100 transition-all duration-500">
+                  <span className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-cyan-500 to-cyan-700">3</span>
+                </div>
+                <div className="absolute -inset-2 bg-cyan-50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Get Confirmed</h3>
-              <p className="text-gray-600">
-                Your guide will review and confirm your booking. You'll receive all the details you need.
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Get Confirmed</h3>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-[220px] font-medium opacity-80">
+                Your guide will review and confirm all details for your upcoming journey.
               </p>
-            </div>
+            </motion.div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#1FB67A] rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
-                4
+            {/* Step 4 */}
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.3 }}
+               className="flex flex-col items-center text-center group"
+            >
+              <div className="relative mb-4 sm:mb-6 md:mb-8">
+                <div className="w-24 h-24 rounded-full bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex items-center justify-center relative z-10 border border-gray-50 group-hover:scale-110 group-hover:border-emerald-100 transition-all duration-500">
+                  <span className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-emerald-500 to-emerald-700">4</span>
+                </div>
+                <div className="absolute -inset-2 bg-emerald-50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Enjoy & Pay</h3>
-              <p className="text-gray-600">
-                Experience your tour, then complete payment after the experience. Simple and secure.
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Enjoy & Pay</h3>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-[220px] font-medium opacity-80">
+                Experience your local tour, then complete payment securely.
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Tour Categories Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore by Category</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Discover tours tailored to your interests. From food adventures to cultural experiences, find the perfect tour for you.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            <Link 
-              href="/explore-tours?category=FOOD"
-              className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
-            >
-              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🍜</span>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Food</h3>
-              <p className="text-sm text-gray-600">Culinary Tours</p>
-            </Link>
-            
-            <Link 
-              href="/explore-tours?category=HISTORICAL"
-              className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
-            >
-              <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🏛️</span>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Historical</h3>
-              <p className="text-sm text-gray-600">Heritage Sites</p>
-            </Link>
-            
-            <Link 
-              href="/explore-tours?category=ART"
-              className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
-            >
-              <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🎨</span>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Art</h3>
-              <p className="text-sm text-gray-600">Art & Culture</p>
-            </Link>
-            
-            <Link 
-              href="/explore-tours?category=NATURE"
-              className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
-            >
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🌲</span>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Nature</h3>
-              <p className="text-sm text-gray-600">Outdoor Adventures</p>
-            </Link>
-            
-            <Link 
-              href="/explore-tours?category=ADVENTURE"
-              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
-            >
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">⛰️</span>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Adventure</h3>
-              <p className="text-sm text-gray-600">Thrilling Tours</p>
-            </Link>
-            
-            <Link 
-              href="/explore-tours?category=CULTURAL"
-              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 text-center hover:shadow-lg transition-all hover:scale-105"
-            >
-              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🎭</span>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-1">Cultural</h3>
-              <p className="text-sm text-gray-600">Local Traditions</p>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CustomerReviews />
 
-      {/* Call to Action Section */}
-      <section className="py-16 bg-[#1FB67A]">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Adventure?</h2>
-          <p className="text-white/90 max-w-2xl mx-auto mb-8">
-            Join thousands of travelers discovering authentic local experiences. Browse our tours or become a guide and share your city with the world.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/explore-tours"
-              className="bg-white text-[#1FB67A] px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors font-medium"
-            >
-              Explore Tours
-            </Link>
-            <Link 
-              href="/register/guide"
-              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white/10 transition-colors font-medium"
-            >
-              Become a Guide
-            </Link>
-          </div>
-        </div>
-      </section>
+
 
       {/* Booking Modal */}
       <Dialog open={showBookingModal} onOpenChange={setShowBookingModal}>
         {selectedTour && (
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Book Tour</DialogTitle>
+              <DialogTitle>Book Experience</DialogTitle>
               <DialogDescription>
                 Complete your booking details below
               </DialogDescription>
             </DialogHeader>
             
-            <div className="mb-3">
-              <img 
-                src={selectedTour.images?.[0] || '/placeholder-tour.jpg'} 
-                alt={selectedTour.title}
-                className="w-full h-24 object-cover rounded-lg mb-2"
-              />
-              <h4 className="font-medium text-gray-900 text-sm">{selectedTour.title}</h4>
-              <div className="flex items-center text-xs text-gray-600 mt-1">
-                <MapPin className="w-3 h-3 mr-1" />
+            <div className="mb-3 p-4 bg-gray-50 rounded-2xl">
+              <h4 className="font-bold text-gray-900 text-sm mb-1">{selectedTour.title}</h4>
+              <div className="flex items-center text-xs text-gray-500">
+                <MapPin className="w-3 h-3 mr-1 text-[#4088FD]" />
                 <span>{selectedTour.location}</span>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
                   Select Date *
                 </label>
                 <input 
                   type="date" 
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1FB67A] focus:border-transparent"
+                  className="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4088FD] transition-all"
                   min={new Date().toISOString().split('T')[0]}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Number of Guests *
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  Guests *
                 </label>
                 <select 
                   value={guestCount}
                   onChange={(e) => setGuestCount(parseInt(e.target.value))}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1FB67A] focus:border-transparent"
+                  className="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4088FD] transition-all"
                 >
                   {Array.from({ length: selectedTour.maxGroupSize }, (_, i) => i + 1).map(num => (
                     <option key={num} value={num}>{num} guest{num > 1 ? 's' : ''}</option>
@@ -493,14 +349,14 @@ export default function HomePage() {
                 </select>
               </div>
 
-              <div className="border-t pt-3">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-600">Price per person:</span>
-                  <span className="font-medium text-sm">${selectedTour.tourFee}</span>
+              <div className="pt-4 border-t border-gray-100">
+                <div className="flex justify-between items-center mb-1 text-sm text-gray-500">
+                  <span>Price per person:</span>
+                  <span className="font-bold text-gray-900">{selectedTour.tourFee} TK</span>
                 </div>
-                <div className="flex justify-between items-center mb-3">
-                  <span className="font-medium">Total:</span>
-                  <span className="text-lg font-bold text-[#1FB67A]">${(selectedTour.tourFee * guestCount).toFixed(2)}</span>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="font-bold text-gray-900">Total:</span>
+                  <span className="text-xl font-black text-[#4088FD]">{(selectedTour.tourFee * guestCount).toFixed(2)} TK</span>
                 </div>
               </div>
 
@@ -512,7 +368,7 @@ export default function HomePage() {
                     setGuestCount(1);
                   }}
                   disabled={isCreatingBooking}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  className="flex-1 px-4 py-3 border border-gray-200 text-gray-500 rounded-xl font-bold hover:bg-gray-50 transition-all text-sm"
                 >
                   Cancel
                 </button>
@@ -553,15 +409,16 @@ export default function HomePage() {
                     }
                   }}
                   disabled={isCreatingBooking || !selectedDate}
-                  className="flex-1 px-4 py-2 bg-[#1FB67A] text-white rounded-md hover:bg-[#1dd489] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 bg-[#4088FD] text-white rounded-xl font-bold hover:bg-blue-600 transition-all text-sm shadow-lg shadow-blue-100"
                 >
-                  {isCreatingBooking ? 'Processing...' : 'Confirm Booking'}
+                  {isCreatingBooking ? 'Processing...' : 'Confirm'}
                 </button>
               </div>
             </div>
           </DialogContent>
         )}
       </Dialog>
+
     </div>
   );
 }

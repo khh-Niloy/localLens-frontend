@@ -13,37 +13,40 @@ import {
   CheckCircle,
   User,
   Home,
+  MessageSquare,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import {
   Sidebar,
   SidebarContent,
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { useGetMeQuery } from "@/redux/features/auth/auth.api"
-import { roleBasedRoutes } from "@/utils/roleBasedRoutes"
+import { roleBasedRoutes, IRoleRoute } from "@/utils/roleBasedRoutes"
 
 // Icon mapping for role-based routes
 const iconMap: Record<string, any> = {
   "Home": Home,
   "User Management": Users,
-  "Listing Management": MapPin,
-  "Booking Management": Calendar,
   "Tour Management": BookOpen,
-  "My Trips": Calendar,
+  "Listing Management": MapPin, // Keeping for safety
+  "Booking Management": Calendar,
+  "My Completed Tours": Calendar,
   "Browse Tours": MapPin,
   "Wishlist": BookOpen,
   "Profile": User,
   "All Users": Users,
   "All Listings": List,
+  "All Tours": List, // Added
   "All Bookings": Calendar,
+  "My Bookings": Calendar,
   "Create Tour": Plus,
   "My Tours": List,
   "Upcoming Bookings": Clock,
   "Pending Bookings": CheckCircle,
   "Past Bookings": BarChart3,
+  "Reviews": MessageSquare,
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -51,7 +54,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const me = meData as any;
 
   // Get role-based routes and transform them for sidebar
-  const roleRoutes = me ? roleBasedRoutes({ role: me.role?.toLowerCase() || 'tourist' }) : [];
+  const roleRoutes: IRoleRoute[] = me ? roleBasedRoutes({ role: me.role?.toLowerCase() || 'tourist' }) : [];
   
   const sidebarData = {
     navMain: roleRoutes.map(route => ({
@@ -64,14 +67,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: item.url,
       })) || [],
     })),
-  projects: [],
   };
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
         <NavMain items={sidebarData.navMain} />
-        <NavProjects projects={sidebarData.projects} />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

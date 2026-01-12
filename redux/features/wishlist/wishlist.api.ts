@@ -29,15 +29,6 @@ export const wishlistApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["wishlist"],
     }),
-
-    // Check if tour is in wishlist
-    checkWishlistStatus: builder.query({
-      query: (tourId) => ({
-        url: `/wishlist/check/${tourId}`,
-        method: "GET",
-      }),
-      providesTags: ["wishlist"],
-    }),
   }),
 });
 
@@ -45,5 +36,4 @@ export const {
   useGetWishlistQuery,
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation,
-  useCheckWishlistStatusQuery,
 } = wishlistApi;

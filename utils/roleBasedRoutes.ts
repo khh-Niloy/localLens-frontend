@@ -1,4 +1,13 @@
-const routes = {
+export interface IRoleRoute {
+  title: string;
+  url: string;
+  items?: {
+    title: string;
+    url: string;
+  }[];
+}
+
+const routes: Record<string, IRoleRoute[]> = {
   admin: [
     {
       title: "Home",
@@ -15,12 +24,12 @@ const routes = {
       ],
     },
     {
-      title: "Listing Management",
+      title: "Tour Management",
       url: "#",
       items: [
         {
-          title: "All Listings",
-          url: "/dashboard/all-listings",
+          title: "All Tours",
+          url: "/dashboard/all-tours",
         },
       ],
     },
@@ -63,10 +72,14 @@ const routes = {
           url: "/dashboard/pending-bookings",
         },
         {
-          title: "All Bookings",
-          url: "/dashboard/all-bookings",
+          title: "My Bookings",
+          url: "/dashboard/guide-bookings",
         },
       ],
+    },
+    {
+      title: "Reviews",
+      url: "/dashboard/reviews",
     },
   ],
   tourist: [
@@ -75,34 +88,24 @@ const routes = {
       url: "/",
     },
     {
-      title: "Booking Management",
-      url: "#",
-      items: [
-        {
-          title: "All Bookings",
-          url: "/dashboard/all-bookings",
-        },
-        {
-          title: "Pending Bookings",
-          url: "/dashboard/pending-bookings",
-        },
-      ],
+      title: "My Bookings",
+      url: "/dashboard/my-bookings",
     },
     {
-      title: "My Trips",
+      title: "My Completed Tours",
       url: "/dashboard/my-trips",
+    },
+    {
+      title: "Reviews",
+      url: "/dashboard/reviews",
     },
     {
       title: "Wishlist",
       url: "/dashboard/wishlist",
     },
-    {
-      title: "Profile",
-      url: "/dashboard/profile",
-    },
   ],
 };
 
 export const roleBasedRoutes = ({ role }: { role: string }) => {
-  return routes[role as keyof typeof routes] || [];
+  return routes[role] || [];
 };

@@ -21,58 +21,47 @@ export const reviewApi = baseApi.injectEndpoints({
       invalidatesTags: ["review"],
     }),
     
-    deleteReview: builder.mutation({
-      query: (id) => ({
-        url: `/review/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["review"],
-    }),
+
     
     // Public routes - view reviews
     getTourReviews: builder.query({
-      query: ({ tourId, page = 1, limit = 10 }) => ({
+      query: ({ tourId, cursor, limit = 10 }) => ({
         url: `/review/tour/${tourId}`,
         method: "GET",
-        params: { page, limit },
+        params: { cursor, limit },
       }),
+      transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
     getGuideReviews: builder.query({
-      query: ({ guideId, page = 1, limit = 10 }) => ({
+      query: ({ guideId, cursor, limit = 10 }) => ({
         url: `/review/guide/${guideId}`,
         method: "GET",
-        params: { page, limit },
+        params: { cursor, limit },
       }),
+      transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
     getUserReviews: builder.query({
-      query: ({ userId, page = 1, limit = 10 }) => ({
+      query: ({ userId, cursor, limit = 10 }) => ({
         url: `/review/user/${userId}`,
         method: "GET",
-        params: { page, limit },
+        params: { cursor, limit },
       }),
+      transformResponse: (response: any) => response.data,
       providesTags: ["review"],
     }),
     
-    // Admin routes
-    getAllReviews: builder.query({
-      query: ({ page = 1, limit = 20 }) => ({
-        url: "/review/admin/all",
+
+    getLatestReviews: builder.query({
+      query: (params: { limit?: number } | void) => ({
+        url: "/review/latest",
         method: "GET",
-        params: { page, limit },
       }),
+      transformResponse: (response: any) => response.data,
       providesTags: ["review"],
-    }),
-    
-    adminDeleteReview: builder.mutation({
-      query: (id) => ({
-        url: `/review/admin/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["review"],
     }),
   }),
 });
@@ -80,10 +69,8 @@ export const reviewApi = baseApi.injectEndpoints({
 export const {
   useCreateReviewMutation,
   useUpdateReviewMutation,
-  useDeleteReviewMutation,
   useGetTourReviewsQuery,
   useGetGuideReviewsQuery,
   useGetUserReviewsQuery,
-  useGetAllReviewsQuery,
-  useAdminDeleteReviewMutation,
+  useGetLatestReviewsQuery,
 } = reviewApi;

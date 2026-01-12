@@ -1,154 +1,210 @@
 "use client";
+import React, { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import {
-  Navbar,
-  NavBody,
-  NavItems,
-  MobileNav,
-  NavbarLogo,
-  NavbarButton,
-  MobileNavHeader,
-  MobileNavToggle,
-  MobileNavMenu,
-} from "@/components/ui/resizable-navbar";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { authApi, useGetMeQuery, useLogoutMutation } from "@/redux/features/auth/auth.api";
+  authApi,
+  useGetMeQuery,
+  useLogoutMutation,
+} from "@/redux/features/auth/auth.api";
 import { useAppDispatch } from "@/redux/hooks";
+import { ArrowUpRight, Menu, X, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export function NavbarDemo() {
   const { data: meData } = useGetMeQuery(undefined);
   const me = meData as any;
-  
-  // Role-based navigation items
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout(undefined).unwrap();
+      dispatch(authApi.util.resetApiState());
+      router.push("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  // Role-based navigation items (excluding auth actions)
   const getNavItems = () => {
     if (!me) {
-      // Logged out navigation
       return [
         { name: "Home", link: "/" },
         { name: "Explore Tours", link: "/explore-tours" },
         { name: "Become a Guide", link: "/register/guide" },
-        { name: "Login", link: "/login" },
-        { name: "Register", link: "/register/tourist" },
       ];
     }
 
-    // Role-specific items
+    const authUserOnly = [
+      { name: "Profile", link: "/profile" },
+      { name: "Chat", link: "/chat" },
+    ];
+
     switch (me.role?.toLowerCase()) {
-      case 'tourist':
+      case "tourist":
         return [
           { name: "Home", link: "/" },
-          { name: "Explore Tours", link: "/explore-tours" },
-          { name: "My Bookings", link: "/dashboard/all-bookings" },
-          { name: "Profile", link: "/dashboard/profile" },
-          { name: "Logout", link: "#", isAction: true },
+          { name: "Explore", link: "/explore-tours" },
+          { name: "My Bookings", link: "/dashboard/my-bookings" },
+          ...authUserOnly,
         ];
-      case 'guide':
+      case "guide":
         return [
           { name: "Home", link: "/" },
           { name: "Explore Tours", link: "/explore-tours" },
           { name: "Dashboard", link: "/dashboard" },
-          { name: "Profile", link: "/dashboard/profile" },
-          { name: "Logout", link: "#", isAction: true },
+          ...authUserOnly,
         ];
-      case 'admin':
+      case "admin":
         return [
           { name: "Home", link: "/" },
-          { name: "Admin Dashboard", link: "/dashboard" },
-          { name: "Manage Users", link: "/dashboard/all-users" },
-          { name: "Manage Listings", link: "/dashboard/listings" },
-          { name: "Profile", link: "/dashboard/profile" },
-          { name: "Logout", link: "#", isAction: true },
+          { name: "Explore Tours", link: "/explore-tours" },
+          { name: "Dashboard", link: "/dashboard" },
+          ...authUserOnly,
         ];
       default:
         return [
           { name: "Home", link: "/" },
-          { name: "Explore Tours", link: "/explore-tours" },
+          { name: "Explore", link: "/explore-tours" },
         ];
     }
   };
 
   const navItems = getNavItems();
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const [logout] = useLogoutMutation();
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    await logout(undefined);
-    dispatch(authApi.util.resetApiState());
-    router.push('/');
-  };
-
-  const handleNavClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    link: string,
-    isAction?: boolean
-  ) => {
-    e.preventDefault();
-
-    // Handle logout action - check if link is "#" or if isAction flag is set
-    if ((isAction || link === "#") && me) {
-      handleLogout();
-      setIsMobileMenuOpen(false);
-      return;
-    }
-
-    if (link.startsWith("/")) {
-      router.push(link);
-      setIsMobileMenuOpen(false);
-      return;
-    }
-
-    const targetId = link.substring(1);
-    const targetElement = document.getElementById(targetId);
-
-    if (targetElement) {
-      targetElement.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-    setIsMobileMenuOpen(false);
-  };
-
   return (
-    <div className="relative w-full">
-      <Navbar>
-        {/* Desktop Navigation */}
-        <NavBody>
-          <NavbarLogo />
-          <NavItems items={navItems} onItemClick={handleNavClick} />
-        </NavBody>
+    <header
+      className={cn(
+        "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 w-full"
+      )}
+    >
+      <div className="max-w-[1440px] mx-auto flex items-center justify-between px-6 py-4 md:py-6">
+        {/* Left: Logo */}
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="flex items-center bg-white px-3 py-1.5 rounded-lg shadow-sm">
+            <span className="text-2xl sm:text-2xl font-black tracking-tight">
+              <span className="text-black">Local</span>
+              <span className="text-[#4088FD]">Lens</span>
+            </span>
+            <div className="w-2 h-2 bg-[#4088FD] rounded-full ml-1 group-hover:scale-150 transition-transform"></div>
+          </div>
+        </Link>
 
-        {/* Mobile Navigation */}
-        <MobileNav>
-          <MobileNavHeader>
-            <NavbarLogo />
-            <MobileNavToggle
-              isOpen={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            />
-          </MobileNavHeader>
-
-          <MobileNavMenu
-            isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
-          >
-            {navItems.map((item, idx) => (
-              <a
-                key={`mobile-link-${idx}`}
+        {/* Middle: Navigation Routes */}
+        <div
+          className={cn(
+            "hidden lg:flex items-center backdrop-blur-md p-1 rounded-full border border-white/20 transition-all duration-300",
+            isScrolled ? "bg-[#4088FD]" : "bg-black/50"
+          )}
+        >
+          {navItems.map((item) => {
+            const isActive = pathname === item.link;
+            return (
+              <Link
+                key={item.link}
                 href={item.link}
-                onClick={(e) => handleNavClick(e, item.link, (item as any).isAction)}
-                className="relative text-white"
+                className={cn(
+                  "px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2",
+                  isActive
+                    ? "bg-white text-black shadow-lg"
+                    : "text-white hover:bg-white/10"
+                )}
               >
-                <span className="block">{item.name}</span>
-              </a>
-            ))}
-          </MobileNavMenu>
-        </MobileNav>
-      </Navbar>
-    </div>
+                {item.name}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Right: Login/Register (Styled like 'Plan Your Trip') */}
+        <div className="hidden md:block">
+          {!me ? (
+            <Link
+              href="/login"
+              className=" rounded-full flex items-center gap-2 font-medium text-base transition-all duration-200 group "
+            >
+              <span className="border bg-white border-blue/20 px-4 py-1.5 rounded-full">
+                Login
+              </span>
+              <div className="bg-[#4088FD] w-8 h-8 rounded-full flex items-center justify-center text-white group-hover:rotate-45 duration-200 transition-transform">
+                <ArrowUpRight size={18} strokeWidth={3} />
+              </div>
+            </Link>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="rounded-full flex items-center gap-2 font-medium text-base transition-all duration-200 group"
+            >
+              <span className="border bg-white border-blue/20 px-4 py-1.5 rounded-full">
+                Logout
+              </span>
+              <div className="bg-[#fc5151] w-8 h-8 rounded-full flex items-center justify-center text-white group-hover:rotate-45 duration-200 transition-transform">
+                <ArrowUpRight size={22} strokeWidth={3} />
+              </div>
+            </button>
+          )}
+        </div>
+
+        {/* Mobile Toggle */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="lg:hidden text-black p-2 rounded-full hover:bg-black/10 transition-colors"
+        >
+          {isMobileMenuOpen ? <X size={30} /> : <Menu size={30} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-[#4088FD] border-t border-white/10 p-6 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+          {navItems.map((item) => (
+            <Link
+              key={item.link}
+              href={item.link}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={cn(
+                "text-xl font-bold p-2 transition-all",
+                pathname === item.link
+                  ? "text-white translate-x-2"
+                  : "text-white/60 hover:text-white"
+              )}
+            >
+              {item.name}
+            </Link>
+          ))}
+          <div className="h-[1px] bg-white/10 my-2" />
+          {!me ? (
+            <Link
+              href="/login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="bg-white text-black py-4 rounded-2xl font-black text-center text-lg shadow-xl"
+            >
+              Login / Register
+            </Link>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="bg-white text-black py-4 rounded-2xl font-black text-center text-lg shadow-xl"
+            >
+              Logout
+            </button>
+          )}
+        </div>
+      )}
+    </header>
   );
 }

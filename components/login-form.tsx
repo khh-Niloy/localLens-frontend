@@ -42,10 +42,15 @@ export function LoginForm({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
+
+  const handleAutoLogin = async (email: string) => {
+    await onSubmit({ email, password: "password123" });
+  };
 
   const onSubmit = async (data: LoginSchema) => {
     try {
@@ -55,89 +60,143 @@ export function LoginForm({
         router.push("/");
       }
     } catch (error: any) {
-      toast.error(error.data?.message || "Login failed. Please check your credentials.");
+      toast.error(
+        error.data?.message || "Login failed. Please check your credentials."
+      );
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>
-            Enter your credentials to login
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  className="focus-visible:ring-[#1FB67A]"
-                  {...register("email")}
-                />
-              </Field>
-              {errors.email && (
-                <FieldDescription className="text-red-500">
-                  {errors.email.message}
-                </FieldDescription>
-              )}
-              <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    className="focus-visible:ring-[#1FB67A]"
-                    {...register("password")}
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <FieldDescription className="text-red-500">
-                    {errors.password.message}
-                  </FieldDescription>
+    <div className={cn("flex flex-col gap-8", className)} {...props}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <label
+              className="text-sm font-black text-gray-900 uppercase tracking-widest pl-1"
+              htmlFor="email"
+            >
+              Email
+            </label>
+            <div className="relative">
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                className="h-14 bg-gray-50 border-gray-100 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-[#4088FD] transition-all px-6 text-base font-medium"
+                {...register("email")}
+              />
+            </div>
+            {errors.email && (
+              <p className="text-red-500 text-xs font-bold pl-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center px-1">
+              <label
+                className="text-sm font-black text-gray-900 uppercase tracking-widest"
+                htmlFor="password"
+              >
+                Password
+              </label>
+              <a
+                href="#"
+                className="text-xs font-bold text-[#4088FD] hover:underline"
+              >
+                Forgot?
+              </a>
+            </div>
+            <div className="relative group">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                required
+                className="h-14 bg-gray-50 border-gray-100 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-[#4088FD] transition-all px-6 text-base font-medium"
+                {...register("password")}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-gray-900 transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
                 )}
-              </Field>
-              <Field>
-                <Button 
-                  type="submit" 
-                  disabled={isLoading}
-                  style={{ backgroundColor: '#1FB67A', color: 'white' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1dd489'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1FB67A'}
-                >
-                  {isLoading ? "Logging in..." : "Login"}
-                </Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account?{" "}
-                  <Link href="/register/tourist" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Sign up</Link>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-      <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Terms of Service</a>{" "}
-        and <a href="#" className="text-[#1FB67A] hover:text-[#1dd489] hover:underline transition-colors">Privacy Policy</a>.
-      </FieldDescription>
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-xs font-bold pl-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-6 pt-2">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full h-14 bg-[#4088FD] text-white rounded-2xl font-black text-base shadow-xl shadow-blue-500/25 hover:bg-blue-600 hover:translate-y-[-2px] transition-all active:scale-95 disabled:opacity-70"
+          >
+            {isLoading ? "Signing in..." : "Continue"}
+          </Button>
+
+          <p className="text-center text-sm font-bold text-gray-400">
+            New to LocalLens?{" "}
+            <Link
+              href="/register/tourist"
+              className="text-[#4088FD] hover:underline decoration-2 underline-offset-4"
+            >
+              Create account
+            </Link>
+          </p>
+
+          <div className="relative py-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-100"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase font-black text-gray-300">
+              <span className="bg-white px-4 tracking-[0.3em]">
+                Demo Access
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { name: "Tourist", email: "tourist1@bengali.com" },
+              { name: "Guide", email: "niloy.dev.101@gmail.com" },
+              { name: "Admin", email: "khhniloy0@gmail.com" },
+            ].map((demo) => (
+              <button
+                key={demo.name}
+                type="button"
+                onClick={() => handleAutoLogin(demo.email)}
+                className="py-3 px-2 border border-blue-50 bg-blue-50/30 text-[#4088FD] rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-[#4088FD] hover:text-white transition-all active:scale-95 shadow-sm"
+              >
+                {demo.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </form>
+
+      <p className="text-xs text-center text-gray-400 font-medium leading-relaxed max-w-[300px] mx-auto">
+        By continuing, you agree to our{" "}
+        <a href="#" className="underline">
+          Terms
+        </a>{" "}
+        and{" "}
+        <a href="#" className="underline">
+          Privacy Policy
+        </a>
+        .
+      </p>
     </div>
   );
 }

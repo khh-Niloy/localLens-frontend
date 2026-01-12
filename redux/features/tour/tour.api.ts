@@ -2,14 +2,36 @@ import { baseApi } from "@/redux/baseApi";
 
 export const tourApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Public routes
     getAllTours: builder.query({
       query: (params) => ({
         url: "/tour",
         method: "GET",
         params: params,
       }),
-      providesTags: ["tour"],
+      transformResponse: (res: any) => res.data,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
+    }),
+
+    getFeaturedTours: builder.query({
+      query: ({ cursor }) => ({
+        url: "/tour/featured",
+        method: "GET",
+        params: { cursor },
+      }),
+      transformResponse: (res: any) => res.data,
+      providesTags: (result) =>
+        result?.data
+          ? [
+              ...result.data.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
     }),
     
     searchTours: builder.query({
@@ -18,42 +40,44 @@ export const tourApi = baseApi.injectEndpoints({
         method: "GET",
         params: params,
       }),
-      providesTags: ["tour"],
+      transformResponse: (res: any) => res.data,
+      providesTags: (result) =>
+        result?.tours
+          ? [
+              ...result.tours.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
     }),
     
-    getTourBySlug: builder.query({
-      query: (slug) => ({
-        url: `/tour/${slug}`,
+    getTourById: builder.query({
+      query: (id) => ({
+        url: `/tour/${id}`,
         method: "GET",
       }),
-      providesTags: ["tour"],
+      transformResponse: (res: any) => res.data,
+      providesTags: (result, error, id) => [{ type: 'tour', id: id }],
     }),
     
-    // Protected routes for guides
     createTour: builder.mutation({
       query: (data) => ({
         url: "/tour",
         method: "POST",
         data: data,
       }),
-      invalidatesTags: ["tour"],
-    }),
-    
-    getTourById: builder.query({
-      query: (id) => ({
-        url: `/tour/details/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["tour"],
+      invalidatesTags: [{ type: 'tour', id: 'LIST' }],
     }),
     
     updateTour: builder.mutation({
-      query: ({ id, ...data }) => ({
-        url: `/tour/update/${id}`,
+      query: ({ id, data }) => ({
+        url: `/tour/${id}`,
         method: "PATCH",
         data: data,
       }),
-      invalidatesTags: ["tour"],
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'tour', id: 'LIST' },
+        { type: 'tour', id }
+      ],
     }),
     
     deleteTour: builder.mutation({
@@ -61,46 +85,78 @@ export const tourApi = baseApi.injectEndpoints({
         url: `/tour/delete/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["tour"],
+      invalidatesTags: (result, error, id) => [
+        { type: 'tour', id: 'LIST' },
+        { type: 'tour', id }
+      ],
     }),
     
-    // Universal my-tours endpoint (works for all roles)
-    getMyTours: builder.query({
-      query: () => ({
-        url: "/tour/my-tours",
-        method: "GET",
-      }),
-      providesTags: ["tour"],
-    }),
-    
-    // Helper endpoints
     getTourEnums: builder.query({
       query: () => ({
         url: "/tour/enums",
         method: "GET",
       }),
     }),
-    
+
+    getGuideMyTours: builder.query({
+      query: () => ({
+        url: "/tour/guide/my-tours",
+        method: "GET",
+      }),
+      transformResponse: (res: any) => res.data,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
+    }),
+
+    getTouristMyTours: builder.query({
+      query: () => ({
+        url: "/tour/tourist/my-tours",
+        method: "GET",
+      }),
+      transformResponse: (res: any) => res.data,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
+    }),
+
     // Admin routes
     getAllToursForAdmin: builder.query({
       query: () => ({
-        url: "/tour/admin/all",
+        url: "/tour/admin/all-tours",
         method: "GET",
       }),
-      providesTags: ["tour"],
+      transformResponse: (res: any) => res.data,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ _id }: any) => ({ type: 'tour' as const, id: _id })),
+              { type: 'tour', id: 'LIST' },
+            ]
+          : [{ type: 'tour', id: 'LIST' }],
     }),
+    
   }),
 });
 
 export const {
   useGetAllToursQuery,
+  useGetFeaturedToursQuery,
   useSearchToursQuery,
-  useGetTourBySlugQuery,
   useGetTourByIdQuery,
   useCreateTourMutation,
   useUpdateTourMutation,
   useDeleteTourMutation,
-  useGetMyToursQuery,
-  useGetAllToursForAdminQuery,
+  useGetGuideMyToursQuery,
+  useGetTouristMyToursQuery,
   useGetTourEnumsQuery,
+  useGetAllToursForAdminQuery,
 } = tourApi;
