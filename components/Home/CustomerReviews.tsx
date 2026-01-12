@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function CustomerReviews() {
   const [activeIndex, setActiveIndex] = useState(0);
   const { data: reviews = [], isLoading } = useGetLatestReviewsQuery();
-  console.log(reviews);
+  // console.log(reviews);
 
   // Map backend data to local structure
   const formattedReviews = reviews.map((r: any) => ({
@@ -31,14 +31,18 @@ export default function CustomerReviews() {
 
   const prevReview = () => {
     if (formattedReviews.length === 0) return;
-    setActiveIndex((prev) => (prev - 1 + formattedReviews.length) % formattedReviews.length);
+    setActiveIndex(
+      (prev) => (prev - 1 + formattedReviews.length) % formattedReviews.length
+    );
   };
 
   if (isLoading) {
     return (
       <div className="py-24 flex flex-col items-center justify-center bg-[#F8FAFC]">
         <Loader2 className="w-12 h-12 text-[#4088FD] animate-spin mb-4" />
-        <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Loading Explorer Stories...</p>
+        <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">
+          Loading Explorer Stories...
+        </p>
       </div>
     );
   }
@@ -48,7 +52,7 @@ export default function CustomerReviews() {
   }
 
   const activeReview = formattedReviews[activeIndex];
-  console.log(activeReview);
+  // console.log(activeReview);
 
   return (
     <section className="py-20 sm:py-24 md:py-28 lg:py-32 bg-[#F8FAFC] relative overflow-hidden">
@@ -60,7 +64,7 @@ export default function CustomerReviews() {
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="text-center mb-16">
-          <motion.h4 
+          <motion.h4
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -68,7 +72,7 @@ export default function CustomerReviews() {
           >
             Testimonials
           </motion.h4>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -84,30 +88,37 @@ export default function CustomerReviews() {
             {/* Image Gallery Side */}
             <div className="lg:col-span-5 hidden lg:block">
               <div className="relative">
-                <motion.div 
+                <motion.div
                   key={activeIndex}
                   initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
                   animate={{ opacity: 1, scale: 1, rotate: 0 }}
                   transition={{ duration: 0.5 }}
                   className="relative z-10 w-full aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white"
                 >
-                  <img 
-                    src={activeReview.image} 
+                  <img
+                    src={activeReview.image}
                     alt={activeReview.name}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-blue-500/10 mix-blend-multiply" />
                 </motion.div>
-                
+
                 {/* Decorative dots/shapes */}
                 <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#4088FD]/10 rounded-full blur-xl" />
                 <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-500/10 rounded-full blur-xl" />
-                
+
                 <div className="absolute -right-4 bottom-12 bg-white p-4 rounded-2xl shadow-xl border border-gray-50 z-20">
-                   <div className="flex gap-1">
-                     {[...Array(activeReview.rating)].map((_, i) => <Star key={i} className="w-3 h-3 text-amber-400 fill-current" />)}
-                   </div>
-                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">100% Verified</p>
+                  <div className="flex gap-1">
+                    {[...Array(activeReview.rating)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="w-3 h-3 text-amber-400 fill-current"
+                      />
+                    ))}
+                  </div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
+                    100% Verified
+                  </p>
                 </div>
               </div>
             </div>
@@ -116,16 +127,20 @@ export default function CustomerReviews() {
             <div className="lg:col-span-7">
               <div className="bg-white p-10 sm:p-16 rounded-[3.5rem] shadow-xl shadow-blue-500/5 relative border border-gray-50">
                 <Quote className="absolute top-10 right-10 w-16 h-16 text-blue-50/50" />
-                
+
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-8 lg:hidden">
-                    <img 
-                      src={activeReview.image} 
+                    <img
+                      src={activeReview.image}
                       className="w-16 h-16 rounded-2xl object-cover shadow-lg"
                     />
                     <div>
-                      <h4 className="font-black text-gray-900">{activeReview.name}</h4>
-                      <p className="text-xs text-[#4088FD] font-bold uppercase tracking-widest">{activeReview.role}</p>
+                      <h4 className="font-black text-gray-900">
+                        {activeReview.name}
+                      </h4>
+                      <p className="text-xs text-[#4088FD] font-bold uppercase tracking-widest">
+                        {activeReview.role}
+                      </p>
                     </div>
                   </div>
 
@@ -138,45 +153,59 @@ export default function CustomerReviews() {
                     <p className="text-xl sm:text-2xl font-bold text-gray-800 leading-relaxed italic mb-10">
                       "{activeReview.content}"
                     </p>
-                    
+
                     <div className="hidden lg:block mb-10">
-                      <h4 className="text-2xl font-black text-gray-900 mb-1">{activeReview.name}</h4>
-                      <p className="text-sm text-[#4088FD] font-bold uppercase tracking-[0.2em]">{activeReview.role}</p>
+                      <h4 className="text-2xl font-black text-gray-900 mb-1">
+                        {activeReview.name}
+                      </h4>
+                      <p className="text-sm text-[#4088FD] font-bold uppercase tracking-[0.2em]">
+                        {activeReview.role}
+                      </p>
                       <p className="text-xs text-gray-400 font-bold mt-1 flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-current text-amber-400" /> 
+                        <Star className="w-3 h-3 fill-current text-amber-400" />
                         {activeReview.location}
                       </p>
 
                       <h1>{activeReview.title}</h1>
 
-                      <p className="text-sm text-gray-600 font-bold mt-1 flex items-center gap-1">Tour was {activeReview.tourTitle}</p>
-                      <button className="bg-[#4088FD] text-white px-4 py-2 rounded-2xl hover:bg-[#4088FD]/80 transition-all active:scale-95 mt-4">
-                        <Link href={`/tour/${activeReview.tourId}`}>See tour details</Link>
-                      </button>
+                      <p className="text-sm text-gray-600 font-bold mt-1 flex items-center gap-1">
+                        Tour was {activeReview.tourTitle}
+                      </p>
+                      <Link href={`/tours/${activeReview.tourId}`}>
+                        <button className="bg-[#4088FD] text-white px-4 py-2 rounded-2xl hover:bg-[#4088FD]/80 transition-all active:scale-95 mt-4 cursor-pointer">
+                          See tour details
+                        </button>
+                      </Link>
                     </div>
                   </motion.div>
 
                   <div className="flex items-center gap-6">
                     <div className="flex gap-3">
-                      <button 
+                      <button
                         onClick={prevReview}
                         className="w-14 h-14 rounded-2xl border border-gray-100 flex items-center justify-center hover:bg-[#4088FD] hover:text-white transition-all shadow-sm active:scale-95"
                       >
                         <ChevronLeft className="w-6 h-6" />
                       </button>
-                      <button 
+                      <button
                         onClick={nextReview}
                         className="w-14 h-14 rounded-2xl bg-gray-900 border border-gray-900 text-white flex items-center justify-center hover:bg-[#4088FD] hover:border-[#4088FD] transition-all shadow-xl shadow-gray-900/10 active:scale-95"
                       >
                         <ChevronRight className="w-6 h-6" />
                       </button>
                     </div>
-                    
+
                     <div className="flex-1 h-px bg-gray-100" />
-                    
+
                     <div className="text-right">
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Story</p>
-                      <p className="text-lg font-black text-gray-900">0{activeIndex + 1} <span className="text-gray-200">/</span> 0{formattedReviews.length}</p>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        Story
+                      </p>
+                      <p className="text-lg font-black text-gray-900">
+                        0{activeIndex + 1}{" "}
+                        <span className="text-gray-200">/</span> 0
+                        {formattedReviews.length}
+                      </p>
                     </div>
                   </div>
                 </div>

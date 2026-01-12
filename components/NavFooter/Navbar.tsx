@@ -1,7 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { authApi, useGetMeQuery, useLogoutMutation } from "@/redux/features/auth/auth.api";
+import {
+  authApi,
+  useGetMeQuery,
+  useLogoutMutation,
+} from "@/redux/features/auth/auth.api";
 import { useAppDispatch } from "@/redux/hooks";
 import { ArrowUpRight, Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -45,27 +49,32 @@ export function NavbarDemo() {
       ];
     }
 
+    const authUserOnly = [
+      { name: "Profile", link: "/profile" },
+      { name: "Chat", link: "/chat" },
+    ];
+
     switch (me.role?.toLowerCase()) {
       case "tourist":
         return [
           { name: "Home", link: "/" },
           { name: "Explore", link: "/explore-tours" },
           { name: "My Bookings", link: "/dashboard/my-bookings" },
-          { name: "Profile", link: "/profile" },
+          ...authUserOnly,
         ];
       case "guide":
         return [
           { name: "Home", link: "/" },
           { name: "Explore Tours", link: "/explore-tours" },
           { name: "Dashboard", link: "/dashboard" },
-          { name: "Profile", link: "/profile" },
+          ...authUserOnly,
         ];
       case "admin":
         return [
           { name: "Home", link: "/" },
           { name: "Explore Tours", link: "/explore-tours" },
           { name: "Dashboard", link: "/dashboard" },
-          { name: "Profile", link: "/profile" },
+          ...authUserOnly,
         ];
       default:
         return [
@@ -80,10 +89,10 @@ export function NavbarDemo() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 w-full"      )}
+        "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 w-full"
+      )}
     >
       <div className="max-w-[1440px] mx-auto flex items-center justify-between px-6 py-4 md:py-6">
-        
         {/* Left: Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="flex items-center bg-white px-3 py-1.5 rounded-lg shadow-sm">
@@ -96,10 +105,12 @@ export function NavbarDemo() {
         </Link>
 
         {/* Middle: Navigation Routes */}
-        <div className={cn(
-          "hidden lg:flex items-center backdrop-blur-md p-1 rounded-full border border-white/20 transition-all duration-300",
-          isScrolled ? "bg-[#4088FD]" : "bg-black/50"
-        )}>
+        <div
+          className={cn(
+            "hidden lg:flex items-center backdrop-blur-md p-1 rounded-full border border-white/20 transition-all duration-300",
+            isScrolled ? "bg-[#4088FD]" : "bg-black/50"
+          )}
+        >
           {navItems.map((item) => {
             const isActive = pathname === item.link;
             return (
@@ -126,18 +137,21 @@ export function NavbarDemo() {
               href="/login"
               className=" rounded-full flex items-center gap-2 font-medium text-base transition-all duration-200 group "
             >
-              <span className="border bg-white border-blue/20 px-4 py-1.5 rounded-full">Login</span>
+              <span className="border bg-white border-blue/20 px-4 py-1.5 rounded-full">
+                Login
+              </span>
               <div className="bg-[#4088FD] w-8 h-8 rounded-full flex items-center justify-center text-white group-hover:rotate-45 duration-200 transition-transform">
                 <ArrowUpRight size={18} strokeWidth={3} />
               </div>
             </Link>
           ) : (
-
             <button
               onClick={handleLogout}
               className="rounded-full flex items-center gap-2 font-medium text-base transition-all duration-200 group"
             >
-              <span className="border bg-white border-blue/20 px-4 py-1.5 rounded-full">Logout</span>
+              <span className="border bg-white border-blue/20 px-4 py-1.5 rounded-full">
+                Logout
+              </span>
               <div className="bg-[#fc5151] w-8 h-8 rounded-full flex items-center justify-center text-white group-hover:rotate-45 duration-200 transition-transform">
                 <ArrowUpRight size={22} strokeWidth={3} />
               </div>
@@ -164,7 +178,9 @@ export function NavbarDemo() {
               onClick={() => setIsMobileMenuOpen(false)}
               className={cn(
                 "text-xl font-bold p-2 transition-all",
-                pathname === item.link ? "text-white translate-x-2" : "text-white/60 hover:text-white"
+                pathname === item.link
+                  ? "text-white translate-x-2"
+                  : "text-white/60 hover:text-white"
               )}
             >
               {item.name}
@@ -192,4 +208,3 @@ export function NavbarDemo() {
     </header>
   );
 }
-
