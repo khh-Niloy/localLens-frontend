@@ -28,7 +28,6 @@ LocalLens Frontend is a Next.js application that provides a comprehensive user i
 
 ### **Frontend Framework**
 - **Next.js 16.0.8** - React framework with App Router
-- **React 19.2.1** - UI library
 - **TypeScript 5.x** - Type safety
 
 ### **State Management**
